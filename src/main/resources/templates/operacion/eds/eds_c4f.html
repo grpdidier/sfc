@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+<!--/*/ <th:block th:include="fragments/headerinc :: head"></th:block> /*/-->
+
+</head>
+<body style="overflow-y: auto">
+	
+		<div id="container" >
+			<div id="actionbar" class="row">
+				<div class="col-md-12 mb-3 tituloPrincipal2" align="center" >VENTA DE COMBUSTIBLE - FACTURA ELECTRONICA<br/></div>
+			</div>
+			<form id="form" th:object="${entidad}" th:action="@{/combustibles/q}" method="Post">
+				<div id="informacion" class="container_v3" >
+					<input type="hidden" th:field="${entidad.dato}" id="idDato"/>
+					<br></br>
+					<div class="container_v4" align="center">
+						<div class="row">
+							<div class="col-md-2 mb-3"> </div>
+							<div class="col-md-3 mb-3" align="right"><b class="titleMain11pt"> Ingrese el valor total en Soles:</b></div>
+							<div class="col-md-4 mb-3" align="left" > 
+								<p id="idValorProducto" class="titleMain30pt" >0.00</p>
+							</div>
+							<div class="col-md-3 mb-3"> </div>
+						</div>	
+						<div class="row">
+							<div class="col-md-4 mb-3"> </div>
+							<div class="col-md-4 mb-3" align="center"> 
+								<div class="row">
+			  						<div class="col-md-4 mb-3"> 
+			  							<button type="button" class="btn btn-primary btn-lg btn-block" onclick="jsAsignarNumero('7');">7</button>
+			  						</div>
+			  						<div class="col-md-4 mb-3"> 
+			  							<button type="button" class="btn btn-primary btn-lg btn-block" onclick="jsAsignarNumero('8');">8</button>
+			  						</div>
+			  						<div class="col-md-4 mb-3"> 
+			  							<button type="button" class="btn btn-primary btn-lg btn-block" onclick="jsAsignarNumero('9');">9</button>
+			  						</div>
+			  					</div>
+			  					<div class="row">
+			  						<div class="col-md-4 mb-3"> 
+			  							<button type="button" class="btn btn-primary btn-lg btn-block" onclick="jsAsignarNumero('4');">4</button>
+			  						</div>
+			  						<div class="col-md-4 mb-3"> 
+			  							<button type="button" class="btn btn-primary btn-lg btn-block" onclick="jsAsignarNumero('5');">5</button>
+			  						</div>
+			  						<div class="col-md-4 mb-3"> 
+			  							<button type="button" class="btn btn-primary btn-lg btn-block" onclick="jsAsignarNumero('6');">6</button>
+			  						</div>
+			  					</div>
+			  					<div class="row">
+			  						<div class="col-md-4 mb-3"> 
+			  							<button type="button" class="btn btn-primary btn-lg btn-block" onclick="jsAsignarNumero('1');">1</button>
+			  						</div>
+			  						<div class="col-md-4 mb-3"> 
+			  							<button type="button" class="btn btn-primary btn-lg btn-block" onclick="jsAsignarNumero('2');">2</button>
+			  						</div>
+			  						<div class="col-md-4 mb-3"> 
+			  							<button type="button" class="btn btn-primary btn-lg btn-block" onclick="jsAsignarNumero('3');">3</button>
+			  						</div>
+			  					</div>
+			  					<div class="row">
+			  						<div class="col-md-4 mb-3"> 
+			  							<button type="button" class="btn btn-primary btn-lg btn-block" onclick="jsAsignarNumero('B');">B</button>
+			  						</div>
+			  						<div class="col-md-4 mb-3"> 
+			  							<button type="button" class="btn btn-primary btn-lg btn-block" onclick="jsAsignarNumero('0');">0</button>
+			  						</div>
+			  						<div class="col-md-4 mb-3"> 
+			  							<button type="button" class="btn btn-primary btn-lg btn-block" onclick="jsAsignarNumero('.');">.</button>
+			  						</div>
+			  					</div>
+							</div>
+							<div class="col-md-4 mb-3"> </div>
+						</div>	
+						
+						<div class="row">
+							<div class="col-md-3 mb-3"> </div>
+							
+			  				<div class="col-md-6 mb-3" align="center">
+			  					<button type="button" class="btn btn-primary btn-lg btn-block" onclick="jsObtenerCliente();">&nbsp;&nbsp;&nbsp;Continuar</button>
+								
+			  				</div>
+			  				<div class="col-md-3 mb-3">
+			  					
+			  				</div>
+			  			</div>
+						<div class="row">
+			  				<div class="col-md-12 mb-3">
+			  					<p style="color: red" th:text="${respuesta}" />
+			  				</div>
+			  			</div>
+			  			<div class="row">
+			  				<div class="col-md-4 mb-3"> </div>
+			  				<div class="col-md-4 mb-3">
+			  					<button type="button" class="btn btn-success btn-lg btn-block" onclick="jsMostrarRegresarProducto();"><img th:src="@{/images/iconos/regresar2.png}"	alt="Regresar" width="80px"/>&nbsp;&nbsp;&nbsp;Regresar</button>
+			  				</div>
+			  				<div class="col-md-4 mb-3"> </div>
+			  			</div>
+			  		</div>
+					
+				</div>
+			</form>
+			
+		</div>
+	
+
+</body>
+</html>

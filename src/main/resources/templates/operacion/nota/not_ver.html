@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+<!--/*/ <th:block th:include="fragments/headerinc :: head"></th:block> /*/-->
+</head>
+<body>
+	<!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+	<main>
+		<div id="container">	
+			<div id="actionbar" class="row">
+				<div class="col-md-4 mb-3">
+					<a href="#" th:href="@{/operacion/notas}"><img th:src="@{/images/iconos/regresar.png}" alt="Regresar" /></a>
+				</div>
+				<div class="col-md-8 mb-3 tituloPrincipal" align="left" ><br/> M&oacute;dulo de Nota - Ver</div>
+			</div>
+			
+			<form id="form" th:object="${filtro}" th:action="@{/operacion/notas/ver/actualizar}" method="post">
+				
+				<div id="informacion" class="container_v3">
+					<fieldset class="scheduler-border">
+						<legend class="scheduler-border title10pt">Datos del Facturador</legend>
+							<div class="row">
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">Fecha de Cargue</label><br/>
+									<label th:text="${filtro.bandejaFacturadorNota.fechaCargue}" ></label>
+								</div>
+								
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">Fecha de Generaci&oacute;n</label>
+									<br/>
+									<label th:text="${filtro.bandejaFacturadorNota.fechaGeneracion}"></label>
+								</div>
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">Fecha de Envio</label><br/>
+									<label th:text="${filtro.bandejaFacturadorNota.fechaEnvio}"></label>
+								</div>
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">Tipo de Archivo</label><br/>
+									<label th:text="${filtro.bandejaFacturadorNota.tipoArchivo}"></label>
+								</div>
+								<div class="col-md-2 mb-0" style="color:red">
+									<label for="idNombre" class="textBold9pt">Estado</label><br/>
+									<div th:replace="fragments/util :: estadoFactura(tipo=${filtro.bandejaFacturadorNota.situacion})"></div>
+								</div>
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">Doc</label><br/>
+									<div th:if="${filtro.bandejaFacturadorNota.situacion == '03'}">
+										<a	th:href="${'/operacion/notas/pdf/' + filtro.nota.codigoComprobante}">
+											<img th:src="@{/images/iconos/doc_pdf.png}" alt="pdf" width="35px"/>
+										</a>
+									</div>
+									
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-6 mb-0">
+									<label for="idNombre" class="textBold9pt">Nombre del Archivo</label><br/>
+									<label th:text="${filtro.bandejaFacturadorNota.nombreArchivo}"></label>
+								</div>
+								<div class="col-md-6 mb-0">
+									<label for="idNombre" class="textBold9pt">Observaci&oacute;n</label><br/>
+									<label th:text="${filtro.bandejaFacturadorNota.observacion}"></label>
+								</div>
+							</div>
+					</fieldset>
+					<div class="container_v4" align="center">
+						<div class="row">
+							<div class="col-md-3 mb-3"></div>
+							
+			  				<div class="col-md-6 mb-3">
+			  					<br/>
+			  					<button class="btn btn-success" type="submit" onclick="">Actualizar</button>
+			  				</div>
+			  				<div class="col-md-3 mb-3"></div>
+			  			</div>
+			  		</div>
+			  		<fieldset class="scheduler-border">
+						<legend class="scheduler-border title10pt">Datos del Comprobante Relacionado</legend>
+							<div class="row">
+								<div class="col-md-3 mb-0">
+									<label for="idNombre" class="textBold9pt">Tipo de Comprobante</label>
+									<label> 
+										<input type="hidden" th:field="${filtro.nota.tblComprobante.tipoComprobante}"/>
+										<input type="hidden" th:field="${filtro.nota.tblComprobante.codigoComprobante}"/>
+										<select th:field="${filtro.nota.tblComprobante.tipoComprobante}" class="form-control_v2 " disabled="disabled">
+											<option value="">--Seleccionar--</option>
+											<option th:each="entry : ${session.SessionMapTipoComprobante}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+										</select>
+									</label>
+								</div>
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">Moneda</label>
+									<label> 
+										<input type="hidden" th:field="${filtro.nota.tblComprobante.moneda}"/>
+										<select th:field="${filtro.nota.tblComprobante.moneda}" class="form-control_v2 " disabled="disabled">
+											<option value="">--Seleccionar--</option>
+											<option th:each="entry : ${session.SessionMapTipoMoneda}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+										</select>
+									</label>
+								</div>
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">Serie</label>
+									<input type="text" class="form-control_v2 " placeholder="serie" th:field="${filtro.nota.tblComprobante.serie}" readonly="readonly" maxlength="4"/>
+								</div>
+								
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">N&uacute;mero Comprobante</label>
+									<input type="text" class="form-control_v2 " placeholder="numero" th:field="${filtro.nota.tblComprobante.numero}" readonly="readonly" maxlength="8"/>
+								</div>
+								<div class="col-md-1 mb-0" align="left">
+									<br/>
+									<button class="btn btn-info" >...</button>
+								</div>
+								<div class="col-md-2 mb-0">
+									
+								</div>
+							</div>
+							
+					</fieldset>
+					<fieldset class="scheduler-border">
+						<legend class="scheduler-border title10pt">Datos de la Nota</legend>
+							<div class="row">
+								<div class="col-md-3 mb-0">
+									<label for="idNombre" class="textBold9pt">Tipo de Comprobante</label>
+									<label> 
+										<select th:field="${filtro.nota.tipoComprobante}" class="form-control_v2 " disabled="disabled">
+											<option value="">--Seleccionar--</option>
+											<option th:each="entry : ${session.SessionMapTipoComprobante}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+										</select>
+									</label>
+								</div>
+								<div class="col-md-3 mb-0">
+									<label for="idNombre" class="textBold9pt">Tipo de Nota</label>
+									<div th:if="${filtro.nota.tipoComprobante == '07'}">
+										<label> 
+											<select th:field="${filtro.nota.tipoNota}" class="form-control_v2 " disabled="disabled">
+												<option value="">--Seleccionar--</option>
+												<option th:each="entry : ${session.SessionMapNotaCredito}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+											</select>
+										</label>
+									</div>
+									<div th:if="${filtro.nota.tipoComprobante == '08'}">
+										<label> 
+											<select th:field="${filtro.nota.tipoNota}" class="form-control_v2 " disabled="disabled">
+												<option value="">--Seleccionar--</option>
+												<option th:each="entry : ${session.SessionMapNotaDebito}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+											</select>
+										</label>
+									</div>
+								</div>
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">Serie</label>
+									<input type="text" class="form-control_v2 " placeholder="Serie" th:field="${filtro.nota.serie}"  maxlength="8" readonly="readonly"/>
+								</div>
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">N&uacute;mero Nota</label>
+									<input type="text" class="form-control_v2 " placeholder="Serie" th:field="${filtro.nota.numero}"  maxlength="16" readonly="readonly"/>
+								</div>
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">Fecha de Emisi&oacute;n</label>
+									<input type="text" class="form-control_v2 " placeholder="dd/MM/yyyy" th:field="${filtro.nota.fechaEmision}" readonly="readonly" />
+								</div>
+								
+							</div>
+							<div class="row">
+								<div class="col-md-12 mb-0">
+									<label for="idNombre" class="textBold9pt">Sustento Nota</label>
+									<input type="text" class="form-control_v2 " readonly="readonly" placeholder="Descripcion del Sustento de Nota" th:field="${filtro.nota.descripcionNota}"  maxlength="255"/>
+								</div>
+								
+							</div>
+					</fieldset>
+					<br></br>
+					
+					
+					<br></br>
+					<fieldset class="scheduler-border">
+						<legend class="scheduler-border title10pt">Datos del Cliente</legend>
+							<div class="row">
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">N&uacute;mero Documento</label>
+									<input type="text" class="form-control_v2" placeholder="numero" th:field="${filtro.nota.numeroDocumento}" readonly="readonly"/>
+								</div>
+								<div class="col-md-1 mb-0" align="left">
+									<br/>
+								</div>
+								<div class="col-md-3 mb-0">
+									<label for="idNombre" class="textBold9pt">Tipo Documento</label>
+									<label> 
+										<select th:field="${filtro.nota.tipoDocumento}" class="form-control_v2" disabled="disabled">
+											<option value="">--Seleccionar--</option>
+											<option th:each="entry : ${session.SessionMapTipoDocumento}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+										</select>
+									</label>
+								</div>
+								<div class="col-md-6 mb-0">
+									<label for="idNombre" class="textBold9pt">Nombre Apellido / Raz&oacute;n Social</label>
+									<input type="text" class="form-control_v2" placeholder="Nombre y Apellido / Razon Social" th:field="${filtro.nota.nombreCliente}" readonly="readonly" />
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-3 mb-0">
+									
+								</div>
+								<div class="col-md-9 mb-0">
+									<label for="idNombre" class="textBold9pt">Direcci&oacute;n</label>
+									<input type="text" class="form-control_v2 " placeholder="numero" th:field="${filtro.nota.direccionCliente}" readonly="readonly"/>
+								</div>
+								
+							</div>
+					</fieldset>
+					<br></br>
+					<div id="c_tablas" th:if="${not #lists.isEmpty(filtro.listaDetalleNota)}">	
+						<table id="t01" class="table   table-bordered table-active tabla_cabecera_general">
+							<tr>
+								<th>Descripci&oacute;n Producto</th>
+								<th>Precio Unitario</th>
+								<th>Cantidad</th>
+								<th>Precio Total</th>
+								<th>Descuento(%)</th>
+								<th>Precio Final</th>
+								<th>Val. Ref</th>
+							</tr>
+							<tr th:each="detalleComprobante : ${filtro.listaDetalleNota}"  class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
+								<td th:text="${detalleComprobante.descripcion}">descripcion</td>
+								<td th:text="${#numbers.formatDecimal(detalleComprobante.precioUnitario, 1, 'DEFAULT', 2, 'DEFAULT')}">precioUnitario</td>
+								<td th:text="${#numbers.formatDecimal(detalleComprobante.cantidad, 1, 'DEFAULT', 2, 'DEFAULT')}">cantidad</td>
+								<td th:text="${#numbers.formatDecimal(detalleComprobante.precioTotal, 1, 'DEFAULT', 2, 'DEFAULT')}">precioTotal</td>
+								<td th:text="${#numbers.formatDecimal(detalleComprobante.descuento, 1, 'DEFAULT', 2, 'DEFAULT')}">descuento</td>
+								<td th:text="${#numbers.formatDecimal(detalleComprobante.precioFinal, 1, 'DEFAULT', 2, 'DEFAULT')}">precioFinal</td>
+								<td th:text="${#numbers.formatDecimal(detalleComprobante.valorReferencia, 1, 'DEFAULT', 2, 'DEFAULT')}">referencia</td>
+								
+							</tr>
+						</table>
+					</div>
+					<div id="c_tablas" th:if="${#lists.isEmpty(filtro.listaDetalleNota)}">				
+						<table id="t01" class="table   table-bordered table-active tabla_cabecera_general">
+							<tr>
+								<th>Descripci&oacute;n Producto</th>
+								<th>Precio Unitario</th>
+								<th>Cantidad</th>
+								<th>Precio Total</th>
+								<th>Descuento(%)</th>
+								<th>Precio Final</th>
+								<th>Val. Ref</th>
+							</tr>
+							<tr class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
+								<td colspan="7" align="center">No se encontr&oacute; elementos</td>
+							</tr>
+						</table>
+					</div>
+					<br></br>
+					<fieldset class="scheduler-border">
+						<legend class="scheduler-border title10pt">Importes Totales</legend>
+							<div class="row">
+								<div class="col-md-1 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									
+								</div>
+								<div class="col-md-3 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									<label for="idNombre" class="textBold9pt">Total Operaciones Gravadas</label>
+									<input type="text" class="form-control_v2" placeholder="serie" th:field="${filtro.nota.totalOpGravada}" readonly="readonly"/>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-1 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									<label for="idNombre" class="textBold9pt">Total Otros Cargos</label>
+									<input type="text" class="form-control_v2" placeholder="numero" th:field="${filtro.nota.totalOtrosCargos}" readonly="readonly"/>
+									
+								</div>
+								<div class="col-md-3 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									<label for="idNombre" class="textBold9pt">Total Operaci&oacute;n Inafecta</label>
+									<input type="text" class="form-control_v2" placeholder="numero" th:field="${filtro.nota.totalOpInafecta}" readonly="readonly"/>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-1 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									
+									
+								</div>
+								<div class="col-md-3 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									<label for="idNombre" class="textBold9pt">Total Operaci&oacute;n Exonerada</label>
+									<input type="text" class="form-control_v2" placeholder="numero" th:field="${filtro.nota.totalOpExonerada}" readonly="readonly"/>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-1 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									<label for="idNombre" class="textBold9pt">Sumatoria ISC</label>
+									<input type="text" class="form-control_v2" placeholder="serie" th:field="${filtro.nota.sumatoriaIsc}" readonly="readonly"/>
+									
+								</div>
+								<div class="col-md-3 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									<label for="idNombre" class="textBold9pt">Sumatoria IGV</label>
+									<input type="text" class="form-control_v2" placeholder="numero" th:field="${filtro.nota.totalIgv}" readonly="readonly"/>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-1 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									 IGV (<label th:text="${filtro.nombreIGV}"></label>)<br/>
+									Servicio (<label th:text="${filtro.nombreServicio}"></label>)
+								</div>
+								<div class="col-md-3 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									<label for="idNombre" class="textBold9pt">Sumatoria Otros Tributos</label>
+									<input type="text" class="form-control_v2" placeholder="serie" th:field="${filtro.nota.sumatorioaOtrosTributos}" readonly="readonly"/>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-1 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									
+								</div>
+								<div class="col-md-3 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									<label for="idNombre" class="textBold9pt">Total Importe</label>
+									<input type="text" class="form-control_v2" placeholder="numero" th:field="${filtro.nota.totalImporte}" readonly="readonly"/>
+								</div>
+							</div>
+					</fieldset>
+					<br></br>
+					<fieldset class="scheduler-border">
+						<legend class="scheduler-border title10pt">Datos de Leyenda</legend>
+							
+							<div class="row">
+								<div class="col-md-6 mb-0">
+									<label for="idNombre" class="textBold9pt">C&oacute;digo</label>
+									<label> 
+										<select th:field="${filtro.leyendaSunat.codigoSunat}" class="form-control_v2 " disabled="disabled">
+											<option value="">--Seleccionar--</option>
+											<option th:each="entry : ${session.SessionMapTipoLeyenda}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+										</select>
+									</label>
+								</div>
+								<div class="col-md-6 mb-0">
+									<label for="idNombre" class="textBold9pt">Descripci&oacute;n</label>
+									<input type="text" class="form-control_v2 " placeholder="descripcion" th:field="${filtro.leyendaSunat.descripcionSunat}" readonly="readonly"/>
+								</div>
+								
+							</div>
+					</fieldset>
+			  	</div>
+			</form>
+
+		</div>
+	</main>
+	<nav id="nav" >
+		<!--/*/ <th:block th:include="fragments/util :: menu"></th:block> /*/-->
+	</nav>	
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+<!--/*/ <th:block th:include="fragments/headerinc :: head"></th:block> /*/-->
+</head>
+<body>
+	<!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+	<main>
+		<div id="container">	
+			<div id="actionbar" class="row">
+				<div class="col-md-4 mb-3">
+					<a href="#" th:href="@{/usuarios}"><img th:src="@{/images/iconos/regresar.png}" alt="Regresar" /></a>
+				</div>
+				<div class="col-md-8 mb-3 tituloPrincipal" align="left" ><br/> Mantenimiento de Usuario - Asignar Perfil</div>
+			</div>
+			
+			<form id="form" th:object="${usuario}" method="post">
+				<div id="informacion" class="container_v3">
+					<fieldset class="scheduler-border">
+						<legend class="scheduler-border title10pt">Datos del Usuario</legend>
+							<div class="row">
+								<div class="col-md-6 mb-3">
+									<label for="idNombre" class="textBold9pt">Nombre</label>
+									<label for="idNombre" class="form-control_v2 " th:text="${usuario.nombre}">Nombre</label>
+								</div>
+								<div class="col-md-6 mb-3">
+									<label for="idLogin" class="textBold9pt">Login</label>
+									<label for="idLogin" class="form-control_v2 " th:text="${usuario.login}">Nombre</label>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-6 mb-3">
+									<label for="idCorreo" class="textBold9pt">Correo Electr&oacute;nico</label>
+									<label for="idCorreo" class="form-control_v2 " th:text="${usuario.email}">Correo</label>
+								</div>
+								<div class="col-md-3 mb-3">
+									<label for="idNombre" class="textBold9pt">Tipo Caducidad</label>
+									<div
+										th:replace="fragments/util :: tipoCaducidadUsuario(tipo=${usuario.tipoCaducidad}, fecha=${usuario.fechaCaducidad})"></div>
+									
+								</div>
+								<div class="col-md-3 mb-3">
+									<label for="idNombre" class="textBold9pt">Estado Usuario</label>
+									<div
+										th:replace="fragments/util :: imagenEstado(estado=${usuario.estadoUsuario})"></div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-12 mb-3">
+									<label for="idObservacion" class="textBold9pt">Observaci&oacute;n</label>
+									<label for="idObservacion" class="form-control_v2 " th:text="${usuario.observacion}">Observacion</label>
+								</div>
+							</div>
+							
+							<div id="c_tablas" th:if="${not #lists.isEmpty(perfiles)}">				
+								<table id="t01" class="table   table-bordered table-active tabla_cabecera_general">
+									<tr>
+										<th align="center">Nombre Perfil</th>
+										<th>Estado</th>
+										<th>Descripci&oacute;n</th>
+										<th>Asociar/Desasociar</th>
+									</tr>
+									<tr th:each="perfil : ${perfiles}"  class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
+										<td th:text="${perfil.nombre}">nombre</td>
+										<td align="center">
+											<div
+												th:replace="fragments/util :: imagenEstado(estado=${perfil.estadoPerfil})"></div>
+										</td>
+										<td th:text="${perfil.descripcion}">descirpcion</td>
+										<td align="center">
+											
+											<div th:if="${usuario.tblPerfil} == null">
+												<a th:href="${'/usuario/perfil/asociar/'+ {usuario.codigoUsuario} + '/' + {perfil.codigoPerfil} }">
+													<img th:src="@{/images/iconos/perfil.png}" alt="Perfil" />
+												</a>
+											</div>
+											<div th:if="${usuario.tblPerfil} != null">
+												<a th:href="${'/usuario/perfil/asociar/'+ {usuario.codigoUsuario} + '/' + {perfil.codigoPerfil} }">
+													<img th:src="@{/images/iconos/perfil_2.png}" alt="Perfil" width="30px"/>
+												</a>
+											</div>
+												
+										</td>
+									</tr>
+								</table>
+							</div>
+							<div id="c_tablas" th:if="${ #lists.isEmpty(perfiles)}">				
+								<table id="t01" class="table   table-bordered table-active tabla_cabecera_general">
+									<tr>
+										<th>Nombre Perfil</th>
+										<th>Estado</th>
+										<th>Descripci&oacute;n</th>
+										<th>Asociar/Desasociar</th>
+									</tr>
+									<tr  class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
+										<td colspan="4" align="center">No se encontr&oacute; elementos</td>
+									</tr>
+								</table>
+							</div>
+							
+					</fieldset>
+					<br></br>
+					
+			  	</div>
+			</form>
+
+		</div>
+	</main>
+	<nav id="nav" >
+		<!--/*/ <th:block th:include="fragments/util :: menu"></th:block> /*/-->
+	</nav>	
+	
+	
+
+</body>
+</html>

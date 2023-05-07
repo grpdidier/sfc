@@ -1,0 +1,78 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<!--/*/ <th:block th:include="fragments/headerinc :: head"></th:block> /*/-->
+
+
+</head>
+<body class="myimage">
+
+<div align="center">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-3 mb-3">&nbsp;</div>
+			<div class="col-md-6 mb-3">
+				<div class="row">
+			        <div class="col-md-12 mb-3">
+			            <div class="account-wall">
+			            	<div class="row">
+		                		<div class="col-md-12 mb-3">
+		                			 <label class="titleMain11pt">Sistema de Gesti&oacute;n de Comprobantes</label>
+		                		</div>
+		                		
+			                </div>
+			                <div class="row">
+		                		<div class="col-md-12 mb-3">
+		                			 <img th:src="@{/images/iconos/user_02.png}" alt="Usuario" width="140px"></img>
+		                		</div>
+		                		
+			                </div>	
+			                <div class="row">
+								<div class="col-md-12 mb-3 mensajeError">
+								
+									<!-- Bad Credentials -->
+									<div th:if="${param.error}">Usuario o Clave invalido.</div>
+									<!-- Logout -->
+									<div th:if="${param.cerrar}">Sesion terminada.</div>
+								</div>
+							</div>
+			               <form id="form" role="form" action="/login" th:action="@{/login}" method="post">
+			                	<div class="row">
+			                		<div class="col-md-3 mb-3">&nbsp;</div>
+			                		<div class="col-md-6 mb-3">
+			                			<input type="text" class="form-control_v2 is-valid" placeholder="Login" name="login" id="login"	required="required" autofocus="autofocus" />
+			                		</div>
+			                		<div class="col-md-3 mb-3">&nbsp;</div>
+			                	</div>
+				                <div class="row">
+				                	<div class="col-md-3 mb-3">&nbsp;</div>
+			                		<div class="col-md-6 mb-3">
+			                			 <input type="password" class="form-control_v2 is-valid" placeholder="Clave" name="clave" id="clave"	required="required" />
+			                		</div>
+			                		<div class="col-md-3 mb-3">&nbsp;</div>
+			                	</div>
+			                	<div class="row" align="center">
+			                		<div class="col-md-3 mb-3">&nbsp;</div>
+			                		<div class="col-md-6 mb-3" align="center">
+			                			<button class="btn btn-success" type="submit">Ingresar al Sistema</button>
+			                		</div>
+			                		<div class="col-md-3 mb-3">&nbsp;</div>
+			                	</div>
+				                
+				                
+			                </form>
+			            </div>
+			            
+			        </div>
+			    </div>	
+			
+			</div>
+			<div class="col-md-3 mb-3">&nbsp;</div>
+		</div>
+	
+	    
+	</div>
+</div>	
+	
+</body>
+</html>

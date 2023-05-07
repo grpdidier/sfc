@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+<!--/*/ <th:block th:include="fragments/headerinc :: head"></th:block> /*/-->
+
+</head>
+<body>
+	
+		<div id="container">
+			<div id="actionbar" class="row">
+				<div class="col-md-12 mb-3 tituloPrincipal2" align="center" >VENTA DE COMBUSTIBLE</div>
+			</div>
+			<form id="form" th:object="${entidad}" th:action="@{/comprobante/q1}" method="Post">
+				<div id="informacion" class="container_v3">
+					
+					<br></br><br></br>
+					<div class="container_v4" align="center">
+						<div class="row">
+			  				<div class="col-md-12 mb-3">
+			  					<p style="color: red" th:text="${respuesta}" />
+			  				</div>
+			  			</div>
+						<div class="row">
+							<div class="col-md-3 mb-3"> </div>
+							<input type="hidden" th:field="${entidad.dato}" id="idDato"/>
+			  				<div class="col-md-6 mb-3">
+			  					<button type="button" class="btn btn-primary btn-lg btn-block" onclick="jsMostrarNuevoComprobante();"><img th:src="@{/images/iconos/credito.png}"	alt="Regresar" width="150px"/> &nbsp;&nbsp;&nbsp;Nuevo Comprobante</button>
+			  				</div>
+			  				<div class="col-md-3 mb-3"></div>
+			  			</div>
+						<div class="row">
+			  				<div class="col-md-12 mb-3">
+			  					<p style="color: red" th:text="${respuesta}" />
+			  				</div>
+			  			</div>
+			  		</div>
+					
+				</div>
+			</form>
+			
+		</div>
+	
+
+</body>
+</html>

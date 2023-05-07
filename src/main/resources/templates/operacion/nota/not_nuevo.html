@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+<!--/*/ <th:block th:include="fragments/headerinc :: head"></th:block> /*/-->
+</head>
+<body>
+	<!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+	<main>
+		<div id="container">	
+			<div id="actionbar" class="row">
+				<div class="col-md-4 mb-3">
+					<a href="#" th:href="@{/operacion/notas}"><img th:src="@{/images/iconos/regresar.png}" alt="Regresar" /></a>
+				</div>
+				<div class="col-md-8 mb-3 tituloPrincipal" align="left" ><br/> M&oacute;dulo de Notas - Nuevo - RUC: <label th:text="${filtro.ruc}" style="color: RED"></label></div>
+			</div>
+			
+			<form id="form" th:object="${filtro}" th:action="@{/operacion/notas/nuevo/guardar}" method="post">
+				<div id="informacion" class="container_v3">
+					<div>
+						<p style="color: red" th:text="${respuesta}" /> 
+					</div>
+					<fieldset class="scheduler-border">
+						<legend class="scheduler-border title10pt">Datos del Comprobante</legend>
+							<div class="row">
+								<div class="col-md-3 mb-0">
+									<label for="idNombre" class="textBold9pt">Tipo de Comprobante</label>
+									<label> 
+										<input type="hidden" th:field="${filtro.comprobante.tipoComprobante}"/>
+										<input type="hidden" th:field="${filtro.comprobante.codigoDomicilio}"/>
+										<input type="hidden" th:field="${filtro.comprobante.codigoComprobante}"/>
+										<select th:field="${filtro.comprobante.tipoComprobante}" class="form-control_v2 " disabled="disabled">
+											<option value="">--Seleccionar--</option>
+											<option th:each="entry : ${session.SessionMapTipoComprobante}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+										</select>
+									</label>
+								</div>
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">Moneda</label>
+									<label> 
+										<input type="hidden" th:field="${filtro.comprobante.moneda}"/>
+										<select th:field="${filtro.comprobante.moneda}" class="form-control_v2 " disabled="disabled">
+											<option value="">--Seleccionar--</option>
+											<option th:each="entry : ${session.SessionMapTipoMoneda}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+										</select>
+									</label>
+								</div>
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">Serie</label>
+									<input type="text" class="form-control_v2 " placeholder="serie" th:field="${filtro.comprobante.serie}" readonly="readonly" maxlength="4"/>
+								</div>
+								
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">N&uacute;mero Comprobante</label>
+									<input type="text" class="form-control_v2 " placeholder="numero" th:field="${filtro.comprobante.numero}" readonly="readonly" maxlength="8"/>
+								</div>
+								<div class="col-md-1 mb-0" align="right">
+									<br/>
+									<button class="btn btn-success" onclick="jsListarComprobanteParaNota();">...</button> 
+								</div>
+								<div class="col-md-2 mb-0" align="left" >
+									<br/><font class="campos2" >(Clic en el bot&oacute;n para buscar Comprobantes)</font>
+								</div>
+							</div>
+							
+					</fieldset>
+					<br></br>
+					<fieldset class="scheduler-border">
+						<legend class="scheduler-border title10pt">Datos de la Nota</legend>
+							<div class="row">
+								<div class="col-md-3 mb-0">
+									<label for="idNombre" class="textBold9pt">Tipo de Comprobante</label>
+									<label> 
+										<select th:field="${filtro.tipoComprobanteNota}" class="form-control_v2 is-valid" onchange="jsMostrarTipoNota();" required="required">
+											<option value="">--Seleccionar--</option>
+											<option th:each="entry : ${session.SessionMapTipoComprobanteNota}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+										</select>
+									</label>
+								</div>
+								<div class="col-md-3 mb-0">
+									<label for="idNombre" class="textBold9pt">Tipo de Nota</label>
+									<div th:if="${filtro.tipoComprobanteNota == '07'}">
+										<label> 
+											<select th:field="${filtro.nota.tipoNota}" class="form-control_v2 is-valid" required="required">
+												<option value="">--Seleccionar--</option>
+												<option th:each="entry : ${session.SessionMapNotaCredito}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+											</select>
+										</label>
+									</div>
+									<div th:if="${filtro.tipoComprobanteNota == '08'}">
+										<label> 
+											<select th:field="${filtro.nota.tipoNota}" class="form-control_v2 is-valid" required="required">
+												<option value="">--Seleccionar--</option>
+												<option th:each="entry : ${session.SessionMapNotaDebito}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+											</select>
+										</label>
+									</div>
+								</div>
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">Serie</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Serie" th:field="${filtro.serieNota}"  maxlength="8" required="required"/>
+								</div>
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">N&uacute;mero Nota</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Serie" th:field="${filtro.numeroNota}"  maxlength="16" required="required"/>
+								</div>
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">Fecha de Emisi&oacute;n</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="dd/MM/yyyy" th:field="${filtro.fechaEmision}" required="required"/>
+								</div>
+								
+							</div>
+							<div class="row">
+								<div class="col-md-12 mb-0">
+									<label for="idNombre" class="textBold9pt">Sustento Nota</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Descripcion del Sustento de Nota" th:field="${filtro.nota.descripcionNota}"  maxlength="255" required="required"/>
+								</div>
+								
+							</div>
+					</fieldset>
+
+					<br></br>
+					
+					<fieldset class="scheduler-border">
+						<legend class="scheduler-border title10pt">Datos del Cliente</legend>
+							<div class="row">
+								<div class="col-md-3 mb-0">
+									<label for="idNombre" class="textBold9pt">N&uacute;mero Documento</label>
+									<input type="text" class="form-control_v2 " placeholder="numero" th:field="${filtro.comprobante.numeroDocumento}"  maxlength="32" readonly="readonly"/>
+								</div>
+								
+								<div class="col-md-3 mb-0">
+									<label for="idNombre" class="textBold9pt">Tipo Documento</label>
+									<label> 
+										<input type="hidden" th:field="${filtro.comprobante.tipoDocumento}"/>
+										<select th:field="${filtro.comprobante.tipoDocumento}" class="form-control_v2 " disabled="disabled">
+											<option value="">--Seleccionar--</option>
+											<option th:each="entry : ${session.SessionMapTipoDocumento}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+										</select>
+									</label>
+								</div>
+								<div class="col-md-6 mb-0">
+									<label for="idNombre" class="textBold9pt">Nombre Apellido / Raz&oacute;n Social</label>
+									<input type="text" class="form-control_v2 " placeholder="Nombre y Apellido / Razon Social" th:field="${filtro.comprobante.nombreCliente}" readonly="readonly" maxlength="256"/>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-3 mb-0">
+									<br/><font class="campos2" >(Los datos del cliente se cargan luego de buscar y seleccionar un comprobante)</font>
+								</div>
+								<div class="col-md-9 mb-0">
+									<label for="idNombre" class="textBold9pt">Direcci&oacute;n</label>
+									<input type="text" class="form-control_v2 " placeholder="numero" th:field="${filtro.comprobante.direccionCliente}" readonly="readonly" maxlength="128" />
+								</div>
+								
+							</div>
+					</fieldset>
+					<br></br>
+					<fieldset class="scheduler-border">
+						<legend class="scheduler-border title10pt">Detalle del Producto</legend>
+							<div class="row">
+								<div class="col-md-2 mb-1">
+									<label for="idNombre" class="textBold9pt">U. Medida</label>
+									<label> 
+										<select th:field="${filtro.detalleComprobante.unidadMedida}" class="form-control_v2 is-valid">
+											<option value="">--Seleccionar--</option>
+											<option th:each="entry : ${session.SessionMapTipoUnidad}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+										</select>
+									</label>
+									<input type="hidden" th:field="${filtro.codigoProducto}"/>
+									
+								</div>
+								<div class="col-md-4 mb-1">
+									<label for="idNombre" class="textBold9pt">Nombre Producto</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="nombre producto" th:field="${filtro.detalleComprobante.descripcion}" maxlength="256" size="80"/>
+								</div>
+								<div class="col-md-1 mb-1">
+									<label for="idNombre" class="textBold9pt">Moneda</label>
+									<input type="text" class="form-control_v2 " placeholder="moneda" th:field="${filtro.detalleComprobante.moneda}" readonly="readonly"/>
+								</div>
+								<div class="col-md-1 mb-1" align="left">
+									<br/>
+									<button class="btn btn-success" onclick="jsListarProductoNota();">...</button>
+								</div>
+								<div class="col-md-2 mb-1">
+									<label for="idNombre" class="textBold9pt">Cantidad</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="cantidad" th:field="${filtro.detalleComprobante.cantidad}" maxlength="12" onkeyup="jsCalcularMontos(event)"/>
+								</div>
+								<div class="col-md-2 mb-1">
+									<label for="idNombre" class="textBold9pt">Precio Unitario</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="precio" th:field="${filtro.detalleComprobante.precioUnitario}" maxlength="12"/>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-4 mb-1">
+									<label for="idNombre" class="textBold9pt">Afectaci&oacute;n IGV</label>
+									<label> 
+										<select th:field="${filtro.detalleComprobante.tipoAfectacion}" class="form-control_v2 is-valid">
+											<option value="">--Seleccionar--</option>
+											<option th:each="entry : ${session.SessionMapTipoAfectacion}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+										</select>
+									</label>
+								</div>
+								<div class="col-md-2 mb-1">
+									
+								</div>
+								<div class="col-md-2 mb-1">
+									<label for="idNombre" class="textBold9pt">Descuento (%)</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="% descuento" th:field="${filtro.detalleComprobante.descuento}" required="required" maxlength="12"/>
+								</div>
+								<div class="col-md-2 mb-1">
+									<label for="idNombre" class="textBold9pt">Valor Referencial</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Valor Referencial" th:field="${filtro.detalleComprobante.valorReferencia}" required="required" maxlength="12"/>
+								</div>
+								<div class="col-md-1 mb-1">
+									<br/>
+									<button class="btn btn-primary" onclick="jsAdicionarDetalleNota();">Adicionar</button>
+								</div>
+							</div>
+							
+							
+					</fieldset>
+					<br></br>
+					<div id="c_tablas" th:if="${not #lists.isEmpty(filtro.listaDetalle)}">	
+						<table id="t01" class="table   table-bordered table-active tabla_cabecera_general">
+							<tr>
+								<th>Descripci&oacute;n Producto</th>
+								<th>Precio Unitario</th>
+								<th>Cantidad</th>
+								<th>Precio Total</th>
+								<th>Descuento(%)</th>
+								<th>Precio Final</th>
+								<th>Val. Ref</th>
+								<th>Eliminar</th>
+								<th>Editar</th>
+							</tr>
+							<tr th:each="detalleComprobante, status : ${filtro.listaDetalle}"  class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
+								<td th:text="${detalleComprobante.descripcion}">descripcion</td>
+								<td align="right" th:text="${detalleComprobante.precioUnitario}">precioUnitario</td>
+								<td align="right" th:text="${detalleComprobante.cantidad}">cantidad</td>
+								<td align="right" th:text="${detalleComprobante.precioTotal}">precioTotal</td>
+								<td align="right" th:text="${detalleComprobante.descuento}">descuento</td>
+								<td align="right" th:text="${detalleComprobante.precioFinal}">precioFinal</td>
+								<td align="right" th:text="${detalleComprobante.valorReferencia}">referencia</td>
+								<td align="center">
+									<a th:href="${'/operacion/notas/eliminar/' + status.index}"><img
+										th:src="@{/images/iconos/eliminar.png}" alt="Eliminar"
+										onclick="if(!confirm('Desea eliminar el elemento seleccionado?')){ return false;}" /></a>
+								</td>
+								<td align="center">
+									<button class="btn btn-success" type="button" th:onclick="'jsEditarDetalleNota(' + ${status.index} + ');'">...</button>
+								</td>
+							</tr>
+						</table>
+						<input type="hidden" th:field="${filtro.indice}" id="idIndice"/>
+					</div>
+					<div id="c_tablas" th:if="${#lists.isEmpty(filtro.listaDetalle)}">				
+						<table id="t01" class="table   table-bordered table-active tabla_cabecera_general">
+							<tr>
+								<th>Descripci&oacute;n Producto</th>
+								<th>Precio Unitario</th>
+								<th>Cantidad</th>
+								<th>Precio Total</th>
+								<th>Descuento(%)</th>
+								<th>Precio Final</th>
+								<th>Val. Ref</th>
+								<th>Eliminar</th>
+								<th>Editar</th>
+							</tr>
+							<tr class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
+								<td colspan="9" align="center">No se encontr&oacute; elementos</td>
+							</tr>
+						</table>
+					</div>
+					<br></br>
+					<fieldset class="scheduler-border">
+						<legend class="scheduler-border title10pt">Importes Totales</legend>
+							<div class="row">
+								<div class="col-md-1 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									<label for="idNombre" class="textBold9pt">Descuentos Globales</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="serie" th:field="${filtro.comprobante.descuentosGlobales}" required="required" maxlength="12"/>
+								</div>
+								<div class="col-md-3 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									<label for="idNombre" class="textBold9pt">Total Operaciones Gravadas</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="serie" th:field="${filtro.comprobante.totalOpGravada}" required="required" maxlength="12"/>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-1 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									<label for="idNombre" class="textBold9pt">Total Otros Cargos</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="numero" th:field="${filtro.comprobante.totalOtrosCargos}" required="required" maxlength="12"/>
+									
+								</div>
+								<div class="col-md-3 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									<label for="idNombre" class="textBold9pt">Total Operaci&oacute;n Inafecta</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="numero" th:field="${filtro.comprobante.totalOpInafecta}" required="required" maxlength="12"/>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-1 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									<label for="idNombre" class="textBold9pt">Total Descuento</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="serie" th:field="${filtro.comprobante.totalDescuento}" required="required" maxlength="12"/>
+									
+								</div>
+								<div class="col-md-3 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									<label for="idNombre" class="textBold9pt">Total Operaci&oacute;n Exonerada</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="numero" th:field="${filtro.comprobante.totalOpExonerada}" required="required" maxlength="12"/>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-1 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									<label for="idNombre" class="textBold9pt">Sumatoria ISC</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="serie" th:field="${filtro.comprobante.sumatoriaIsc}" required="required" maxlength="12"/>
+								</div>
+								<div class="col-md-3 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									<label for="idNombre" class="textBold9pt">Sumatoria IGV</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="numero" th:field="${filtro.comprobante.totalIgv}" required="required" maxlength="12"/>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-1 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									 
+									<div class="row">
+										
+										<div class="col-md-6 mb-1">
+											Servicio (<label th:text="${filtro.nombreServicio}"></label>)<input type="text" class="form-control_v2 is-valid" th:field="${filtro.valorServicio}"/>
+										</div>
+										<div class="col-md-6 mb-1">
+											IGV (<label th:text="${filtro.nombreIGV}"></label>)<br/>
+										</div>
+									</div>
+									
+									<input type="hidden" th:field="${filtro.nombreIGV}"/>
+									<input type="hidden" th:field="${filtro.nombreServicio}"/>
+									<input type="hidden" th:field="${filtro.valorIGV}"/>
+									<input type="hidden" th:field="${filtro.sunatData}"/>
+									<input type="hidden" th:field="${filtro.sunatBD}"/>
+									
+								</div>
+								<div class="col-md-3 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									<label for="idNombre" class="textBold9pt">Sumatoria Otros Tributos</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="serie" th:field="${filtro.comprobante.sumatorioaOtrosTributos}" required="required" maxlength="12"/>
+									
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-1 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									<label for="idNombre" class="textBold9pt">Valor Ope. Gratuitas</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="serie" th:field="${filtro.comprobante.valorOpGratuitas}" required="required" maxlength="12"/>
+								</div>
+								<div class="col-md-3 mb-1">
+								</div>
+								<div class="col-md-3 mb-1">
+									<label for="idNombre" class="textBold9pt">Total Importe</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="numero" th:field="${filtro.comprobante.totalImporte}" required="required" maxlength="12" />
+								</div>
+							</div>
+					</fieldset>
+					<br></br>
+					<fieldset class="scheduler-border">
+						<legend class="scheduler-border title10pt">Datos de Leyenda</legend>
+							
+							<div class="row">
+								<div class="col-md-6 mb-0">
+									<label for="idNombre" class="textBold9pt">C&oacute;digo</label>
+									<label> 
+										<select th:field="${filtro.leyendaSunat.codigoSunat}" class="form-control_v2 is-valid" onchange="jsCargarLeyendaDescripcion()">
+											<option value="">--Seleccionar--</option>
+											<option th:each="entry : ${session.SessionMapTipoLeyenda}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+										</select>
+									</label>
+								</div>
+								<div class="col-md-6 mb-0">
+									<label for="idNombre" class="textBold9pt">Descripci&oacute;n</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="descripcion" th:field="${filtro.leyendaSunat.descripcionSunat}" maxlength="99" />
+								</div>
+								
+							</div>
+					</fieldset>
+					<div class="container_v4" align="center">
+						<div class="row">
+							<div class="col-md-3 mb-3"></div>
+							
+			  				<div class="col-md-6 mb-3">
+			  					<br/>
+			  					<button class="btn btn-success" type="submit" onclick="">Guardar Comprobante</button>
+			  				</div>
+			  				<div class="col-md-3 mb-3"></div>
+			  			</div>
+			  		</div>
+			  	</div>
+			</form>
+
+		</div>
+	</main>
+	<nav id="nav" >
+		<!--/*/ <th:block th:include="fragments/util :: menu"></th:block> /*/-->
+	</nav>	
+</body>
+</html>

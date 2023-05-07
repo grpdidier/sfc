@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+<!--/*/ <th:block th:include="fragments/headerinc :: head"></th:block> /*/-->
+
+</head>
+<body>
+	
+		<div id="container">
+			<div id="actionbar" class="row">
+				<div class="col-md-12 mb-3 tituloPrincipal2" align="center" > VENTA DE COMBUSTIBLE - PRODUCTO</div>
+			</div>
+			<form id="form" th:object="${entidad}" th:action="@{/combustibles/q}" method="Post">
+				<div id="informacion" class="container_v3">
+					<input type="hidden" th:field="${entidad.dato}" id="idDato"/>
+					<br></br>
+					<div class="container_v4" align="center">
+						<div class="row">
+							
+							
+			  				<div class="col-md-4 mb-3">
+			  					<button type="button" class="btn btn-primary btn-lg btn-block" onclick="jsMostrarProducto('GASOLINA-97');"><img th:src="@{/images/iconos/gasolina.png}"	alt="Regresar" width="150px"/>&nbsp;&nbsp;&nbsp;Gasohol 97 Plus</button>
+								<br></br><br></br>
+								<button type="button" class="btn btn-primary btn-lg btn-block" onclick="jsMostrarProducto('GASOLINA-95');"><img th:src="@{/images/iconos/gasolina.png}"	alt="Regresar" width="150px"/> &nbsp;&nbsp;&nbsp;Gasohol 95 Plus</button>
+			  				</div>
+			  				
+			  				<div class="col-md-4 mb-3"> 
+			  					<button type="button" class="btn btn-primary btn-lg btn-block" onclick="jsMostrarProducto('GASOLINA-90');"><img th:src="@{/images/iconos/gasolina.png}"	alt="Regresar" width="150px"/>&nbsp;&nbsp;&nbsp;Gasohol 90 Plus</button>
+								<br></br><br></br>
+								<button type="button" class="btn btn-primary btn-lg btn-block" onclick="jsMostrarProducto('GASOLINA-84');"><img th:src="@{/images/iconos/gasolina.png}"	alt="Regresar" width="150px"/> &nbsp;&nbsp;&nbsp;Gasohol 84 Plus</button>
+			  				</div>
+			  				
+			  				<div class="col-md-4 mb-3">
+			  					<button type="button" class="btn btn-danger btn-lg btn-block" onclick="jsMostrarProducto('DIESEL');"><img th:src="@{/images/iconos/diesel.png}"	alt="Regresar" width="150px"/>&nbsp;&nbsp;&nbsp;Diesel</button>
+								<br></br><br></br>
+								<button type="button" class="btn btn-info btn-lg btn-block" onclick="jsMostrarProducto('GLP');"><img th:src="@{/images/iconos/glp.png}"	alt="Regresar" width="150px"/> &nbsp;&nbsp;&nbsp;GLP</button>
+			  				</div>
+			  				
+			  			</div>
+						<div class="row">
+			  				<div class="col-md-12 mb-3">
+			  					<p style="color: red" th:text="${respuesta}" />
+			  				</div>
+			  			</div>
+			  			<div class="row">
+			  				<div class="col-md-4 mb-3"> </div>
+			  				<div class="col-md-4 mb-3">
+			  					<button type="button" class="btn btn-success btn-lg btn-block" onclick="jsMostrarRegresarComprobante();"><img th:src="@{/images/iconos/regresar2.png}"	alt="Regresar" width="80px"/>&nbsp;&nbsp;&nbsp;Regresar</button>
+			  				</div>
+			  				<div class="col-md-4 mb-3"> </div>
+			  			</div>
+			  		</div>
+					
+				</div>
+			</form>
+			
+		</div>
+	
+
+</body>
+</html>

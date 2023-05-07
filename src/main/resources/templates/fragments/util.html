@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en" th:fragment="head">
+<title>Sistema de Gesti&oacute;n</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Pragma" content="no-cache" />
+</head>
+<body >
+
+	<div th:fragment="menu">
+		<br/>
+		<div class="nav_panel">
+			&nbsp;&nbsp;<a href="#" th:href="@{/}"><img th:src="@{/images/iconos/panel01.png}" class="img-responsive" alt="Panel de Control" width="32px"/> Panel de Control</a>
+			
+		</div>
+		<br></br>
+		<!--  div class="nav_panel">
+			&nbsp;&nbsp;<a href="#"  th:target="_blank" th:href="@{/eds/nuevo}"><img th:src="@{/images/iconos/panel01.png}" class="img-responsive" alt="Comprobante EDS" width="32px"/> Comprobante EDS</a>
+			
+		</div-->
+		<div class="nav_menu">
+			Menu del Sistema
+		</div>
+		<div th:fragment="menu">
+			<div th:remove="tag" th:utext="${session.SessionMenu}"></div>
+		</div>
+		
+	</div>
+	
+	<div id="container">	
+		<div th:fragment="nombreMes">
+			<div th:if="${tipo} == '1'">
+				<span>ENERO</span>
+			</div>
+			<div th:if="${tipo} == '2'">
+				<span>FEBRERO</span>
+			</div>
+			<div th:if="${tipo} == '3'">
+				<span>MARZO</span>
+			</div>
+			<div th:if="${tipo} == '4'">
+				<span>ABRIL</span>
+			</div>
+			<div th:if="${tipo} == '5'">
+				<span>MAYO</span>
+			</div>
+			<div th:if="${tipo} == '6'">
+				<span>JUNIO</span>
+			</div>
+			<div th:if="${tipo} == '7'">
+				<span>JULIO</span>
+			</div>
+			<div th:if="${tipo} == '8'">
+				<span>AGOSTO</span>
+			</div>
+			<div th:if="${tipo} == '9'">
+				<span>SEPTIEMBRE</span>
+			</div>
+			<div th:if="${tipo} == '10'">
+				<span>OCTUBRE</span>
+			</div>
+			<div th:if="${tipo} == '11'">
+				<span>NOVIEMBRE</span>
+			</div>
+			<div th:if="${tipo} == '12'">
+				<span>DICIEMBRE</span>
+			</div>
+		</div>
+		<div th:fragment="nombreTipoOperacion">
+			<div th:if="${tipo} == 'PRM'">
+				<span>PRIMEROS COBROS</span>
+			</div>
+			<div th:if="${tipo} == 'MNS'">
+				<span>COBRO MENSUAL</span>
+			</div>
+		</div>
+		<div th:fragment="estadoFactura">
+			<div th:if="${tipo} == '00'">
+				<span>PENDIENTE</span>
+			</div>
+			<div th:if="${tipo} == '01'">
+				<span>POR GENERAR XML</span>
+			</div>
+			<div th:if="${tipo} == '02'">
+				<span>XML GENERADO</span>
+			</div>
+			<div th:if="${tipo} == '03'">
+				<span>ENVIADO Y ACEPTADO SUNAT</span>
+			</div>
+			<div th:if="${tipo} == '04'">
+				<span>ENVIADO Y ACEPTADO SUNAT CON OBSERVACION</span>
+			</div>
+			<div th:if="${tipo} == '05'">
+				<span>ENVIADO Y ANULADO por SUNAT</span>
+			</div>
+			<div th:if="${tipo} == '06'">
+				<span>CON ERRORES</span>
+			</div>
+			<div th:if="${tipo} == '07'">
+				<span>ENVIADO Y VALIDADO POR OSE</span>
+			</div>
+		</div>
+		<div th:fragment="nombreTipoCobro">
+			<div th:if="${tipo} == 'ALQ'">
+				<span>ALQUILER</span>
+			</div>
+			<div th:if="${tipo} == 'SER'">
+				<span>SERVICIO</span>
+			</div>
+			<div th:if="${tipo} == 'LUZ'">
+				<span>LUZ</span>
+			</div>
+			<div th:if="${tipo} == 'ARB'">
+				<span>ARBITRIO</span>
+			</div>
+		</div>
+		
+		<div th:fragment="tipoCaducidadUsuario">
+			<div th:if="${tipo} == 'INDEFINIDO'">
+				<span>INDEFINIDO</span>
+			</div>
+			<div th:if="${tipo} == 'CADUCA 30 DIAS'">
+				<span class="texto2" th:utext="${fecha}">fecha</span>
+			</div>
+		</div>
+		<div th:fragment="tipoTienda">
+			<div th:if="${tipo} == 'TI'">
+				<span>LOCAL</span>
+			</div>
+			<div th:if="${tipo} == 'AL'">
+				<span>ALMACEN</span>
+			</div>
+			<div th:if="${tipo} == 'BO'">
+				<span>BODEGA</span>
+			</div>
+		</div>
+		<div th:fragment="tipoConcepto">
+			<div th:if="${tipo} == 'IG'">
+				<span>INGRESO</span>
+			</div>
+			<div th:if="${tipo} == 'GS'">
+				<span>GASTO</span>
+			</div>
+		</div>
+		<div th:fragment="tipoPersona">
+			<div th:if="${tipo} == 'N'">
+				<span>NATURAL</span>
+			</div>
+			<div th:if="${tipo} == 'J'">
+				<span>JURIDICA</span>
+			</div>
+		</div>
+		<div th:fragment="imagenEstado">
+			<div th:if="${estado} == 'S'">
+				<img th:src="@{/images/iconos/bien.png}" alt="Estado" />
+			</div>
+			<div th:if="${estado} == 'N'">
+				<img th:src="@{/images/iconos/mal.png}" alt="Estado" />
+			</div>
+		</div>
+		<div th:fragment="imagenAsignado">
+			<div th:if="${estado} == 'ASIGNADO'">
+				<img th:src="@{/images/iconos/bien.png}" alt="Estado" />
+			</div>
+			<div th:if="${estado} == 'PENDIENTE'">
+				<img th:src="@{/images/iconos/mal.png}" alt="Estado" />
+			</div>
+		</div>
+		<div th:fragment="tipoMoneda">
+			<div th:if="${tipo} == 'DO'">
+				<span>DOLARES</span>
+			</div>
+			<div th:if="${tipo} == 'SO'">
+				<span>SOLES</span>
+			</div>
+		</div>
+		<div th:fragment="estadoContrato">
+			<div th:if="${tipo} == 'PND'">
+				<span>PENDIENTE</span>
+			</div>
+			<div th:if="${tipo} == 'VGN'">
+				<span>VIGENTE</span>
+			</div>
+			<div th:if="${tipo} == 'RNV'">
+				<span>RENOVADO</span>
+			</div>
+		</div>
+		<div th:fragment="estadoLocal">
+			<div th:if="${tipo} == 'CPD'">
+				<span>OCUPADO</span>
+			</div>
+			<div th:if="${tipo} == 'DSC'">
+				<span>DESOCUPADO</span>
+			</div>
+			<div th:if="${tipo} == null">
+				<label for="idNombreInmueble" class="form-control_v2 " th:text="estado">estado</label>
+			</div>
+		</div>
+		<div th:fragment="tipoDocumento">
+			<div th:if="${tipo} == 'FAC'">
+				<span>FACTURA</span>
+			</div>
+			<div th:if="${tipo} == 'BOL'">
+				<span>BOLETA</span>
+			</div>
+			<div th:if="${tipo} == 'INT'">
+				<span>INTERNO</span>
+			</div>
+		</div>
+		<div th:fragment="tipoComprobante">
+			<div th:if="${tipo} == '01'">
+				<span>FACTURA</span>
+			</div>
+			<div th:if="${tipo} == '03'">
+				<span>BOLETA DE VENTA</span>
+			</div>
+			<div th:if="${tipo} == '07'">
+				<span>NOTA DE CREDITO</span>
+			</div>
+			<div th:if="${tipo} == '08'">
+				<span>NOTA DE DEBITO</span>
+			</div>
+			
+		</div>
+		<div th:fragment="tipoMonedaSunat">
+			<div th:if="${tipo} == 'PEN'">
+				<span>SOLES</span>
+			</div>
+			<div th:if="${tipo} == 'USD'">
+				<span>US DOLLAR</span>
+			</div>
+		</div>
+		<div th:fragment="tipoRubro">
+			<div th:if="${tipo} == 'SRV'">
+				<span>SERVICIO</span>
+			</div>
+			<div th:if="${tipo} == 'CNT'">
+				<span>CONTRATO</span>
+			</div>
+		</div>
+		<div th:fragment="estadoContratoInput">
+			<div th:if="${tipo} == 'PND'">
+				<input type="text" class="form-control_v2" placeholder="a" value="PENDIENTE" readonly="readonly"/>
+			</div>
+			<div th:if="${tipo} == 'VGN'">
+				<input type="text" class="form-control_v2" placeholder="local" value="VIGENTE" readonly="readonly"/>
+			</div>
+			<div th:if="${tipo} == 'RNV'">
+				<input type="text" class="form-control_v2" placeholder="local" value="RENOVADO" readonly="readonly"/>
+			</div>
+		</div>
+		<div th:fragment="estadoLocalInput">
+			<div th:if="${tipo} == 'CPD'">
+				<input type="text" class="form-control_v2" value="OCUPADO" readonly="readonly"/>
+			</div>
+			<div th:if="${tipo} == 'DSC'">
+				<input type="text" class="form-control_v2" value="DESOCUPADO" readonly="readonly"/>
+			</div>
+			<div th:if="${tipo} == null">
+				<label for="idNombreInmueble" class="form-control_v2 " th:text="estado">estado</label>
+			</div>
+		</div>
+	</div>		
+	
+	
+		
+	<div th:fragment="formulario">
+		<div class="row" th:each="entry : ${map}">
+			<div class="col-md-3 mb-3"></div>
+			<div class="col-md-6 mb-3">
+				<span class="textBold9pt" th:text="${entry.key}">label </span>
+				<div th:if="${entry.value.tipo} == 'text'"> 
+					<span class="textBold9pt" th:if="${entry.value.required} == false">
+						<input th:type="${entry.value.tipo}" th:field="*{__${entry.value.valor}__}" class="form-control_v2 is-valid"/>
+						
+					</span>
+					<span class="textBold9pt" th:if="${entry.value.required} == true">
+						<input th:type="${entry.value.tipo}" th:field="*{__${entry.value.valor}__}" class="form-control_v2 is-valid" required="required"/>
+					</span>
+				</div>
+				
+				<div th:if="${entry.value.tipo} == 'combo_estado_usuario'"> 
+					<span class="textBold9pt" th:if="${entry.value.required} == false">
+						<!--/*/ <th:block th:include="fragments/util :: combo" th:with="campo=${entry.value.valor},map=${mapEstadoUsuario}"></th:block> /*/-->
+					</span>
+					<span class="textBold9pt" th:if="${entry.value.required} == true">
+						<!--/*/ <th:block th:include="fragments/util :: comboRequired" th:with="campo=${entry.value.valor},map=${mapEstadoUsuario}"></th:block> /*/-->
+					</span>
+					
+				</div>
+				<div th:if="${entry.value.tipo} == 'combo_estado'"> 
+					<span class="textBold9pt" th:if="${entry.value.required} == false">
+						<!--/*/ <th:block th:include="fragments/util :: combo" th:with="campo=${entry.value.valor},map=${mapEstadoUsuario}"></th:block> /*/-->
+					</span>
+					<span class="textBold9pt" th:if="${entry.value.required} == true">
+						<!--/*/ <th:block th:include="fragments/util :: comboRequired" th:with="campo=${entry.value.valor},map=${mapEstadoUsuario}"></th:block> /*/-->
+					</span>
+					
+				</div>
+				<div th:if="${entry.value.tipo} == 'combo_tipo_concepto'"> 
+					<span class="textBold9pt" th:if="${entry.value.required} == false">
+						<!--/*/ <th:block th:include="fragments/util :: combo" th:with="campo=${entry.value.valor},map=${mapTipoConcepto}"></th:block> /*/-->
+					</span>
+					<span class="textBold9pt" th:if="${entry.value.required} == true">
+						<!--/*/ <th:block th:include="fragments/util :: comboRequired" th:with="campo=${entry.value.valor},map=${mapTipoConcepto}"></th:block> /*/-->
+					</span>
+					
+				</div>
+				
+			</div>
+			
+			<div class="col-md-3 mb-3"></div>
+		</div>
+	</div>
+	
+	<div th:fragment="formularioFecha">
+		<div class="row" th:each="entry : ${map}">
+			<div class="col-md-5 mb-3"></div>
+			<div class="col-md-2 mb-3">
+				<span class="textBold9pt" th:text="${entry.key}">label </span>
+				<div th:if="${entry.value.tipo} == 'text'"> 
+					<span class="textBold9pt" th:if="${entry.value.required} == false">
+						<input th:type="${entry.value.tipo}" th:field="*{__${entry.value.valor}__}" class="form-control_v2 is-valid"/>
+						
+					</span>
+					<span class="textBold9pt" th:if="${entry.value.required} == true">
+						<input th:type="${entry.value.tipo}" th:field="*{__${entry.value.valor}__}" class="form-control_v2 is-valid" required="required"/>
+					</span>
+				</div>
+				
+				
+				
+			</div>
+			
+			<div class="col-md-5 mb-3"></div>
+		</div>
+	</div>
+	
+	
+	
+	<div th:fragment="comboRequired">
+			<select th:field="*{__${campo}__}" th:id="${id}"
+				class="form-control_v2 is-valid" required="required">
+				<option value="-1">--Seleccionar--</option>
+				<option th:each="entry : ${map}" th:value="${entry.value}"
+					th:text="${entry.key}">opcion</option>
+			</select>
+		
+	</div>
+	<div th:fragment="comboDisable">
+			<select th:field="*{__${campo}__}" th:id="${id}"
+				class="form-control_v2 " disabled="disabled">
+				<option value="-1">No Aplica</option>
+				<option th:each="entry : ${map}" th:value="${entry.value}"
+					th:text="${entry.key}">opcion</option>
+			</select>
+		
+	</div>
+	<div th:fragment="combo">
+		<label> <select th:field="*{__${campo}__}" th:id="${id}"
+			class="form-control_v2 is-valid">
+				<option value="">--Seleccionar--</option>
+				<option th:each="entry : ${map}" th:value="${entry.value}"
+					th:text="${entry.key}">opcion</option>
+		</select>
+		</label>
+	</div>
+
+</body>
+</html>

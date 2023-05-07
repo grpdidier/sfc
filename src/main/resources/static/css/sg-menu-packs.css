@@ -1,0 +1,28 @@
+/* CSS Document */
+
+			
+#adpacks-wrapper{font-family: Arial, Helvetica;width:280px;position:fixed;_position: absolute;bottom: 0;right: 5px;z-index: 9999;background: #eee;padding: 15px;box-shadow: 0 0 2px #444;border-radius: 5px 5px 0 0;
+}				
+body 
+.adpacks{background:#fff;padding:15px;margin:15px 0 0;border:3px solid #eee;}				
+.adpacks-wrap { 				    
+display: block;				    
+overflow: hidden;				
+}				
+.adpacks-img {				    
+float: left;				    
+margin-right: 10px;				    
+width: 130px;				    
+height: 100px;				
+}				
+.adpacks-text {				    
+display: block;				    
+line-height: normal;				    
+color: #333;				    
+font-size: 12px;				    
+text-decoration: none;				    
+text-align: left;				
+}				
+.adpacks-poweredby {				    
+display: none;				
+}				

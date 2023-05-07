@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en" th:fragment="head">
+<title>Sistema de Gesti&oacute;n</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Pragma" content="no-cache" />
+
+<link rel="stylesheet" type="text/css" href="static/css/sgt/inicio.css" 			th:href="@{/css/sgt/inicio.css}"  				media="screen"/>
+<link rel="stylesheet" type="text/css"	href="static/css/bootstrap.css"  			th:href="@{/css/bootstrap.css}" 				media="screen"/>	
+<link rel="stylesheet" type="text/css"	href="static/css/bootstrap-reboot.css" 		th:href="@{/css/bootstrap-reboot.css}" 			media="screen" />	
+<link rel="stylesheet" type="text/css"	href="static/css/bootstrap-grid.css"  		th:href="@{/css/bootstrap-grid.css}" 			media="screen"/>	
+<link rel="stylesheet" type="text/css"	href="static/css/main.css"  				th:href="@{/css/main.css}" 						media="screen"/>
+<link rel="stylesheet" type="text/css"	href="static/css/util.css"  				th:href="@{/css/util.css}" 						media="screen"/>
+<link rel="stylesheet" type="text/css"	href="static/css/frame.css"  				th:href="@{/css/frame.css}" 					media="screen"/>
+<link rel="stylesheet" type="text/css"	href="static/css/jquery-ui.css"  			th:href="@{/css/jquery-ui.css}" 				media="screen"/>
+<link rel="stylesheet" type="text/css"  href="static/dist/themes/default/style.css" th:href="@{/dist/themes/default/style.css}" 	media="screen"/>
+
+
+<script type="text/javascript" src="../static/js/jquery-3.2.1.js"		th:src="@{/js/jquery-3.2.1.js}"></script>
+<script type="text/javascript" src="../static/js/jquery-1.12.4.js"		th:src="@{/js/jquery-1.12.4.js}"></script>
+<script type="text/javascript" src="../static/js/jquery-ui.js"			th:src="@{/js/jquery-ui.js}"></script>
+<script type="text/javascript" src="../static/js/bootstrap.js"			th:src="@{/js/bootstrap.js}"></script>
+<script type="text/javascript" src="../static/dist/jstree.min.js"		th:src="@{/dist/jstree.min.js}"></script>
+<script type="text/javascript" src="../static/js/sgt/inicio.js"			th:src="@{/js/sgt/inicio.js}"></script>
+
+<script>
+  window.Tether = {};
+</script>
+
+ 
+
+<script>
+
+
+  $(function () {
+    // 6 create an instance when the DOM is ready
+    $('#jstree').jstree();
+    $('#jstree').on('ready.jstree', function() {
+        $("#jstree").jstree("open_all");          
+    });
+    
+    $('#jstree2').jstree();
+    $('#jstree2').on('ready.jstree', function() {
+        $("#jstree2").jstree("open_all");          
+    });
+    // 7 bind to events triggered on the tree
+    $('#jstree').on("changed.jstree", function (e, data) {
+      console.log(data.selected);
+    });
+    $('#jstree2').on("changed.jstree2", function (e, data) {
+        console.log(data.selected);
+      });
+    // 8 interact with the tree - either way is OK
+   /* $('button').on('click', function () {
+      $('#jstree').jstree(true).select_node('child_node_1');
+      $('#jstree').jstree('select_node', 'child_node_1');
+      $.jstree.reference('#jstree').select_node('child_node_1');
+      
+      var nodeId = $('#jstree').jstree(true).get_node("child_node_1");
+      $("#jstree").jstree(true).set_icon(nodeId, "18_n.png");
+      
+    });*/
+  });
+  
+  $( function() {
+
+	    $( "#fechaInicio" ).datepicker({dateFormat: 'dd/mm/yy'});
+	    $( "#fechaFin" ).datepicker({dateFormat: 'dd/mm/yy'});
+	    $( "#fecha" ).datepicker({dateFormat: 'dd/mm/yy'});
+	    $( "#fechaEmision" ).datepicker({dateFormat: 'dd/mm/yy'});
+	    $( "#fechaVencimiento" ).datepicker({dateFormat: 'dd/mm/yy'});
+	    
+	  } );
+  
+	$( function() {
+	
+	  $( "#tabs" ).tabs();
+	
+	} );
+  </script>
+
+</head>
+<body>
+
+</body>
+</html>

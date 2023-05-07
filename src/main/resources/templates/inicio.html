@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+
+<!--/*/ <th:block th:include="fragments/headerinc :: head"></th:block> /*/-->
+
+
+</head>
+<body>
+	<header>
+		<!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+	</header>
+		
+	<main>
+	<form id="form" role="form" action="/inicio" th:action="@{/inicio}"	method="post">
+		<div class="container">
+			<div class="row">
+	           <div class="col-md-12 mb-3">
+	           		
+
+	        	</div>
+	        </div>
+	        
+		</div>
+		
+	</form>
+	</main>
+	<nav id="nav" >
+		
+		<!--/*/ <th:block th:include="fragments/util :: menu"></th:block> /*/-->
+	</nav>
+
+	
+</body>
+</html>

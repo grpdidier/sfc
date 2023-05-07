@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+
+</head>
+<body>
+<form id="form" role="form" action="/salir" th:action="@{/salir}"	method="post">
+	<div th:fragment="header">
+		<header id="header">
+			<div class="container_v3">
+		 		<div class="row" >
+			    	<div class="col-md-4 mb-3" align="center"><label for="idNombre" class="textWhite13pxBold">Sistema de Gesti&oacute;n de Comprobantes</label></div>
+			    	<div class="col-md-4 mb-3 textWhite11px" align="center"><label class="textWhite11px" for="idNombre" th:text="${session.UsuarioSession.nombre}"></label> - [<label class="textWhite11px" for="idNombre" th:text="${session.UsuarioSession.nombre}"></label>]</div>
+			    	<div class="col-md-2 mb-3 textWhite11px" align="center"></div>
+			    	<div class="col-md-2 mb-3 textWhite11px" align="center">
+			    		<a class="textWhite11px"	th:href="${'/salir'}" onclick="if(!confirm('Esta seguro de salir del sistema?')){ return false;}" >
+			    			<img th:src="@{/images/iconos/logout_02.png}" alt="Salir" width="30px"/>Salir
+						</a>
+			    	</div>
+			    </div>
+			    <div class="row" >
+			    	<div class="col-md-1 mb-3" align="center"></div>
+			    	<div class="col-md-10 mb-3 textWhite15pxPlomo" align="center">
+			    		NOMBRE COMERCIAL: <label class="textWhite15px" for="idNombre" th:text="${session.UsuarioSession.tblEmpresa.nombreComercial}"></label> - 
+			    		RUC: <label class="textWhite15px" for="idNombre" th:text="${session.UsuarioSession.tblEmpresa.ruc}"></label> 
+			    	</div>
+			    	<div class="col-md-1 mb-3 textWhite11px" align="center"></div>
+			    	
+			    </div>
+			    
+			</div>
+
+		</header>
+	</div>
+
+</form>
+
+</body>
+</html>

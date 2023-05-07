@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+<!--/*/ <th:block th:include="fragments/headerinc :: head"></th:block> /*/-->
+</head>
+<body>
+	<!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+	<main>
+		<div id="container">	
+			<div id="actionbar" class="row">
+				<div class="col-md-4 mb-3">
+					<a href="#" th:href="@{/passwords}"><img th:src="@{/images/iconos/regresar.png}" alt="Regresar" /></a>
+				</div>
+				<div class="col-md-8 mb-3 tituloPrincipal" align="left" ><br/> Mantenimiento de Usuario - Cambio de Clave- Edici&oacute;n</div>
+			</div>
+			
+			<form id="form" th:object="${entidad}" th:action="@{/password/nuevo/editar}" method="post">
+				<input type="hidden" th:field="${entidad.codigoUsuario}" />
+				<div id="informacion" class="container_v3">
+					<fieldset class="scheduler-border">
+						<legend class="scheduler-border title10pt">Datos de Edici&oacute;n del Usuario</legend>
+							<div class="row">
+								<div class="col-md-5 mb-3">
+									<label for="idNombre" class="textBold9pt">Nombre</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Nombre" th:field="${entidad.nombre}" required="required"/>
+								</div>
+								<div class="col-md-3 mb-3">
+									<label for="idNombre" class="textBold9pt">Login</label>
+									<label for="idNombre" class="form-control_v2 " th:text="${entidad.login}">Login</label>
+								</div>
+								<div class="col-md-4 mb-3">
+									<label for="idNombre" class="textBold9pt">Empresa</label>
+									<div th:if="${entidad.tblEmpresa != null}">
+										<div th:fragment="combo">
+											<label> <select th:field="${entidad.tblEmpresa.ruc}" disabled="disabled"
+												class="form-control_v2 is-valid">
+													<option value="-1">--Seleccionar--</option>
+													<option th:each="entry : ${session.SessionMapEmpresa}" th:value="${entry.value}"
+														th:text="${entry.key}">opcion</option>
+											</select>
+											</label>
+										</div>
+									</div>
+									
+									
+								</div>
+								
+							</div>
+							<div class="row">
+								<div class="col-md-2 mb-3">
+									<label for="idNombre" class="textBold9pt">Clave</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Clave" th:field="${entidad.cambioClave}" required="required"/>
+								</div>
+								<div class="col-md-2 mb-3">
+									<label for="idNombre" class="textBold9pt">Estado Usuario</label>
+									<!--/*/ <th:block th:include="fragments/util :: comboRequired" th:with="campo='estadoUsuario',map=${mapEstadoUsuario}"></th:block> /*/-->
+									
+								</div>
+								<div class="col-md-8 mb-3">
+								</div>
+							</div>	
+							<div class="row">
+								<div class="col-md-6 mb-3">
+									<label for="idNombre" class="textBold9pt">Correo Electr&oacute;nico</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Nombre" th:field="${entidad.email}" required="required"/>
+								</div>
+								<div class="col-md-3 mb-3">
+									<label for="idNombre" class="textBold9pt">Tipo Caducidad</label>
+									<!--/*/ <th:block th:include="fragments/util :: comboRequired" th:with="campo='tipoCaducidad',map=${mapTipoCaducidad}"></th:block> /*/-->
+									
+								</div>
+								<div class="col-md-3 mb-3">
+									<label for="idNombre" class="textBold9pt">Fecha Caducidad</label>
+									<span class="form-control_v2" th:if="${entidad.fechaCaducidad} == NULL">NINGUNO</span>
+									<span th:if="${entidad.fechaCaducidad} != NULL"><label for="idNombre" class="form-control_v2 " th:text="${entidad.fechaCaducidad}">Login</label></span>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-12 mb-3">
+									<label for="idNombre" class="textBold9pt">Observaci&oacute;n</label>
+									<textarea rows="5" cols="60" class="form-control_v2 is-valid" th:field="${entidad.observacion}"></textarea>
+									
+								</div>
+								
+							</div>
+							
+					</fieldset>
+					<br></br>
+					<div class="container_v4" align="center">
+						<div class="row">
+							<div class="col-md-3 mb-3"></div>
+							
+			  				<div class="col-md-6 mb-3">
+			  					<p style="color: red" th:text="${respuesta}" /> 
+			  					<button class="btn btn-success" type="submit">Guardar</button>
+			  				</div>
+			  				<div class="col-md-3 mb-3"></div>
+			  			</div>
+			  		</div>
+			  	</div>
+			</form>
+
+		</div>
+	</main>
+	<nav id="nav" >
+		<!--/*/ <th:block th:include="fragments/util :: menu"></th:block> /*/-->
+	</nav>	
+</body>
+</html>

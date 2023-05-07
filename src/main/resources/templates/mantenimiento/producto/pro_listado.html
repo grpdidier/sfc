@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+<!--/*/ <th:block th:include="fragments/headerinc :: head"></th:block> /*/-->
+
+</head>
+<body>
+	<!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+	<main>
+		<div id="container">
+			<div id="actionbar" class="row">
+				<div class="col-md-4 mb-3">
+					<a href="#" th:href="@{/producto/nuevo}"><img th:src="@{/images/iconos/nuevo.png}" alt="Nuevo" /></a> 
+					<a href="#"	th:href="@{/}"><img th:src="@{/images/iconos/regresar.png}"	alt="Regresar" /></a>
+				</div>
+				<div class="col-md-8 mb-3 tituloPrincipal" align="left" ><br/> Mantenimiento de Producto</div>
+			</div>
+			<form id="form" th:object="${entidad}" th:action="@{/productos/q}" method="Post">
+				<div id="informacion" class="container_v3">
+					<fieldset class="scheduler-border">
+						<legend class="scheduler-border title10pt">Criterios de b&uacute;squeda</legend>
+							<div class="row">
+								<div class="col-md-3 mb-3">
+									<label for="idPaterno" class="textBold9pt">C&oacute;digo Producto</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Codigo Producto" th:field="${entidad.codigoEmpresa}" size="8" maxlength="30"/>
+								</div>
+								<div class="col-md-8 mb-3">
+									<label for="idMaterno" class="textBold9pt">Nombre Producto</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Nombre Producto" th:field="${entidad.nombre}" size="40" maxlength="200"/>
+								</div>
+							</div>
+								
+					</fieldset>
+					<br></br>
+					<div class="container_v4" align="center">
+						<div class="row">
+							<div class="col-md-3 mb-3"> </div>
+							
+			  				<div class="col-md-6 mb-3">
+			  					<button class="btn btn-success" type="submit">Buscar</button>
+			  				</div>
+			  				<div class="col-md-3 mb-3"></div>
+			  			</div>
+			  			<div class="row">
+			  				<div class="col-md-12 mb-3">
+			  					<p style="color: red" th:text="${respuesta}" />
+			  				</div>
+			  			</div>
+			  		</div>
+					<div id="c_tablas" th:if="${not #lists.isEmpty(registros)}">				
+						<table id="t01" class="table   table-bordered table-active tabla_cabecera_general">
+							<tr>
+								<th>C&oacute;digo </th>
+								<th>Nombre de Producto</th>
+								<th>Precio Unitario</th>
+								<th>Moneda</th>
+								<th>RUC</th>
+								<th>Editar</th>
+								<th>Eliminar</th>
+							</tr>
+							<tr th:each="producto : ${registros}" class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
+								<td th:text="${producto.codigoEmpresa}">codigoEmpresa</td>
+								<td th:text="${producto.nombre}">nombre</td>
+								<td th:text="${producto.precio}">precio</td>
+								<td th:text="${producto.tblCatalogo.nombre}">nombre</td>
+								<td th:text="${producto.tblEmpresa == null? '': producto.tblEmpresa.ruc }">RUC</td>
+								<td align="center"><a
+									th:href="${'/producto/editar/' + producto.codigoProducto}"><img
+										th:src="@{/images/iconos/editar.png}" alt="Editar" /></a></td>
+								<td align="center"><a
+									th:href="${'/producto/eliminar/' + producto.codigoProducto}"><img
+										th:src="@{/images/iconos/eliminar.png}" alt="Eliminar"
+										onclick="if(!confirm('Desea eliminar el producto seleccionado?')){ return false;}" /></a></td>
+							</tr>
+						</table>
+					</div>
+					<div id="c_tablas" th:if="${#lists.isEmpty(registros)}">				
+						<table id="t01" class="table   table-bordered table-active tabla_cabecera_general">
+							<tr>
+								<th>C&oacute;digo </th>
+								<th>Nombre de Producto</th>
+								<th>Precio Unitario</th>
+								<th>Moneda</th>
+								<th>RUC</th>
+								<th>Editar</th>
+								<th>Eliminar</th>
+							</tr>
+							<tr class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
+								<td colspan="7" align="center">No se encontr&oacute; elementos</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</form>
+			
+		</div>
+	</main>
+	<nav id="nav" >
+		
+		<!--/*/ <th:block th:include="fragments/util :: menu"></th:block> /*/-->
+	</nav>
+</body>
+</html>

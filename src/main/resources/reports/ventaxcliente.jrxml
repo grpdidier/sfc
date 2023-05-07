@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.5.1.final using JasperReports Library version 6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ventaxcliente" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d1bb4b2b-45ca-4ec4-8bed-324079f9ad91">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="fechaEmision" class="java.lang.String"/>
+	<field name="nombreTipoComprobante" class="java.lang.String"/>
+	<field name="numeroComprobante" class="java.lang.String"/>
+	<field name="numeroDocumento" class="java.lang.String"/>
+	<field name="nombreCliente" class="java.lang.String"/>
+	<field name="totalOpGravada" class="java.math.BigDecimal"/>
+	<field name="totalIgv" class="java.math.BigDecimal"/>
+	<field name="totalImporte" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="85" splitType="Stretch">
+			<staticText>
+				<reportElement x="177" y="59" width="201" height="21" uuid="e1d56bab-5d8e-44ee-a7ba-0b7467f96015"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REGISTRO DE VENTAS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="201" height="21" uuid="677e4221-5db2-477a-8781-a2b9a765b21c"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[DISTRIBUCIONES KENOR S.A.]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="72" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="50" width="40" height="15" uuid="a06b511b-f20e-4453-b975-75cba776231f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="f1b9154b-8a0a-4e8f-a403-305effadd24d"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Fecha]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="40" y="50" width="100" height="15" uuid="75d0f3d0-7dca-400a-99bc-8e3b351ac91a">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="dd269600-6da8-4290-b8c7-0946ff2700a4"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tipo Comprobante]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="140" y="50" width="100" height="15" uuid="2d824158-7147-42ec-a514-a54c2860ed51">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="61665d10-0f8d-469b-bb1b-0a9b62a2e649"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Numero Documento]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="240" y="50" width="70" height="15" uuid="cdb4e17a-176f-431b-a708-1837b913b221">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="0c1f40b5-54bb-4b16-a36f-8b0e30e134eb"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[R.U.C.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="310" y="50" width="110" height="15" uuid="cd41fe75-dd86-4d59-b945-eb9994c7362c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="07df6c62-0363-44f3-b561-4030721c3a4c"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cliente]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="420" y="50" width="60" height="15" uuid="f14c2e43-9866-4865-b200-2cb95355315e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="17b438d5-5cbd-4e3e-a234-4839dad1332e"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Valor Venta]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="480" y="50" width="40" height="15" uuid="759f2dbf-5439-49af-92b7-a3603e44763e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c84f1ace-2b70-4167-b693-367b0ed7b0ea"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[I.G.V.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="520" y="50" width="40" height="15" uuid="1ba865b7-b7ca-4404-98e6-290c0d869566">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="72309cec-5d4e-4f3e-9a1a-2f2826383d08"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="40" height="30" uuid="7fcc47cd-9391-4ae8-a71a-2cc146306d5e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="f1b9154b-8a0a-4e8f-a403-305effadd24d"/>
+				</reportElement>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{fechaEmision}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="40" y="0" width="100" height="30" uuid="a3988d15-23d6-4534-a59a-6761456e94b5">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="dd269600-6da8-4290-b8c7-0946ff2700a4"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{nombreTipoComprobante}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="140" y="0" width="100" height="30" uuid="abbedec7-6643-47d4-b05f-b091c84c83a5">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="61665d10-0f8d-469b-bb1b-0a9b62a2e649"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{numeroComprobante}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="240" y="0" width="70" height="30" uuid="81da8347-6a2f-43b1-b39e-72302050e024">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="0c1f40b5-54bb-4b16-a36f-8b0e30e134eb"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{numeroDocumento}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="310" y="0" width="110" height="30" uuid="fa6ef5f6-a6d1-4c64-b623-e9b30c907c99">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="07df6c62-0363-44f3-b561-4030721c3a4c"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{nombreCliente}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="420" y="0" width="58" height="30" uuid="2cc9d416-e985-4abd-97f8-2897655ec991">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="17b438d5-5cbd-4e3e-a234-4839dad1332e"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{totalOpGravada}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="478" y="0" width="42" height="30" uuid="5d70002f-3d02-470d-848f-faed50209751">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c84f1ace-2b70-4167-b693-367b0ed7b0ea"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{totalIgv}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="520" y="0" width="40" height="30" uuid="1fd965ea-b852-42f3-a149-33714972a3f6">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="72309cec-5d4e-4f3e-9a1a-2f2826383d08"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{totalImporte}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>
