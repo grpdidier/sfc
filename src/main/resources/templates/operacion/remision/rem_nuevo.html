@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+<!--/*/ <th:block th:include="fragments/headerinc :: head"></th:block> /*/-->
+</head>
+<body>
+	<!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+	<main>
+		<div id="container">	
+			<div id="actionbar" class="row">
+				<div class="col-md-4 mb-3">
+					<a href="#" th:href="@{/operacion/regresar}"><img th:src="@{/images/iconos/regresar.png}" alt="Regresar" /></a>
+				</div>
+				<div class="col-md-8 mb-3 tituloPrincipal" align="left" ><br/> M&oacute;dulo de Remisi&oacute;n - Nuevo - RUC: <label th:text="${entidad.ruc}" style="color: RED"></label></div>
+				
+			</div>
+			
+			<form id="form" th:object="${entidad}" th:action="@{/operacion/remision/nuevo/guardar}" method="post">
+				
+				<div id="informacion" class="container_v3">
+					<p style="color: red" th:text="${respuesta}" /> 
+						<fieldset class="scheduler-border">
+						<legend class="scheduler-border title10pt">Datos de la Gu&iacute;a de Remisi&oacute;n</legend>
+							
+							<div class="row">
+								<div class="col-md-4 mb-0">
+									<label for="idNombre" class="textBold9pt">Motivo de Traslado</label>
+										<select th:field="${entidad.remision.motivoTraslado}" class="form-control_v2 is-valid" >
+											<option value="-1">--Seleccionar--</option>
+											<option th:each="entry : ${session.SessionMapMotivoTraslado}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+										</select>
+								</div>
+								<div class="col-md-1 mb-0" >
+									<label for="idNombre" class="textBold9pt">Serie</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="serie" th:field="${entidad.remision.serie}" required="required" maxlength="4"/>
+								</div>
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">N&uacute;mero Comprobante</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="numero" th:field="${entidad.remision.numero}" required="required" maxlength="8"/>
+								</div>
+								
+								<div class="col-md-4 mb-0">
+									<div class="row">
+										<div class="col-md-4 mb-0" >
+											<label for="idNombre" class="textBold9pt">Fec. de Emisi&oacute;n</label>
+											<input type="text" class="form-control_v2 is-valid" placeholder="dd/MM/yyyy" th:field="${entidad.remision.fechaEmision}" required="required"/>
+										</div>
+										<div class="col-md-4 mb-0" >
+											<label for="idNombre" class="textBold9pt">Fec. de Traslado</label>
+											<input type="text" class="form-control_v2 is-valid" placeholder="dd/MM/yyyy" th:field="${entidad.remision.fechaInicioTraslado}" />
+										</div>
+										<div class="col-md-4 mb-0" >
+											<label for="idNombre" class="textBold9pt">Hora de Traslado</label>
+											<input type="text" class="form-control_v2 is-valid" placeholder="HH:MI:SS" th:field="${entidad.remision.horaInicioTraslado}" />
+										</div>
+									</div>
+								</div>
+								<div class="col-md-1 mb-0" >
+									<label for="idNombre" class="textBold9pt">Asociar Facturas</label>
+									<button class="btn btn-success" onclick="jsListarFacturas();">...</button>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-3 mb-2">
+									<label for="idNombre" class="textBold9pt">Tipo de Comprobante</label>
+									<select th:field="${entidad.remision.tipoComprobante}" class="form-control_v2 is-valid" >
+										<option value="-1">--Seleccionar--</option>
+										<option th:each="entry : ${session.SessionMapTipoComprobante}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+									</select>
+								</div>
+								<div class="col-md-9 mb-2">
+									<label for="idNombre" class="textBold9pt">C&oacute;digo Domicilio Partida</label>
+									<select th:field="${entidad.remision.codigoDomicilioPartida}" class="form-control_v2 is-valid">
+										<option value="-1">--Seleccionar--</option>
+										<option th:each="entry : ${session.SessionMapDomicilioFiscal}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+									</select>
+									
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-12 mb-2">
+									<label for="idNombre" class="textBold9pt">Domicilio de Llegada</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="domicilio de llegada" th:field="${entidad.remision.domicilioLlegada}" required="required" maxlength="256"/>
+									
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-12 mb-2">
+									<label for="idNombre" class="textBold9pt">Datos del  Transportista (ruc: nombre: marca: placa: nro certificado inscripci&oacute;n: nro licencia)</label>
+									<select th:field="${entidad.datosTransporte}" class="form-control_v2 is-valid">
+										<option value="-1">--Seleccionar--</option>
+										<option th:each="entry : ${session.SessionMapTransporte}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+									</select>
+								</div>
+								
+							</div>
+							
+							
+					</fieldset>
+
+					<br></br>
+					<div id="c_tablas" th:if="${not #lists.isEmpty(entidad.listaFacturaAsociada)}">	
+						<input type="hidden" th:field="${entidad.indiceElemento}" id="idIndice"/>
+						<table id="t01" class="table   table-bordered table-active tabla_cabecera_general">
+							<tr>
+								<th width="20%">Factura Asociada</th>
+								<th width="25%">Cliente</th>
+								<th width="30%">Descripci&oacute;n Producto</th>
+								<th width="10%">Unidad</th>
+								<th width="10%">Cantidad</th>
+								<th width="5%">Eliminar</th>
+							</tr>
+							<tr th:each="detalleComprobante, iterStat : ${entidad.listaFacturaAsociada}"  class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
+								<td th:text="${detalleComprobante.serieFactura + '-' +  detalleComprobante.numeroFactura}">factura</td>
+								<td th:text="${detalleComprobante.nombreCliente}">nombreCliente</td>
+								<td th:text="${detalleComprobante.descripcion}">descripcion</td>
+								<td th:text="${detalleComprobante.unidadMedida}">unidadMedida</td>
+								<td th:text="${detalleComprobante.cantidad}">cantidad</td>
+								<td align="center">
+									<a href="#" th:onclick="'jsEliminarDetalleGuiaRemision(\''+${iterStat.index}+ '\');'">
+									 <img th:src="@{/images/iconos/eliminar.png}" alt="Eliminar"
+										onclick="if(!confirm('Desea eliminar el cliente seleccionado?')){ return false;}" /></a></td>
+							</tr>
+						</table>
+					</div>
+					<div id="c_tablas" th:if="${#lists.isEmpty(entidad.listaFacturaAsociada)}">				
+						<table id="t01" class="table   table-bordered table-active tabla_cabecera_general">
+							<tr>
+								<th width="20%">Factura Asociada</th>
+								<th width="25%">Cliente</th>
+								<th width="30%">Descripci&oacute;n Producto</th>
+								<th width="10%">Unidad</th>
+								<th width="10%">Cantidad</th>
+								<th width="5%">Eliminar</th>
+							</tr>
+							<tr class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
+								<td colspan="5" align="center">No se encontr&oacute; elementos</td>
+							</tr>
+						</table>
+					</div>
+					<br></br>
+					
+						
+							
+					<div class="container_v4" align="center">
+						<div class="row">
+							<div class="col-md-3 mb-3"></div>
+							
+			  				<div class="col-md-6 mb-3">
+			  					<br/>
+			  					<button class="btn btn-success" type="submit" onclick="">Guardar Remisi&oacute;n</button>
+			  				</div>
+			  				<div class="col-md-3 mb-3"></div>
+			  			</div>
+			  		</div>
+			  	</div>
+			</form>
+
+		</div>
+	</main>
+	<nav id="nav" >
+		<!--/*/ <th:block th:include="fragments/util :: menu"></th:block> /*/-->
+	</nav>	
+</body>
+</html>

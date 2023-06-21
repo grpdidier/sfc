@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+<!--/*/ <th:block th:include="fragments/headerinc :: head"></th:block> /*/-->
+</head>
+<body>
+	<!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+	<main>
+		<div id="container">	
+			<div id="actionbar" class="row">
+				<div class="col-md-4 mb-3">
+					<a href="#" th:href="@{/operacion/regresar/listafactura}"><img th:src="@{/images/iconos/regresar.png}" alt="Regresar" /></a>
+				</div>
+				<div class="col-md-8 mb-3 tituloPrincipal" align="left" ><br/> M&oacute;dulo de Remisi&oacute;n - Nuevo - RUC: <label th:text="${entidad.ruc}" style="color: RED"></label></div>
+				
+			</div>
+			
+			<form id="form" th:object="${entidad}" th:action="@{/operacion/remision/nuevo/asociar}" method="post">
+				
+				<div id="informacion" class="container_v3">
+					<p style="color: red" th:text="${respuesta}" /> 
+
+					<fieldset class="scheduler-border">
+						<legend class="scheduler-border title10pt">Datos de la Factura</legend>
+							<div class="row">
+								<div class="col-md-5 mb-2">
+									<label for="idNombre" class="textBold9pt">Tipo de Operaci&oacute;n</label>
+									<select th:field="${entidad.comprobante.tipoOperacion}" class="form-control_v2 " disabled="disabled">
+										<option value="">--Seleccionar--</option>
+										<option th:each="entry : ${session.SessionMapTipoOperacionSFS12}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+									</select>
+									
+								</div>
+								<div class="col-md-1 mb-0" align="left">
+									
+								</div>
+								<div class="col-md-6 mb-2">
+									<label for="idNombre" class="textBold9pt">C&oacute;digo Domicilio Fiscal</label>
+									<select th:field="${entidad.comprobante.codigoDomicilio}" class="form-control_v2 " disabled="disabled">
+										<option value="">--Seleccionar--</option>
+										<option th:each="entry : ${session.SessionMapDomicilioFiscal}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+									</select>
+									
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">Tipo de Comprobante</label>
+										<select th:field="${entidad.comprobante.tipoComprobante}" class="form-control_v2 " disabled="disabled">
+											<option value="">--Seleccionar--</option>
+											<option th:each="entry : ${session.SessionMapTipoComprobanteFacturaBoleta}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+										</select>
+								</div>
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">Moneda</label>
+										<select th:field="${entidad.comprobante.moneda}" class="form-control_v2 " disabled="disabled">
+											<option value="">--Seleccionar--</option>
+											<option th:each="entry : ${session.SessionMapTipoMoneda}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+										</select>
+								</div>
+								
+								<div class="col-md-1 mb-0" >
+									<label for="idNombre" class="textBold9pt">Serie</label>
+									<input type="text" class="form-control_v2 " placeholder="serie" th:field="${entidad.comprobante.serie}" required="required" maxlength="4" disabled="disabled" style="background-color: #ECECEC;"/>
+								</div>
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">N&uacute;mero Comprobante</label>
+									<input type="text" class="form-control_v2 " placeholder="numero" th:field="${entidad.comprobante.numero}" required="required" maxlength="8" disabled="disabled" style="background-color: #ECECEC;"/>
+								</div>
+								
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">Fecha de Emisi&oacute;n</label>
+									<input type="text" class="form-control_v2 " placeholder="dd/MM/yyyy" th:field="${entidad.comprobante.fechaEmision}" required="required" disabled="disabled" style="background-color: #ECECEC;"/>
+								</div>
+								<div class="col-md-1 mb-0">
+									<label for="idNombre" class="textBold9pt">Hora </label>
+									<input type="text" class="form-control_v2 " placeholder="dd/MM/yyyy" th:field="${entidad.comprobante.horaEmision}" required="required" disabled="disabled" style="background-color: #ECECEC;"/>
+								</div>
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">Fecha Vencimiento</label>
+									<input type="text" class="form-control_v2 " placeholder="dd/MM/yyyy" th:field="${entidad.comprobante.fechaVencimiento}" disabled="disabled" style="background-color: #ECECEC;"/>
+								</div>
+							</div>
+							
+					</fieldset>
+
+					<br></br>
+					
+					<fieldset class="scheduler-border">
+						<legend class="scheduler-border title10pt">Datos del Cliente</legend>
+							<div class="row">
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">N&uacute;mero Documento</label>
+									<input type="text" class="form-control_v2 " placeholder="numero" th:field="${entidad.comprobante.numeroDocumento}" required="required" maxlength="32"  disabled="disabled" style="background-color: #ECECEC;"/>
+								</div>
+								
+								<div class="col-md-3 mb-0">
+									<label for="idNombre" class="textBold9pt">Tipo Documento</label>
+									<select th:field="${entidad.comprobante.tipoDocumento}" class="form-control_v2" disabled="disabled">
+										<option value="">--Seleccionar--</option>
+										<option th:each="entry : ${session.SessionMapTipoDocumento}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+									</select>
+								</div>
+								<div class="col-md-7 mb-0">
+									<label for="idNombre" class="textBold9pt">Direcci&oacute;n Cliente</label>
+									<input type="text" class="form-control_v2 " placeholder="direccion cliente" th:field="${entidad.comprobante.direccionCliente}" required="required" maxlength="256"  disabled="disabled" style="background-color: #ECECEC;"/>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-12 mb-0">
+									<label for="idNombre" class="textBold9pt">Nombre Apellido / Raz&oacute;n Social</label>
+									<input type="text" class="form-control_v2 " placeholder="Nombre y Apellido / Razon Social" th:field="${entidad.comprobante.nombreCliente}" required="required" maxlength="256"  disabled="disabled" style="background-color: #ECECEC;"/>
+								</div>
+								
+							</div>
+					</fieldset>
+					
+					<br></br>
+					<div id="c_tablas" th:if="${not #lists.isEmpty(entidad.listaDetalle)}">	
+						<table id="t01" class="table   table-bordered table-active tabla_cabecera_general">
+							<tr>
+								<th width="60%">Descripci&oacute;n Producto</th>
+								<th width="10%">Unidad</th>
+								<th width="30%">Cantidad</th>
+							</tr>
+							<tr th:each="detalleComprobante, status : ${entidad.listaDetalle}"  class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
+								<td th:text="${detalleComprobante.descripcion}">descripcion</td>
+								<td th:text="${detalleComprobante.unidadMedida}">unidadMedida</td>
+								<td>
+									<input type="text" class="form-control_v2 is-valid" th:field="*{listaDetalle[__${status.index}__].cantidad}" ></input>
+								</td>
+								
+								
+							</tr>
+						</table>
+					</div>
+					<div id="c_tablas" th:if="${#lists.isEmpty(entidad.listaDetalle)}">				
+						<table id="t01" class="table   table-bordered table-active tabla_cabecera_general">
+							<tr>
+								<th width="60%">Descripci&oacute;n Producto</th>
+								<th width="10%">Unidad</th>
+								<th width="30%">Cantidad</th>
+							</tr>
+							<tr class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
+								<td colspan="5" align="center">No se encontr&oacute; elementos</td>
+							</tr>
+						</table>
+					</div>
+					<br></br>
+					
+						
+							
+					<div class="container_v4" align="center">
+						<div class="row">
+							<div class="col-md-3 mb-3"></div>
+							
+			  				<div class="col-md-6 mb-3">
+			  					<br/>
+			  					<button class="btn btn-success" type="submit" onclick="">Asociar Remisi&oacute;n</button>
+			  				</div>
+			  				<div class="col-md-3 mb-3"></div>
+			  			</div>
+			  		</div>
+			  	</div>
+			</form>
+
+		</div>
+	</main>
+	<nav id="nav" >
+		<!--/*/ <th:block th:include="fragments/util :: menu"></th:block> /*/-->
+	</nav>	
+</body>
+</html>

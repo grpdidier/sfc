@@ -273,6 +273,7 @@ public class Constantes {
 	public static String TIPO_COMPROBANTE_NOTA_CREDITO		= "07";
 	public static String TIPO_COMPROBANTE_NOTA_DEBITO		= "08";
 	public static String TIPO_COMPROBANTE_INTERNO			= "99"; //SOLO PARA DOC INTERNOS
+	public static String TIPO_COMPROBANTE_GUIA_REMISION		= "09";
 	
 	//SERIE: Tipo de Operacion
 	public static String SERIE_TIPO_OPERACION_MENSUAL			= "MNS";
@@ -335,6 +336,7 @@ public class Constantes {
 	public static String TIPO_CATALAGO_TIPO_LEYENDA							= "TIPO_LEYENDA";
 	public static String TIPO_CATALAGO_NOTA_CREDITO							= "TIPO_NOTA_CREDITO";
 	public static String TIPO_CATALAGO_NOTA_DEBITO							= "TIPO_NOTA_DEBITO";
+	public static String TIPO_CATALAGO_MOTIVO_TRASLADO						= "TIPO_MOTIVO_TRASLADO";
 	
 	public static String TIPO_CATALAGO_TIPO_OPERACION_SFS_1_2				= "TIPO_OPERACION_SFS_1_2";
 	
@@ -348,6 +350,7 @@ public class Constantes {
 	public static Integer TIPO_CATALAGO_COD_TIPO_SISTEMA					= 7;
 	public static Integer TIPO_CATALAGO_COD_TIPO_COMPROBANTE				= 8;
 	public static Integer TIPO_CATALAGO_COD_TIPO_LEYENDA					= 9;
+	public static Integer TIPO_CATALAGO_COD_MOTIVO_TRASLADO					= 14;
 	
 	//Parametro de la suna
 	public static String  SUNAT_PARAMETRO_SISTEMA							= "PARASIST";
@@ -422,4 +425,8 @@ public class Constantes {
 	//Variables para la operacion
 	public static String FORMA_PAGO_CONTADO									= "Contado";
 	public static String FORMA_PAGO_CREDITO									= "Credito";
+	
+	public static String CODIGO_DOMICILIO_FISCAL							= "03";
+	
+	public static String ESTADO_XML_GENERADO								= "02";
 }

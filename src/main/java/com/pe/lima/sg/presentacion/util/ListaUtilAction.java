@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
-
+//import org.apache.commons.lang3.StringUtils;
 /**
  * Clase Bean que se encarga de la consruccion de las listas desplegables para
  * los combos de seleccion que se utilizan en las vistas
@@ -323,4 +323,21 @@ public class ListaUtilAction {
 		resultados.put("CONTADO", "Contado");
 		return resultados;
 	}
+	
+	public static String AddSpacio(String dato, Integer longitudDeseada) {
+		String resultado = "";
+		if (dato!=null) {
+			if (dato.length()<longitudDeseada) {
+				//resultado = StringUtils.rightPad(dato, longitudDeseada);
+				resultado = String.format("%-"+longitudDeseada+"s", dato)+":";
+			}
+			if (dato.length()==longitudDeseada) {
+				resultado = dato+":";
+			}
+			if (dato.length()>longitudDeseada) {
+				resultado = dato.substring(0,longitudDeseada)+":";
+			}
+		}
+        return resultado;
+    }
 }

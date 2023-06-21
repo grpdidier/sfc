@@ -34,6 +34,7 @@ import com.pe.lima.sg.dao.mantenimiento.ICatalogoDAO;
 import com.pe.lima.sg.dao.mantenimiento.IEmpresaDAO;
 import com.pe.lima.sg.dao.mantenimiento.IParametroDAO;
 import com.pe.lima.sg.dao.mantenimiento.IProductoDAO;
+import com.pe.lima.sg.dao.mantenimiento.ITransporteDAO;
 import com.pe.lima.sg.dao.operacion.IConfiguracionDAO;
 import com.pe.lima.sg.dao.seguridad.IOpcionDAO;
 import com.pe.lima.sg.dao.seguridad.IUsuarioDAO;
@@ -43,6 +44,7 @@ import com.pe.lima.sg.entity.mantenimiento.TblCatalogo;
 import com.pe.lima.sg.entity.mantenimiento.TblEmpresa;
 import com.pe.lima.sg.entity.mantenimiento.TblParametro;
 import com.pe.lima.sg.entity.mantenimiento.TblProducto;
+import com.pe.lima.sg.entity.mantenimiento.TblTransporte;
 import com.pe.lima.sg.entity.operacion.TblComprobante;
 import com.pe.lima.sg.entity.operacion.TblConfiguracion;
 import com.pe.lima.sg.entity.operacion.TblDetalleComprobante;
@@ -59,6 +61,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	AuthenticationSuccessHandler successHandler;
+	
+	@Autowired
+	ITransporteDAO transporteDao;
 	
 	@Autowired
 	private ICatalogoDAO catalogoDao;
@@ -263,6 +268,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				Map<String, Object> mapTipoOperacion 	= new LinkedHashMap<String, Object>();
 				Map<String, Object> mapTipoOperacionSfs12	= new LinkedHashMap<String, Object>();
 				Map<String, Object> mapDomicilioFiscal	= new LinkedHashMap<String, Object>();
+				Map<String, String> mapDomicilioFiscalSession	= new HashMap<String, String>();
 				Map<String, Object> mapTipoDocumento	= new LinkedHashMap<String, Object>();
 				Map<String, Object> mapTipoMoneda		= new LinkedHashMap<String, Object>();
 				Map<String, Object> mapTipoUnidad		= new LinkedHashMap<String, Object>();
@@ -277,6 +283,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				Map<String, Object> mapTipoFacturaBoleta	= new LinkedHashMap<String, Object>();
 				//Tipo de comprobante: nota debito y credito
 				Map<String, Object> mapTipoNota				= new LinkedHashMap<String, Object>();
+				Map<String, Object> mapTipoMotivoTraslado	= new LinkedHashMap<String, Object>();
+				Map<String, String> mapTipoMotivoTrasladoSesion	= new HashMap<String, String>();
+				//Transporte
+				Map<String, String> mapTransporte	= new LinkedHashMap<String, String>();
 				
 				List<TblCatalogo> listaCatalogo 		= null;
 				IOperacionFacturador operacionFacturador		= null;
@@ -318,6 +328,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 							//Domicilio Fiscal
 							if (entidad.getTblTipoCatalogo().getNombre().equals(Constantes.TIPO_CATALAGO_DOMICILIO_FISCAL)){
 								mapDomicilioFiscal.put(entidad.getCodigoSunat() + " : " +entidad.getNombre(), entidad.getCodigoSunat());
+								mapDomicilioFiscalSession.put(entidad.getCodigoSunat(), entidad.getNombre());
 							}
 							//Tipo Documento
 							if (entidad.getTblTipoCatalogo().getNombre().equals(Constantes.TIPO_CATALAGO_TIPO_DOCUMENTO)){
@@ -343,7 +354,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 							if (entidad.getTblTipoCatalogo().getNombre().equals(Constantes.TIPO_CATALAGO_TIPO_COMPROBANTE)){
 								mapTipoComprobante.put(entidad.getCodigoSunat() + " : " +entidad.getNombre(), entidad.getCodigoSunat());
 								//Factura - Boleta
-								if (entidad.getCodigoSunat().equals(Constantes.TIPO_COMPROBANTE_FACTURA) || entidad.getCodigoSunat().equals(Constantes.TIPO_COMPROBANTE_BOLETA)){
+								if (entidad.getCodigoSunat().equals(Constantes.TIPO_COMPROBANTE_FACTURA) || entidad.getCodigoSunat().equals(Constantes.TIPO_COMPROBANTE_BOLETA) || entidad.getCodigoSunat().equals(Constantes.TIPO_COMPROBANTE_GUIA_REMISION)){
 									mapTipoFacturaBoleta.put(entidad.getCodigoSunat() + " : " +entidad.getNombre(), entidad.getCodigoSunat());
 								}
 								//Nota Credito y Debito
@@ -364,6 +375,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 							if (entidad.getTblTipoCatalogo().getNombre().equals(Constantes.TIPO_CATALAGO_NOTA_DEBITO)){
 								mapNotaDebito.put(entidad.getCodigoSunat() + " : " +entidad.getNombre(), entidad.getCodigoSunat());
 							}
+							//Tipo Motivo Traslado
+							if (entidad.getTblTipoCatalogo().getNombre().equals(Constantes.TIPO_CATALAGO_MOTIVO_TRASLADO)){
+								mapTipoMotivoTraslado.put(entidad.getCodigoSunat() + " : " +entidad.getNombre(), entidad.getCodigoSunat());
+								mapTipoMotivoTrasladoSesion.put(entidad.getCodigoSunat() , entidad.getNombre());
+							}
 						}
 						//Tipo de Operacion
 						request.getSession().setAttribute("SessionMapTipoOperacion",mapTipoOperacion);
@@ -372,6 +388,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						
 						//Domicilio Fiscal
 						request.getSession().setAttribute("SessionMapDomicilioFiscal",mapDomicilioFiscal);
+						request.getSession().setAttribute("SessionMapDomicilioFiscalDescripcion",mapDomicilioFiscalSession);
+						
 						//Tipo Documento
 						request.getSession().setAttribute("SessionMapTipoDocumento",mapTipoDocumento);
 						//Tipo Moneda
@@ -396,6 +414,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						request.getSession().setAttribute("SessionMapNotaCredito",mapNotaCredito);
 						//Tipo Nota Debito
 						request.getSession().setAttribute("SessionMapNotaDebito",mapNotaDebito);
+						//Tipo Motivo Traslado
+						request.getSession().setAttribute("SessionMapMotivoTraslado",mapTipoMotivoTraslado);
+						request.getSession().setAttribute("SessionMapMotivoTrasladoDescripcion",mapTipoMotivoTrasladoSesion);
 						
 						//Lista completa de la tabla de catalogo
 						request.getSession().setAttribute("SessionListCatalogo", listaCatalogo);
@@ -459,6 +480,28 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						}
 					}
 					request.getSession().setAttribute("SessionMapEmpresa",mapEmpresa);
+					//Cargamos los transportes
+					List<TblTransporte> listaTransporte = transporteDao.buscarAllxEstado();
+					if (listaTransporte != null) {
+						mapTransporte = new LinkedHashMap<String, String>();
+						for(TblTransporte transporte: listaTransporte) {
+							/*String dato = ListaUtilAction.AddSpacio( transporte.getRuc(),16);
+							dato = dato + ListaUtilAction.AddSpacio(transporte.getNombre(),80);
+							dato = dato + ListaUtilAction.AddSpacio(transporte.getMarca(),20);
+							dato = dato + ListaUtilAction.AddSpacio(transporte.getPlaca(),10);
+							dato = dato + ListaUtilAction.AddSpacio(transporte.getNumeroCertificadoInscripcion(),32);
+							dato = dato + ListaUtilAction.AddSpacio(transporte.getNumeroLicencia(),32);*/
+							String dato;
+							dato = transporte.getRuc();
+							dato = dato + ":"+ transporte.getNombre();
+							dato = dato + ":"+ transporte.getMarca();
+							dato = dato + ":"+ transporte.getPlaca();
+							dato = dato + ":"+ transporte.getNumeroCertificadoInscripcion();
+							dato = dato + ":"+ transporte.getNumeroLicencia();
+							mapTransporte.put(dato, dato);
+						}
+					}
+					request.getSession().setAttribute("SessionMapTransporte",mapTransporte);
 					LOGGER.debug("[obtenerValoresCatalogo] Fin");
 				}catch(Exception e){
 					e.printStackTrace();

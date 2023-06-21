@@ -88,15 +88,12 @@ public class PageWrapper<T> {
     public boolean isFirstPage(){
         //return page.isFirst();
     	//return operacion.equals("F");
-    	LOGGER.debug("[isFirstPage] currentNumber == 1:"+ (currentNumber == 1));
     	return currentNumber == 1;
     }
 
     public boolean isLastPage(){
         //return page.isLast();
     	//return operacion.equals("L");
-    	LOGGER.debug("[isLastPage] pageActual : pageMaximo:"+ pageActual +":"+ pageMaximo);
-    	LOGGER.debug("[isLastPage] pageActual == pageMaximo:"+ (pageActual == pageMaximo));
     	return pageActual == pageMaximo;
     }
 
@@ -108,8 +105,6 @@ public class PageWrapper<T> {
 
     public boolean isHasNextPage(){
         //return page.hasNext();
-    	LOGGER.debug("[isHasNextPage] pageActual : pageMaximo:"+ pageActual +":"+ pageMaximo);
-    	LOGGER.debug("[isHasNextPage] (pageActual >= pageMaximo):"+ (pageActual >=pageMaximo));
     	return (pageActual >= pageMaximo);
     }
 

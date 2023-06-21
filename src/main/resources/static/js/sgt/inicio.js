@@ -370,3 +370,29 @@ function jsOcultarObject(idOcultar, idMostrar){
 	obj = document.getElementById(idMostrar);
 	obj.style.display = '';
 }
+/* *********************************************************************************************************************************
+ * MODULO DE GUIA DE REMISION
+ ********************************************************************************************************************************* */
+//Busqueda de FACTURAS
+function jsListarFacturas(){
+	document.forms[0].action = '/operacion/remision/facturas' ;
+	document.forms[0].method = 'POST';
+	document.forms[0].submit();
+}
+function jsRegresarNuevoRemision(){
+	document.forms[0].action = '/operacion/remision/regresar' ;
+	document.forms[0].method = 'GET';
+	document.forms[0].submit();
+}
+function jsModificarDetalleProductoRemision(){
+	document.forms[0].action = '/operacion/remision/detalle/actualizar' ;
+	document.forms[0].method = 'POST';
+	document.forms[0].submit();
+}
+//Elimina un detalle
+function jsEliminarDetalleGuiaRemision(indice){
+	document.getElementById('idIndice').value = indice;
+	document.forms[0].action = '/operacion/remision/detalle/eliminar' ;
+	document.forms[0].method = 'POST';
+	document.forms[0].submit();	
+}

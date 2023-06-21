@@ -52,6 +52,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.pe.lima.sg.bean.facturador.BandejaFacturadorBean;
 import com.pe.lima.sg.bean.facturador.ParametroFacturadorBean;
+import com.pe.lima.sg.bean.remision.RemisionBean;
 import com.pe.lima.sg.dao.BaseOperacionDAO;
 import com.pe.lima.sg.dao.mantenimiento.ICatalogoDAO;
 import com.pe.lima.sg.dao.mantenimiento.IClienteDAO;
@@ -348,6 +349,7 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 			e.printStackTrace();
 		}
 	}
+	
 
 	private void inicializaDatosComprobante(Filtro filtro ){
 		filtro.setHoraEmision(UtilSGT.getHora());

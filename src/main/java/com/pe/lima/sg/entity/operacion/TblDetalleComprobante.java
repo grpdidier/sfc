@@ -74,6 +74,7 @@ public class TblDetalleComprobante implements java.io.Serializable {
 	private BigDecimal valorVentaItem;
 	private BigDecimal valorReferencialUnitario;
 	private BigDecimal valorUnitario;
+	private BigDecimal cantidadGuia;	
 
 	public TblDetalleComprobante() {
 	}
@@ -607,5 +608,14 @@ public class TblDetalleComprobante implements java.io.Serializable {
 			idUsuario 		= null;
 			strIdUsuario	= null;
 		}
+	}
+
+	@Column(name = "cantidad_guia", precision = 23, scale = 10)
+	public BigDecimal getCantidadGuia() {
+		return cantidadGuia;
+	}
+
+	public void setCantidadGuia(BigDecimal cantidadGuia) {
+		this.cantidadGuia = cantidadGuia;
 	}
 }

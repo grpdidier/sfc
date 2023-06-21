@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+<!--/*/ <th:block th:include="fragments/headerinc :: head"></th:block> /*/-->
+
+</head>
+<body>
+	<!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+	<main>
+		<div id="container" style="width:95%">
+			<div id="actionbar" class="row">
+				<div class="col-md-4 mb-3">
+					<a href="#"	th:href="@{/operacion/remision/regresar}"><img th:src="@{/images/iconos/regresar.png}"	alt="Regresar" /></a>
+				</div>
+				<div class="col-md-8 mb-3 tituloPrincipal" align="left" ><br/> M&oacute;dulo de Factura</div>
+			</div>
+			<form id="form" th:object="${filtro}" th:action="@{/operacion/remision/factura/q}" method="Post">
+				<div id="informacion" class="container_v3">
+					<fieldset class="scheduler-border">
+						<legend class="scheduler-border title10pt">Criterios de b&uacute;squeda</legend>
+
+							<div class="row">
+								<div class="col-md-5 mb-3">
+									
+								</div>
+								<div class="col-md-2 mb-3">
+									<label for="idMaterno" class="textBold9pt">N&uacute;mero</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Numero del Comprobante" th:field="${filtro.numero}" size="16" maxlength="8"/>
+								</div>
+								<div class="col-md-5 mb-3">
+									
+								</div>
+							</div>
+															
+					</fieldset>
+					<br></br>
+					<div class="container_v4" align="center">
+						<div class="row">
+							<div class="col-md-3 mb-3"> </div>
+							
+			  				<div class="col-md-6 mb-3">
+			  					<button class="btn btn-success" type="submit">Buscar</button>
+			  				</div>
+			  				<div class="col-md-3 mb-3"></div>
+			  			</div>
+			  			<div class="row">
+			  				<div class="col-md-12 mb-3">
+			  					<p style="color: red" th:text="${respuesta}" />
+			  				</div>
+			  			</div>
+			  		</div>
+					<div id="c_tablas" th:if="${not #lists.isEmpty(registros)}">	
+						<!--Pagination -->
+						<nav class="my-1">
+						    <ul class="pagination pagination-circle pg-blue mb-0">
+								 <!--First-->
+						        <li th:class="${page.firstPage}? 'page-item disabled' : 'page-item'">
+						        	<span aria-hidden="true" class="page-link" th:if='${page.firstPage}'>First</span>
+						        	<a th:if='${not page.firstPage}' th:href="${ page.url + '0' + '/' +  page.size + '/F'  }">
+						        		 <span class="page-link" th:if='${not page.firstPage}'>First</span>
+						        	</a>
+						        </li>
+						
+						        <!--Arrow left-->
+						        <li  th:class="${page.hasPreviousPage}? 'page-item disabled' : 'page-link'">
+						        	<span aria-hidden="true"  class="page-link" th:if='${page.hasPreviousPage}'>&laquo;</span>
+						            <a  th:if='${not page.hasPreviousPage}' th:href="${page.url + (page.pageActual-2) + '/' +  page.size + '/P'}" title='Go to previous page' aria-label="Previous" >
+						               <span  aria-hidden="true">&laquo;Previous</span>
+						            </a>
+						        </li>
+						
+						        <!--Numbers-->
+						        <li th:each='item : ${page.items}' th:class="${item.current}? 'page-item active' : 'page-item'">
+						        	 <span th:if='${item.current}' th:text='${item.number}' class="page-link">1</span>
+						        	 <a class="page-link" th:if='${not item.current}' th:href="${page.url + (item.number-1)  + '/' +  page.size + '/C'}"><span th:text='${item.number}'>1</span></a>
+						        </li>
+						        <!--Arrow right-->
+						        <li th:class="${page.hasNextPage}? 'page-item disable' : 'page-link'">
+						        	<span aria-hidden="true"  class="page-link" th:if='${page.hasNextPage}'>&raquo;</span>
+						        	<a aria-label="Next" th:if='${not page.hasNextPage}' th:href="${page.url + (page.pageActual)  + '/' +  page.size + '/N'}" title='Go to next page'>
+						            	<span aria-hidden="true">Next&raquo;</span>
+						            </a>
+						        </li>
+						
+						        <!--First-->
+						        <li th:class="${page.lastPage}? 'page-item disabled' : 'page-link'">
+						        	<span aria-hidden="true" class="page-link" th:if='${page.lastPage}'>Last</span>
+						        	<a  aria-label="Last" th:if='${not page.lastPage}' th:href="${page.url + (page.totalPages - 1)  + '/' +  page.size + '/L'}">
+						        		<span aria-hidden="true" >Last: </span><font th:text="${page.total}"> </font> Elements
+						        	</a>
+						        </li>
+						        
+						        
+						
+						    </ul>
+						</nav>
+						
+						<!--/Pagination -->				
+						<table id="t01" class="table   table-bordered table-active tabla_cabecera_general">
+							<tr>
+								<th>Comprobante</th>
+								<th>Serie</th>
+								<th>N&uacute;mero</th>
+								<th>Fecha Emision</th>
+								<th>Moneda</th>
+								<th>Total Gravado</th>
+								<th>IGV</th>
+								<th>Importe Total</th>
+								<th >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Estado</th>
+								<th>Seleccionar</th>
+							</tr>
+							<tr th:each="comprobante, iterStat : ${registros}"  class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
+								<td align="center">
+									<div th:replace="fragments/util :: tipoComprobante(tipo=${comprobante.tipoComprobante})"></div>
+								</td>
+								<td th:text="${comprobante.serie}">serie</td>
+								<td th:text="${comprobante.numero}">numero</td>
+								<td th:text="${comprobante.fechaEmision}">fecha</td>
+								<td align="center">
+									<div th:replace="fragments/util :: tipoMonedaSunat(tipo=${comprobante.moneda})"></div>
+								</td>
+								<td th:text="${#numbers.formatDecimal(comprobante.totalOpGravada, 1, 'DEFAULT', 2, 'DEFAULT')}">monto gravado</td>
+								<td th:text="${#numbers.formatDecimal(comprobante.totalIgv, 1, 'DEFAULT', 2, 'DEFAULT')}">igv</td>
+								<td th:text="${#numbers.formatDecimal(comprobante.totalImporte, 1, 'DEFAULT', 2, 'DEFAULT')}">total</td>
+								
+								<td align="center">
+									<div th:replace="fragments/util :: estadoFactura(tipo=${comprobante.estadoOperacion})"></div>
+								</td>
+								
+								<td align="center">
+									<a	th:href="${'/operacion/remision/seleccion/' + iterStat.index}">
+										<img th:src="@{/images/iconos/documento.png}" alt="Editar" />
+									</a>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div id="c_tablas" th:if="${#lists.isEmpty(registros)}">				
+						<table id="t01" class="table   table-bordered table-active tabla_cabecera_general">
+							<tr>
+								<th>Comprobante</th>
+								<th>Serie</th>
+								<th>N&uacute;mero</th>
+								<th>Fecha Emision</th>
+								<th>Moneda</th>
+								<th>Total Gravado</th>
+								<th>IGV</th>
+								<th>Importe Total</th>
+								<th>Estado</th>
+								<th>Seleccionar</th>
+							</tr>
+							<tr class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
+								<td colspan="10" align="center">No se encontr&oacute; elementos</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</form>
+			
+		</div>
+	</main>
+	<nav id="nav" >
+		
+		<!--/*/ <th:block th:include="fragments/util :: menu"></th:block> /*/-->
+	</nav>
+</body>
+</html>
