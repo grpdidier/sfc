@@ -396,3 +396,26 @@ function jsEliminarDetalleGuiaRemision(indice){
 	document.forms[0].method = 'POST';
 	document.forms[0].submit();	
 }
+function jsActualizarTipoTransporte(){
+	document.forms[0].action = '/operacion/remision/tipotransporte/actualizar' ;
+	document.forms[0].method = 'POST';
+	document.forms[0].submit();
+}
+function jsListarTransporte(){
+	document.forms[0].action = '/operacion/remision/transporte' ;
+	document.forms[0].method = 'POST';
+	document.forms[0].submit();
+}
+/* *********************************************************************************************************************************
+ * MODULO DE CLIENTE
+ ********************************************************************************************************************************* */
+function jsCargarProvinciaInei(obj){
+	document.forms[0].action = '/persona/provincia' ;
+	document.forms[0].method = 'POST';
+	document.forms[0].submit();
+}
+function jsCargarDistritoInei(obj){
+	document.forms[0].action = '/persona/distrito' ;
+	document.forms[0].method = 'POST';
+	document.forms[0].submit();
+}

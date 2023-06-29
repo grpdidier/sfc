@@ -11,7 +11,9 @@ import static com.pe.lima.sg.dao.mantenimiento.CatalogoSpecifications.conCodigoS
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -33,6 +35,7 @@ import com.pe.lima.sg.dao.mantenimiento.IEmpresaDAO;
 import com.pe.lima.sg.entity.mantenimiento.TblCatalogo;
 import com.pe.lima.sg.entity.seguridad.TblUsuario;
 import com.pe.lima.sg.entity.mantenimiento.TblCliente;
+import com.pe.lima.sg.entity.mantenimiento.TblUbigeo;
 import com.pe.lima.sg.presentacion.BaseOperacionPresentacion;
 import com.pe.lima.sg.presentacion.util.Constantes;
 
@@ -334,6 +337,9 @@ public class ClienteAction extends BaseOperacionPresentacion<TblCliente> {
 			entidadEnBd.setDireccion(entidad.getDireccion());
 			entidadEnBd.setNombre(entidad.getNombre());
 			entidadEnBd.setEmail(entidad.getEmail());
+			entidadEnBd.setDepartamento(entidad.getDepartamento());
+			entidadEnBd.setProvincia(entidad.getProvincia());
+			entidadEnBd.setDistrito(entidad.getDistrito());
 			
 			this.preEditar(entidadEnBd, request);
 			boolean exitoso = super.guardar(entidadEnBd, model);
@@ -415,5 +421,61 @@ public class ClienteAction extends BaseOperacionPresentacion<TblCliente> {
 			entidad 	= null;
 		}
 		return path;
+	}
+	
+
+	@RequestMapping(value = "persona/provincia", method = RequestMethod.POST)
+	public String cargarDepartamento(Model model, TblCliente entidad, HttpServletRequest request) {
+		asignarMapCargaDepartamento(request, entidad);
+		model.addAttribute("entidad", entidad);
+		if (entidad.getCodigoCliente()<=0) {
+			return "mantenimiento/cliente/cli_nuevo";
+		}else {
+			return "mantenimiento/cliente/cli_edicion";
+		}
+	}
+	@SuppressWarnings("unchecked")
+	private void asignarMapCargaDepartamento(HttpServletRequest request, TblCliente entidad) {
+		Map<String,List<TblUbigeo>> provinciaMap = (Map<String,List<TblUbigeo>>)request.getSession().getAttribute("SessionMapProvinciaInei");
+		if (entidad.getDepartamento() != null) {
+			List<TblUbigeo> lista = provinciaMap.get(entidad.getDepartamento());
+			request.getSession().setAttribute("SessionPersonaMapProvinciaInei", obtenerDatosUbigeo(lista));
+			request.getSession().setAttribute("SessionPersonaMapDistritoInei", null);
+		}else {
+			request.getSession().setAttribute("SessionPersonaMapProvinciaInei", null);
+			request.getSession().setAttribute("SessionPersonaMapDistritoInei", null);
+		}
+	}
+
+	@RequestMapping(value = "persona/distrito", method = RequestMethod.POST)
+	public String cargarDistrito(Model model, TblCliente entidad, HttpServletRequest request) {
+		asignarMapCargarDistrito(request,entidad);
+		model.addAttribute("entidad", entidad);
+		if (entidad.getCodigoCliente()<=0) {
+			return "mantenimiento/cliente/cli_nuevo";
+		}else {
+			return "mantenimiento/cliente/cli_edicion";
+		}
+	}
+	@SuppressWarnings("unchecked")
+	private void asignarMapCargarDistrito(HttpServletRequest request, TblCliente entidad) {
+		Map<String,List<TblUbigeo>> distritoMap = (Map<String,List<TblUbigeo>>)request.getSession().getAttribute("SessionMapDistritoInei");
+		if (entidad.getProvincia() != null) {
+			List<TblUbigeo> lista = distritoMap.get(entidad.getProvincia());
+			request.getSession().setAttribute("SessionPersonaMapDistritoInei", obtenerDatosUbigeo(lista));
+		}else {
+			request.getSession().setAttribute("SessionPersonaMapDistritoInei", null);
+		}
+		
+	}
+
+	private Map<String, String> obtenerDatosUbigeo(List<TblUbigeo> lista) {
+		Map<String, String> resultados = new LinkedHashMap<String, String>();
+		if (lista != null && !lista.isEmpty()) {
+			for(TblUbigeo ubigeo: lista) {
+				resultados.put(ubigeo.getNombre(), ubigeo.getCodigoInei());
+			}
+		}
+		return resultados;
 	}
 }

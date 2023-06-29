@@ -340,4 +340,14 @@ public class ListaUtilAction {
 		}
         return resultado;
     }
+	/**
+	 * Listado de tipos de transporte
+	 * 
+	 */
+	public Map<String, Object> obtenerTipoDeTransporte() {
+		Map<String, Object> resultados = new LinkedHashMap<String, Object>();
+		resultados.put(Constantes.DESC_TIPO_TRANSPORTE_PUBLICO, Constantes.TIPO_TRANSPORTE_PUBLICO);
+		resultados.put(Constantes.DESC_TIPO_TRANSPORTE_PRIVADO, Constantes.TIPO_TRANSPORTE_PRIVADO);
+		return resultados;
+	}
 }

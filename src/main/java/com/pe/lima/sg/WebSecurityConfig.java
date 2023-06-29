@@ -1,6 +1,7 @@
 package com.pe.lima.sg;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -35,6 +36,7 @@ import com.pe.lima.sg.dao.mantenimiento.IEmpresaDAO;
 import com.pe.lima.sg.dao.mantenimiento.IParametroDAO;
 import com.pe.lima.sg.dao.mantenimiento.IProductoDAO;
 import com.pe.lima.sg.dao.mantenimiento.ITransporteDAO;
+import com.pe.lima.sg.dao.mantenimiento.IUbigeoDAO;
 import com.pe.lima.sg.dao.operacion.IConfiguracionDAO;
 import com.pe.lima.sg.dao.seguridad.IOpcionDAO;
 import com.pe.lima.sg.dao.seguridad.IUsuarioDAO;
@@ -45,6 +47,7 @@ import com.pe.lima.sg.entity.mantenimiento.TblEmpresa;
 import com.pe.lima.sg.entity.mantenimiento.TblParametro;
 import com.pe.lima.sg.entity.mantenimiento.TblProducto;
 import com.pe.lima.sg.entity.mantenimiento.TblTransporte;
+import com.pe.lima.sg.entity.mantenimiento.TblUbigeo;
 import com.pe.lima.sg.entity.operacion.TblComprobante;
 import com.pe.lima.sg.entity.operacion.TblConfiguracion;
 import com.pe.lima.sg.entity.operacion.TblDetalleComprobante;
@@ -53,6 +56,7 @@ import com.pe.lima.sg.entity.seguridad.TblUsuario;
 import com.pe.lima.sg.presentacion.Filtro;
 import com.pe.lima.sg.presentacion.util.Constantes;
 import com.pe.lima.sg.presentacion.util.ListaUtilAction;
+import com.pe.lima.sg.util.remision.util.ConfiguracionSistema;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -73,6 +77,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Autowired
 	private ListaUtilAction listaUtil;
+	
+	@Autowired
+	private IUbigeoDAO ubigeoDao;
 	
 	 private static final Logger LOGGER = LoggerFactory.getLogger(WebSecurityConfig.class);
 		
@@ -287,6 +294,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				Map<String, String> mapTipoMotivoTrasladoSesion	= new HashMap<String, String>();
 				//Transporte
 				Map<String, String> mapTransporte	= new LinkedHashMap<String, String>();
+				//Domicilio Partida
+				Map<String, Object> mapDomicilioPartidaDysalim		= new LinkedHashMap<String, Object>();
+				Map<String, String> mapDomicilioPartidaDysalimDatos	= new HashMap<String, String>();
+				Map<String, Object> mapDomicilioPartidaDistcen		= new LinkedHashMap<String, Object>();
+				Map<String, String> mapDomicilioPartidaDistcenDatos	= new HashMap<String, String>();
 				
 				List<TblCatalogo> listaCatalogo 		= null;
 				IOperacionFacturador operacionFacturador		= null;
@@ -300,6 +312,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				List<TblEmpresa> listaEmpresa					= null;
 				Map<String, Object> mapEmpresa					= null;
 				Integer codigoEntidad 							= null;
+				
 				try{
 					LOGGER.debug("[obtenerValoresCatalogo] inicio");
 					//Para la EDS
@@ -312,6 +325,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 					}catch(Exception e){
 						request.getSession().setAttribute("SessionListConfiguracion",null);
 					}
+					
+					//Cargando los parametros del sistema
+					codigoEntidad = ((TblUsuario)request.getSession().getAttribute("UsuarioSession") ).getTblEmpresa().getCodigoEntidad() ;
 					
 					listaCatalogo = catalogoDao.listarAllActivos();
 					if (listaCatalogo!=null){
@@ -380,6 +396,26 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 								mapTipoMotivoTraslado.put(entidad.getCodigoSunat() + " : " +entidad.getNombre(), entidad.getCodigoSunat());
 								mapTipoMotivoTrasladoSesion.put(entidad.getCodigoSunat() , entidad.getNombre());
 							}
+							//Domicilio Partida
+							if (entidad.getTblTipoCatalogo().getNombre().equals(Constantes.TIPO_CATALAGO_DIRECCION_PARTIDA)){
+								if (entidad.getCodigoEmpresa().compareTo(Constantes.ENTIDAD_DYSALIM)==0) {
+									mapDomicilioPartidaDysalim.put(entidad.getCodigoSunat() + " : " +entidad.getNombre(), entidad.getCodigoSunat());
+									mapDomicilioPartidaDysalimDatos.put(entidad.getCodigoSunat(),entidad.getNombre());
+								}
+								if (entidad.getCodigoEmpresa().compareTo(Constantes.ENTIDAD_DISTCEN)==0) {
+									mapDomicilioPartidaDistcen.put(entidad.getCodigoSunat() + " : " +entidad.getNombre(), entidad.getCodigoSunat());
+									mapDomicilioPartidaDistcenDatos.put(entidad.getCodigoSunat(),entidad.getNombre());
+								}
+								
+							}
+						}
+						if (codigoEntidad.compareTo(Constantes.ENTIDAD_DYSALIM)==0) {
+							request.getSession().setAttribute("SessionMapDomicilioPartida",mapDomicilioPartidaDysalim);
+							request.getSession().setAttribute("SessionMapDomicilioPartidaDatos",mapDomicilioPartidaDysalimDatos);
+						}
+						if (codigoEntidad.compareTo(Constantes.ENTIDAD_DISTCEN)==0) {
+							request.getSession().setAttribute("SessionMapDomicilioPartida",mapDomicilioPartidaDistcen);
+							request.getSession().setAttribute("SessionMapDomicilioPartidaDatos",mapDomicilioPartidaDistcenDatos);
 						}
 						//Tipo de Operacion
 						request.getSession().setAttribute("SessionMapTipoOperacion",mapTipoOperacion);
@@ -422,8 +458,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						request.getSession().setAttribute("SessionListCatalogo", listaCatalogo);
 					}
 					
-					//Cargando los parametros del sistema
-					codigoEntidad = ((TblUsuario)request.getSession().getAttribute("UsuarioSession") ).getTblEmpresa().getCodigoEntidad() ;
+					
 					listaParametroSistema = parametroDao.listarAllActivos(codigoEntidad);
 					if (listaParametroSistema!=null){
 						mapParametro = new HashMap<String, TblParametro>();
@@ -445,9 +480,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 					if (listaProductoSistema!=null){
 						mapProducto = new HashMap<String, TblProducto>();
 						for(TblProducto producto:listaProductoSistema){
-							mapProducto.put(producto.getNombre(), producto);
+							mapProducto.put(producto.getCodigoEmpresa(), producto);
 						}
 					}
+					request.getSession().setAttribute("SessionListaProductoxEntidad",listaProductoSistema);
 					request.getSession().setAttribute("SessionMapProductoSistema",mapProducto);
 					//Cargando los parametros del Facturador
 					try{
@@ -468,6 +504,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 					
 					//Cargando los años
 					request.getSession().setAttribute("SessionFormasPago", listaUtil.obtenerValoresFormasPago());
+					
+					//Tipo de transporte
+					request.getSession().setAttribute("SessionTipoTransporteGuia", listaUtil.obtenerTipoDeTransporte());
+					
+					/*Ubigeo*/
+					request.getSession().setAttribute("SessionMapDepartamentoInei", obtenerDepartamento());
+					request.getSession().setAttribute("SessionMapProvinciaInei", obtenerTodasLasProvincias());
+					request.getSession().setAttribute("SessionMapDistritoInei", obtenerTodosLosDistritos());
 					
 					
 					//Cargar todas las empresa
@@ -520,6 +564,78 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
   
    
+
+	public Map<String, Object> obtenerDepartamento() {
+		Map<String, Object> resultados = new LinkedHashMap<String, Object>();
+		List<TblUbigeo> listaDepartamento = null;
+		try{
+			LOGGER.debug("[obtenerDepartamento] inicio");
+			listaDepartamento = ubigeoDao.obtenerDepartamento();
+			if (listaDepartamento!=null){
+				for(TblUbigeo entidad: listaDepartamento){
+					LOGGER.debug("[obtenerDepartamento] departamento:"+entidad.getNombre());
+					resultados.put(entidad.getNombre(), entidad.getCodigoInei());
+				}
+				
+			}
+			LOGGER.debug("[obtenerDepartamento] Fin");
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			listaDepartamento = null;
+		}
+		
+		return resultados;
+	}
 	
+	public Map<String,List<TblUbigeo>> obtenerTodasLasProvincias(){
+		Map<String,List<TblUbigeo>> resultados = new HashMap<>();
+		List<TblUbigeo> listaConsulta = null;
+		List<TblUbigeo> listaProvincia = null;
+		
+		try {
+			listaConsulta = ubigeoDao.obtenerProvincia();
+			for(TblUbigeo entidad:listaConsulta) {
+				listaProvincia = resultados.get(entidad.getCodigoPadreInei());
+				if (listaProvincia == null) {
+					listaProvincia = new ArrayList<>();
+					listaProvincia.add(entidad);
+					resultados.put(entidad.getCodigoPadreInei(), listaProvincia);
+				}else {
+					listaProvincia.add(entidad);
+				}
+			}
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return resultados;
+	}
+
+	public Map<String,List<TblUbigeo>> obtenerTodosLosDistritos(){
+		Map<String,List<TblUbigeo>> resultados = new HashMap<>();
+		List<TblUbigeo> listaConsulta = null;
+		List<TblUbigeo> listaDistritos = null;
+		
+		try {
+			listaConsulta = ubigeoDao.obtenerDistrito();
+			for(TblUbigeo entidad:listaConsulta) {
+				listaDistritos = resultados.get(entidad.getCodigoPadreInei());
+				if (listaDistritos == null) {
+					listaDistritos = new ArrayList<>();
+					listaDistritos.add(entidad);
+					resultados.put(entidad.getCodigoPadreInei(), listaDistritos);
+				}else {
+					listaDistritos.add(entidad);
+				}
+			}
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return resultados;
+	}
 	
 }

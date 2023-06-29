@@ -9,13 +9,13 @@
 		<div id="container">	
 			<div id="actionbar" class="row">
 				<div class="col-md-4 mb-3">
-					<a href="#" th:href="@{/operacion/regresar}"><img th:src="@{/images/iconos/regresar.png}" alt="Regresar" /></a>
+					<a href="#" th:href="@{/operacion/consulta/regresar}"><img th:src="@{/images/iconos/regresar.png}" alt="Regresar" /></a>
 				</div>
 				<div class="col-md-8 mb-3 tituloPrincipal" align="left" ><br/> M&oacute;dulo de Remisi&oacute;n - Ver - RUC: <label th:text="${entidad.ruc}" style="color: RED"></label></div>
 				
 			</div>
 			
-			<form id="form" th:object="${entidad}" th:action="@{/operacion/remision/nuevo/guardar}" method="post">
+			<form id="form" th:object="${entidad}" th:action="@{/}" method="post">
 				
 				<div id="informacion" class="container_v3">
 					<p style="color: red" th:text="${respuesta}" /> 

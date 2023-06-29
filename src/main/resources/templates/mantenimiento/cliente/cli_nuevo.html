@@ -48,6 +48,29 @@
 								</div>
 							</div>
 							<div class="row">
+								<div class="col-md-4 mb-3">
+									<label for="idNombre" class="textBold9pt">Departamento</label>
+									<select th:field="${entidad.departamento}" class="form-control_v2 is-valid" required="required" onchange="jsCargarProvinciaInei(this);" >
+										<option value="-1">--Seleccionar--</option>
+										<option th:each="entry : ${session.SessionMapDepartamentoInei}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+									</select>
+								</div>
+								<div class="col-md-4 mb-3">
+									<label for="idNombre" class="textBold9pt">Provincia</label>
+									<select th:field="${entidad.provincia}" class="form-control_v2 is-valid" required="required" onchange="jsCargarDistritoInei(this);">
+										<option value="-1">--Seleccionar--</option>
+										<option th:each="entry : ${session.SessionPersonaMapProvinciaInei}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+									</select>
+								</div>
+								<div class="col-md-4 mb-3">
+									<label for="idDireccion" class="textBold9pt">Distrito</label>
+									<select th:field="${entidad.distrito}" class="form-control_v2 is-valid" required="required" >
+										<option value="-1">--Seleccionar--</option>
+										<option th:each="entry : ${session.SessionPersonaMapDistritoInei}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+									</select>
+								</div>
+							</div>
+							<div class="row">
 								<div class="col-md-6 mb-3">
 									<label for="idNombre" class="textBold9pt">E-mail</label>
 									<input type="text" class="form-control_v2 is-valid" placeholder="Correo electronico" th:field="${entidad.email}" maxlength="200"/>

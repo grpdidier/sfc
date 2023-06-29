@@ -106,6 +106,9 @@ public class Filtro {
 	private String flagMostrarDetalleFormaPago					= null;
 	private String nombreFileFormaPago							= null;
 	private String nombreFileDetalleFormaPago					= null;
+	//Datos para el transporte
+	private String marca										= null;
+	private String placa										= null;
 	public Filtro() {
 		// TODO Auto-generated constructor stub
 	}

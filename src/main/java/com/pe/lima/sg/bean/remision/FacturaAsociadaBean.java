@@ -17,5 +17,8 @@ public class FacturaAsociadaBean {
 	private BigDecimal cantidad; 
 	private int codigoComprobante;
 	private int codigoDetalleComprobante;
+	private BigDecimal  peso;
+	//para validar al cliente
+	private String numeroCliente;
 	
 }

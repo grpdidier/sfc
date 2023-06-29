@@ -66,6 +66,14 @@ public class TblRemision implements java.io.Serializable {
 	private String customizacionDoc;
 	private String observacion;
 	private String ticket;
+	private String rutaXML;
+	private String tipoTransporte;
+	private String nombreConductor;
+	private String apellidoConductor;
+	private String numeroDNIConductor;
+	private String rutaCDR;
+	private String ubigeoLlegada;
+	
 	private Set<TblFacturaAsociada> tblFacturaAsociadas = new HashSet<>(0);
 
 	public TblRemision() {
@@ -494,6 +502,69 @@ public class TblRemision implements java.io.Serializable {
 			idUsuario 		= null;
 			strIdUsuario	= null;
 		}
+	}
+
+	@Column(name = "ruta_xml", length = 256)
+	public String getRutaXML() {
+		return rutaXML;
+	}
+
+	public void setRutaXML(String rutaXML) {
+		this.rutaXML = rutaXML;
+	}
+
+	@Column(name = "tipo_transporte", length = 2)
+	public String getTipoTransporte() {
+		return tipoTransporte;
+	}
+
+	public void setTipoTransporte(String tipoTransporte) {
+		this.tipoTransporte = tipoTransporte;
+	}
+
+	@Column(name = "nombre_conductor", length = 64)
+	public String getNombreConductor() {
+		return nombreConductor;
+	}
+
+	public void setNombreConductor(String nombreConductor) {
+		this.nombreConductor = nombreConductor;
+	}
+
+	@Column(name = "apellido_conductor", length = 64)
+	public String getApellidoConductor() {
+		return apellidoConductor;
+	}
+
+	public void setApellidoConductor(String apellidoConductor) {
+		this.apellidoConductor = apellidoConductor;
+	}
+
+	@Column(name = "numero_dni_conductor", length = 16)
+	public String getNumeroDNIConductor() {
+		return numeroDNIConductor;
+	}
+
+	public void setNumeroDNIConductor(String numeroDNIConductor) {
+		this.numeroDNIConductor = numeroDNIConductor;
+	}
+
+	@Column(name = "ruta_cdr", length = 256)
+	public String getRutaCDR() {
+		return rutaCDR;
+	}
+
+	public void setRutaCDR(String rutaCDR) {
+		this.rutaCDR = rutaCDR;
+	}
+
+	@Column(name = "ubigeo_llegada", length = 8)
+	public String getUbigeoLlegada() {
+		return ubigeoLlegada;
+	}
+
+	public void setUbigeoLlegada(String ubigeoLlegada) {
+		this.ubigeoLlegada = ubigeoLlegada;
 	}
 }
 

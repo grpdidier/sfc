@@ -43,6 +43,7 @@ public class TblCatalogo implements java.io.Serializable {
 	private String ipModificacion;
 	private Set<TblCliente> tblClientes = new HashSet<TblCliente>(0);
 	private Set<TblProducto> tblProductos = new HashSet<TblProducto>(0);
+	private Integer codigoEmpresa;
 
 	public TblCatalogo() {
 	}
@@ -203,6 +204,15 @@ public class TblCatalogo implements java.io.Serializable {
 
 	public void setTblProductos(Set<TblProducto> tblProductos) {
 		this.tblProductos = tblProductos;
+	}
+
+	@Column(name = "codigo_entidad")
+	public Integer getCodigoEmpresa() {
+		return codigoEmpresa;
+	}
+
+	public void setCodigoEmpresa(Integer codigoEmpresa) {
+		this.codigoEmpresa = codigoEmpresa;
 	}
 
 }

@@ -10,43 +10,35 @@
 		<div id="container" style="width:95%">
 			<div id="actionbar" class="row">
 				<div class="col-md-4 mb-3">
-					<a href="#"	th:href="@{/operacion/remision/regresar}"><img th:src="@{/images/iconos/regresar.png}"	alt="Regresar" /></a>
+					<a href="#"	th:href="@{/}"><img th:src="@{/images/iconos/regresar.png}"	alt="Regresar" /></a>
 				</div>
-				<div class="col-md-8 mb-3 tituloPrincipal" align="left" ><br/> M&oacute;dulo de Factura</div>
+				<div class="col-md-8 mb-3 tituloPrincipal" align="left" ><br/> M&oacute;dulo de Consulta de Remisi&oacute;n</div>
 			</div>
-			<form id="form" th:object="${filtro}" th:action="@{/operacion/remision/factura/q}" method="Post">
+			<form id="form" th:object="${filtro}" th:action="@{/operacion/remision/consulta/q}" method="Post">
 				<div id="informacion" class="container_v3">
 					<fieldset class="scheduler-border">
 						<legend class="scheduler-border title10pt">Criterios de b&uacute;squeda</legend>
 
 							<div class="row">
-								<div class="col-md-4 mb-3">
+								<div class="col-md-5 mb-3">
 									
 								</div>
 								<div class="col-md-2 mb-3">
 									<label for="idMaterno" class="textBold9pt">N&uacute;mero</label>
-									<input type="text" class="form-control_v2 is-valid" placeholder="Numero del Comprobante" th:field="${filtro.numero}" size="16" maxlength="8"/>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Numero del Remision" th:field="${filtro.numero}" size="16" maxlength="8"/>
 								</div>
-								<div class="col-md-2 mb-3">
-									<label for="idMaterno" class="textBold9pt">Cliente</label>
-									<input type="text" class="form-control_v2 is-valid" placeholder="Nombre del cliente" th:field="${filtro.nombre}" size="16" maxlength="8"/>
-								</div>
-								<div class="col-md-4 mb-3">
+								<div class="col-md-1 mb-3">
 									
+								</div>								
+								<div class="col-md-4 mb-3">
+									<button class="btn btn-success" type="submit">Buscar</button>
 								</div>
 							</div>
 															
 					</fieldset>
 					<br></br>
 					<div class="container_v4" align="center">
-						<div class="row">
-							<div class="col-md-3 mb-3"> </div>
-							
-			  				<div class="col-md-6 mb-3">
-			  					<button class="btn btn-success" type="submit">Buscar</button>
-			  				</div>
-			  				<div class="col-md-3 mb-3"></div>
-			  			</div>
+						
 			  			<div class="row">
 			  				<div class="col-md-12 mb-3">
 			  					<p style="color: red" th:text="${respuesta}" />
@@ -105,37 +97,58 @@
 								<th>Comprobante</th>
 								<th>Serie</th>
 								<th>N&uacute;mero</th>
-								<th>Fecha Emision</th>
-								<th>Moneda</th>
-								<th>Total Gravado</th>
-								<th>IGV</th>
-								<th>Importe Total</th>
-								<th >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Estado</th>
-								<th>Seleccionar</th>
+								<th>Fecha Traslado</th>
+								<th>Cliente</th>
+								<th>Estado</th>								
+								<th>Ver</th>
+								<th>Xml</th>
+								<th>Cdr</th>
+								<th>Pdf</th>
 							</tr>
-							<tr th:each="comprobante, iterStat : ${registros}"  class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
+							<tr th:each="comprobante, iterStat  : ${registros}"  class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
 								<td align="center">
 									<div th:replace="fragments/util :: tipoComprobante(tipo=${comprobante.tipoComprobante})"></div>
 								</td>
 								<td th:text="${comprobante.serie}">serie</td>
 								<td th:text="${comprobante.numero}">numero</td>
-								<td th:text="${comprobante.fechaEmision}">fecha</td>
-								<td align="center">
-									<div th:replace="fragments/util :: tipoMonedaSunat(tipo=${comprobante.moneda})"></div>
-								</td>
-								<td th:text="${#numbers.formatDecimal(comprobante.totalOpGravada, 1, 'DEFAULT', 2, 'DEFAULT')}">monto gravado</td>
-								<td th:text="${#numbers.formatDecimal(comprobante.totalIgv, 1, 'DEFAULT', 2, 'DEFAULT')}">igv</td>
-								<td th:text="${#numbers.formatDecimal(comprobante.totalImporte, 1, 'DEFAULT', 2, 'DEFAULT')}">total</td>
-								
+								<td th:text="${comprobante.fechaInicioTraslado}">fecha</td>
+								<td th:text="${comprobante.nombreCliente}">nombreCliente</td>
 								<td align="center">
 									<div th:replace="fragments/util :: estadoFactura(tipo=${comprobante.estadoOperacion})"></div>
 								</td>
-								
 								<td align="center">
-									<a	th:href="${'/operacion/remision/seleccion/' + iterStat.index}">
+									<a	th:href="${'/operacion/remision/consulta/ver/' + comprobante.codigoRemision}">
 										<img th:src="@{/images/iconos/documento.png}" alt="Editar" />
 									</a>
 								</td>
+								<td align="center">
+									<div th:if="${comprobante.estadoOperacion == '00'}">
+										-
+									</div>
+									<div th:if="${comprobante.estadoOperacion != '00'}">
+										<a	th:href="${'/operacion/remision/consulta/descargar/xml/' +  iterStat.index}">
+											<img th:src="@{/images/iconos/xml.png}" alt="XML"  width="30px"/>
+										</a>
+									</div>
+								</td>
+								<td align="center">
+									<div th:if="${comprobante.estadoOperacion == '02'}">
+										-
+									</div>
+									<div th:if="${comprobante.estadoOperacion == '03'}">
+										<a	th:href="${'/operacion/remision/consulta/descargar/cdr/' +  iterStat.index}">
+											<img th:src="@{/images/iconos/cdr.png}" alt="CDR"  width="30px"/>
+										</a>
+									</div>
+								</td>
+								<td >
+									<div th:if="${comprobante.estadoOperacion == '03'}">
+										<a	th:href="${'/operacion/remision/consulta/pdf/' + comprobante.codigoRemision}">
+											<img th:src="@{/images/iconos/doc_pdf.png}" alt="pdf" width="35px"/>
+										</a>
+									</div>
+								</td>
+								
 							</tr>
 						</table>
 					</div>
@@ -145,13 +158,13 @@
 								<th>Comprobante</th>
 								<th>Serie</th>
 								<th>N&uacute;mero</th>
-								<th>Fecha Emision</th>
-								<th>Moneda</th>
-								<th>Total Gravado</th>
-								<th>IGV</th>
-								<th>Importe Total</th>
-								<th>Estado</th>
-								<th>Seleccionar</th>
+								<th>Fecha Traslado</th>
+								<th>Cliente</th>
+								<th>Estado</th>								
+								<th>Ver</th>
+								<th>Xml</th>
+								<th>Enviar</th>
+								<th>Pdf</th>
 							</tr>
 							<tr class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
 								<td colspan="10" align="center">No se encontr&oacute; elementos</td>

@@ -3,6 +3,7 @@ package com.pe.lima.sg.presentacion.pdf;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.text.DecimalFormat;
 import java.util.List;
@@ -22,6 +23,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.pe.lima.sg.bean.facturador.ParametroFacturadorBean;
 import com.pe.lima.sg.bean.remision.RemisionBean;
 import com.pe.lima.sg.entity.operacion.TblDetalleRemision;
+import com.pe.lima.sg.entity.operacion.TblFacturaAsociada;
 import com.pe.lima.sg.presentacion.Filtro;
 import com.pe.lima.sg.presentacion.util.Constantes;
 
@@ -157,10 +159,13 @@ public class GuiaRemisionPdf {
 	            tableCliente.addCell(this.getDatoCeldaNoBorde(": "+entidad.getRemision().getNumeroDocumentoCliente(), headFont8, Element.ALIGN_LEFT, tamanioAltura));
 	            // -Transportista
 	            tableCliente.addCell(this.getDatoCeldaNoBorde("Transportista", headFonBoldt8, Element.ALIGN_LEFT,tamanioAltura));
-	            tableCliente.addCell(this.getDatoCeldaNoBorde(": "+entidad.getRemision().getNombreTransportista(), headFont8, Element.ALIGN_LEFT, tamanioAltura));
+	            tableCliente.addCell(this.getDatoCeldaNoBorde(": "+entidad.getRemision().getNombreTransportista().trim(), headFont8, Element.ALIGN_LEFT, tamanioAltura));
 	            // -Nro Ruc
 	            tableCliente.addCell(this.getDatoCeldaNoBorde("Nro Documento / RUC", headFonBoldt8, Element.ALIGN_LEFT,tamanioAltura));
 	            tableCliente.addCell(this.getDatoCeldaNoBorde(": "+entidad.getRemision().getNumeroDocumentoTransportista(), headFont8, Element.ALIGN_LEFT, tamanioAltura));
+	            // -Documento relacionado
+	            tableCliente.addCell(this.getDatoCeldaNoBorde("Documento Relacionado", headFonBoldt8, Element.ALIGN_LEFT,tamanioAltura));
+	            tableCliente.addCell(this.getDatoCeldaNoBorde(": "+obgenerNumeroFactura(entidad.getListaTblFacturaAsociada()), headFont8, Element.ALIGN_LEFT, tamanioAltura));
 	            
 	            datoCell = new PdfPCell();
 	            datoCell.setBorder(Rectangle.NO_BORDER);
@@ -202,6 +207,9 @@ public class GuiaRemisionPdf {
 	            tableTransporteMarca.addCell(this.getDatoCeldaNoBorde(": "+entidad.getRemision().getMarca(), headFont8, Element.ALIGN_LEFT, tamanioAltura));
 	            tableTransporteMarca.addCell(this.getDatoCeldaNoBorde("Certificado de Inscripción", headFonBoldt8, Element.ALIGN_LEFT,tamanioAltura));
 	            tableTransporteMarca.addCell(this.getDatoCeldaNoBorde(": "+entidad.getRemision().getNumeroCertInscripcion(), headFont8, Element.ALIGN_LEFT, tamanioAltura));
+	            tableTransporteMarca.addCell(this.getDatoCeldaNoBorde("Motivo de Traslado", headFonBoldt8, Element.ALIGN_LEFT,tamanioAltura));
+	            tableTransporteMarca.addCell(this.getDatoCeldaNoBorde(": "+entidad.getDescripcionMotivo(), headFont8, Element.ALIGN_LEFT, tamanioAltura));
+	            
 	            PdfPCell cellTransporteMarca = new PdfPCell();
 	            cellTransporteMarca.addElement(tableTransporteMarca);
 	            cellTransporteMarca.setBorder(Rectangle.NO_BORDER);
@@ -214,6 +222,8 @@ public class GuiaRemisionPdf {
 	            tableTransportePlaca.addCell(this.getDatoCeldaNoBorde(": "+entidad.getRemision().getPlaca(), headFont8, Element.ALIGN_LEFT, tamanioAltura));
 	            tableTransportePlaca.addCell(this.getDatoCeldaNoBorde("Licencia de Conducir", headFonBoldt8, Element.ALIGN_LEFT,tamanioAltura));
 	            tableTransportePlaca.addCell(this.getDatoCeldaNoBorde(": "+entidad.getRemision().getNumeroLicencia(), headFont8, Element.ALIGN_LEFT, tamanioAltura));
+	            tableTransportePlaca.addCell(this.getDatoCeldaNoBorde("Modalidad de Traslado", headFonBoldt8, Element.ALIGN_LEFT,tamanioAltura));
+	            tableTransportePlaca.addCell(this.getDatoCeldaNoBorde(": "+obtenerDescripcionTipoTransporte(entidad.getRemision().getTipoTransporte()), headFont8, Element.ALIGN_LEFT, tamanioAltura));
 	            PdfPCell cellTransportePlaca = new PdfPCell();
 	            cellTransportePlaca.addElement(tableTransportePlaca);
 	            cellTransportePlaca.setBorder(Rectangle.NO_BORDER);
@@ -224,7 +234,7 @@ public class GuiaRemisionPdf {
 	            datoCell.addElement(tableTransporte);
 	            table.addCell(datoCell);
 	            //Motivo
-	            PdfPTable tableMotivo = new PdfPTable(2);
+	           /* PdfPTable tableMotivo = new PdfPTable(2);
 	            tableMotivo.setWidthPercentage(100);
 	            tableMotivo.setWidths(new int[]{1,3});
 	            tableMotivo.addCell(this.getDatoCeldaNoBorde("Motivo de Traslado", headFonBoldt8, Element.ALIGN_LEFT,tamanioAltura));
@@ -232,7 +242,7 @@ public class GuiaRemisionPdf {
 	            datoCell = new PdfPCell();
 	            datoCell.setBorder(Rectangle.NO_BORDER);
 	            datoCell.addElement(tableMotivo);
-	            table.addCell(datoCell);
+	            table.addCell(datoCell);*/
 	            
 	            
 	            //Formato de la lista
@@ -245,7 +255,7 @@ public class GuiaRemisionPdf {
 	            tableDetalle.addCell(this.getDatoCelda("Descripción", headFonBoldt8, Element.ALIGN_CENTER, 20));
 	            for(TblDetalleRemision detalle: entidad.getListaDetalleRemision()){
 	            	tableDetalle.addCell(this.getDatoCeldaNoBorde(formatter.format(detalle.getCantidad()), headFont8, Element.ALIGN_CENTER, tamanioAltura));
-	            	tableDetalle.addCell(this.getDatoCeldaNoBorde("PAQ", headFont8, Element.ALIGN_CENTER, tamanioAltura));
+	            	tableDetalle.addCell(this.getDatoCeldaNoBorde(detalle.getUnidadMedida(), headFont8, Element.ALIGN_CENTER, tamanioAltura));
 	            	tableDetalle.addCell(this.getDatoCeldaNoBorde(detalle.getDescripcion(), headFont8, Element.ALIGN_LEFT, tamanioAltura));
 	            }
 	            datoCell = new PdfPCell();
@@ -285,7 +295,7 @@ public class GuiaRemisionPdf {
 	            //tableCalculo.addCell(this.getDatoCeldaNoBorde("Otros Tributos", headFonBoldt10, Element.ALIGN_LEFT,20));
 	            //tableCalculo.addCell(this.getDatoCeldaNoBorde(this.getSimboloMoneda(entidad.getComprobante().getMoneda())+entidad.getSunatCabecera().getOtrosTributos(), headFont10, Element.ALIGN_LEFT, 20));
 	            tableCalculo.addCell(this.getDatoCelda("Peso Total", headFonBoldt8, Element.ALIGN_LEFT, tamanioAltura));
-	            tableCalculo.addCell(this.getDatoCelda("Tn", headFont8, Element.ALIGN_LEFT, tamanioAltura));
+	            tableCalculo.addCell(this.getDatoCelda(obtenerPesoTotal(entidad.getListaTblFacturaAsociada())+"  KGR", headFont8, Element.ALIGN_LEFT, tamanioAltura));
 	            
 	            datoCell = new PdfPCell();
 	            datoCell.setBorder(Rectangle.NO_BORDER);
@@ -357,7 +367,37 @@ public class GuiaRemisionPdf {
 	        return new ByteArrayInputStream(out.toByteArray());
 	    }
 	 
-	 /*Obtiene la forma de pago*/
+	 private String obtenerPesoTotal(List<TblFacturaAsociada> listaTblFacturaAsociada) {
+		 BigDecimal total = new BigDecimal("0");
+		 for (TblFacturaAsociada factura:listaTblFacturaAsociada ) {
+			 total = total.add(factura.getPesoTotal());
+			}
+			return total.toString();
+	}
+
+	private String obgenerNumeroFactura(List<TblFacturaAsociada> listaTblFacturaAsociada) {
+		String datosFactura = "";
+		for (TblFacturaAsociada factura:listaTblFacturaAsociada ) {
+			if (datosFactura.equals("")) {
+				datosFactura = datosFactura  + factura.getObservacion();
+			}else {
+				datosFactura = datosFactura  +" , "+ factura.getObservacion();
+			}
+		}
+		return datosFactura;
+	}
+
+	private String obtenerDescripcionTipoTransporte(String tipoTransporte) {
+		if (tipoTransporte.equals("01")) {
+			return "TRANSPORTE PUBLICO";
+		}
+		if (tipoTransporte.equals("02")) {
+			return "TRANSPORTE PRIVADO";
+		}
+		return "";
+	}
+
+	/*Obtiene la forma de pago*/
 	 public String getFormaPago(Filtro entidad){
 		 String formaPago = "Contado";
 		 if (entidad != null && entidad.getFormaPago()!=null && entidad.getFormaPago().getTipo()!=null){

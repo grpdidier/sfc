@@ -40,6 +40,8 @@ public class TblProducto implements java.io.Serializable {
 	private String ipCreacion;
 	private String ipModificacion;
 	private TblEmpresa tblEmpresa;
+	private BigDecimal peso;
+	private String unidadMedida;
 
 	public TblProducto() {
 	}
@@ -201,5 +203,23 @@ public class TblProducto implements java.io.Serializable {
 
 	public void setTblEmpresa(TblEmpresa tblEmpresa) {
 		this.tblEmpresa = tblEmpresa;
+	}
+
+	@Column(name = "peso", precision = 10)
+	public BigDecimal getPeso() {
+		return peso;
+	}
+
+	public void setPeso(BigDecimal peso) {
+		this.peso = peso;
+	}
+
+	@Column(name = "unidad_medida", length = 32)
+	public String getUnidadMedida() {
+		return unidadMedida;
+	}
+
+	public void setUnidadMedida(String unidadMedida) {
+		this.unidadMedida = unidadMedida;
 	}
 }

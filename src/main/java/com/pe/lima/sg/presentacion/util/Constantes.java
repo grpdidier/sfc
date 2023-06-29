@@ -337,6 +337,7 @@ public class Constantes {
 	public static String TIPO_CATALAGO_NOTA_CREDITO							= "TIPO_NOTA_CREDITO";
 	public static String TIPO_CATALAGO_NOTA_DEBITO							= "TIPO_NOTA_DEBITO";
 	public static String TIPO_CATALAGO_MOTIVO_TRASLADO						= "TIPO_MOTIVO_TRASLADO";
+	public static String TIPO_CATALAGO_DIRECCION_PARTIDA					= "DIRECCION_PARTIDA_GRE";
 	
 	public static String TIPO_CATALAGO_TIPO_OPERACION_SFS_1_2				= "TIPO_OPERACION_SFS_1_2";
 	
@@ -429,4 +430,18 @@ public class Constantes {
 	public static String CODIGO_DOMICILIO_FISCAL							= "03";
 	
 	public static String ESTADO_XML_GENERADO								= "02";
+	public static String ESTADO_XML_CDR										= "03";
+	
+	//Variable para el tipo de transporte
+	public static String TIPO_TRANSPORTE_PUBLICO 							= "01";
+	public static String TIPO_TRANSPORTE_PRIVADO	 						= "02";
+	public static String DESC_TIPO_TRANSPORTE_PUBLICO						= "TRANSPORTE PUBLICO";
+	public static String DESC_TIPO_TRANSPORTE_PRIVADO						= "TRANSPORTE PRIVADO";
+	
+	public static String RUTA_XML_GUIA_REMISION								= "RUTA_GUIA_REMISION";
+	
+	public static Integer ENTIDAD_DYSALIM									= 2;
+	public static Integer ENTIDAD_DISTCEN									= 3;
+	public static String CODIGO_DOMICILIO_PARTIDAD							= "1:150103";
+	
 }

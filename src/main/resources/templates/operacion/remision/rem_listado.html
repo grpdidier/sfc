@@ -103,7 +103,7 @@
 								<th>Estado</th>								
 								<th>Ver</th>
 								<th>Xml</th>
-								<th>Enviar</th>
+								<th>Cdr</th>
 								<th>Pdf</th>
 								<th>Eliminar</th>
 							</tr>
@@ -130,22 +130,29 @@
 										</a>
 									</div>
 									<div th:if="${comprobante.estadoOperacion != '00'}">
-										<a	th:href="${'/operacion/remision/descargar/xml/' + + iterStat.index}">
-											<img th:src="@{/images/iconos/xml.png}" alt="Editar"  width="30px"/>
+										<a	th:href="${'/operacion/remision/descargar/xml/' +  iterStat.index}">
+											<img th:src="@{/images/iconos/xml.png}" alt="XML"  width="30px"/>
 										</a>
 									</div>
 								</td>
 								<td align="center">
-									<a	th:href="${'/operacion/remision/envio/xml/' + comprobante.codigoRemision}">
-										<img th:src="@{/images/iconos/descargar2.png}" alt="Editar" width="30px" />
-									</a>
+									<div th:if="${comprobante.estadoOperacion == '02'}">
+										<a	th:href="${'/operacion/remision/envio/xml/' + comprobante.codigoRemision}">
+											<img th:src="@{/images/iconos/descargar2.png}" alt="Editar" width="30px" />
+										</a>
+									</div>
+									<div th:if="${comprobante.estadoOperacion == '03'}">
+										<a	th:href="${'/operacion/remision/descargar/cdr/' +  iterStat.index}">
+											<img th:src="@{/images/iconos/cdr.png}" alt="CDR"  width="30px"/>
+										</a>
+									</div>
 								</td>
 								<td >
-									<!-- div th:if="${comprobante.estadoOperacion == '03'}"-->
+									<div th:if="${comprobante.estadoOperacion == '03'}">
 										<a	th:href="${'/operacion/remision/pdf/' + comprobante.codigoRemision}">
 											<img th:src="@{/images/iconos/doc_pdf.png}" alt="pdf" width="35px"/>
 										</a>
-									<!-- /div-->
+									</div>
 								</td>
 								<td align="center">
 									<div th:if="${comprobante.estadoOperacion == '00'}">

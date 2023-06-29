@@ -28,6 +28,8 @@ public class RemisionBean {
 	private List<ComprobanteBean> listaComprobante;
 	//Lista de comprobantes para el xml
 	private List<TblComprobante> listaTblComprobante;
+	//Para mostrar el total del peso de la remision
+	private BigDecimal totalPesoGuia;
 	
 	//private TblDetalleRemision detalleRemision;
 	private List<TblDetalleRemision> listaDetalleRemision;
@@ -41,10 +43,12 @@ public class RemisionBean {
 	private String descripcionMotivo;
 	private BigDecimal pesoBruto;
 	private String direccionPartida;
+	private String ubigeoPartida;
 	//Datos retornados de la guia xml
 	private String nombreArchivoXML;
 	//Datos para el PDF
 	private List<ParametroFacturadorBean> listaParametro;
+	private List<TblFacturaAsociada> listaTblFacturaAsociada;
 	//Datos para mensaje de los servicios
 	private String mensajeRpta;
 	//para eliminar

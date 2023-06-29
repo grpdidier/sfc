@@ -29,7 +29,12 @@ public final class ComprobanteSpecifications {
 			return cb.like(root.<String> get("tipoComprobante"), valor);
 		};
 	}
-	
+	public static Specification<TblComprobante> conNombreCliente(String strNombreCliente) {
+		return (root, query, cb) -> {
+			String valor = obtenerValorString(strNombreCliente);
+			return cb.like(root.<String> get("nombreCliente"), valor);
+		};
+	}
 	public static Specification<TblComprobante> conEstado(String strEstado) {
 		return (root, query, cb) -> {
 			String valor = obtenerValorString(strEstado);

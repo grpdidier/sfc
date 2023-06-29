@@ -72,42 +72,98 @@
 									<label for="idNombre" class="textBold9pt">C&oacute;digo Domicilio Partida</label>
 									<select th:field="${entidad.remision.codigoDomicilioPartida}" class="form-control_v2 is-valid">
 										<option value="-1">--Seleccionar--</option>
-										<option th:each="entry : ${session.SessionMapDomicilioFiscal}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+										<option th:each="entry : ${session.SessionMapDomicilioPartida}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
 									</select>
 									
 								</div>
 							</div>
 							<div class="row">
-								<div class="col-md-12 mb-2">
+								<div class="col-md-10 mb-2">
 									<label for="idNombre" class="textBold9pt">Domicilio de Llegada</label>
 									<input type="text" class="form-control_v2 is-valid" placeholder="domicilio de llegada" th:field="${entidad.remision.domicilioLlegada}" required="required" maxlength="256"/>
 									
 								</div>
+								<div class="col-md-2 mb-2">
+									<label for="idNombre" class="textBold9pt">Ubigeo de Llegada</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Codigo Ubigeo" th:field="${entidad.remision.ubigeoLlegada}" required="required" maxlength="8"/>
+									
+								</div>
 							</div>
 							<div class="row">
-								<div class="col-md-12 mb-2">
-									<label for="idNombre" class="textBold9pt">Datos del  Transportista (ruc: nombre: marca: placa: nro certificado inscripci&oacute;n: nro licencia)</label>
-									<select th:field="${entidad.datosTransporte}" class="form-control_v2 is-valid">
+								<div class="col-md-3 mb-2">
+									<label for="idNombre" class="textBold9pt">Ruc Transportista</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="ruc del transportista" th:field="${entidad.remision.numeroDocumentoTransportista}"  maxlength="16"  />
+									
+								</div>
+								<div class="col-md-8 mb-2">
+									<label for="idNombre" class="textBold9pt">Nombre Transportista</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="nombre del transportista" th:field="${entidad.remision.nombreTransportista}"  maxlength="256"/>
+									
+								</div>
+								<div class="col-md-1 mb-2">
+									<label for="idNombre" class="textBold9pt">Asociar Transporte</label>
+									<button class="btn btn-success" onclick="jsListarTransporte();">...</button>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="col-md-3 mb-2">
+									<label for="idNombre" class="textBold9pt">Tipo de Transporte</label>
+									<select th:field="${entidad.remision.tipoTransporte}" class="form-control_v2 is-valid" onchange="jsActualizarTipoTransporte()">
 										<option value="-1">--Seleccionar--</option>
-										<option th:each="entry : ${session.SessionMapTransporte}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+										<option th:each="entry : ${session.SessionTipoTransporteGuia}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
 									</select>
+								</div>
+								<div class="col-md-9 mb-2">
+									<div class="row">
+										<div class="col-md-3 mb-2">
+											<label for="idNombre" class="textBold9pt">Veh&iacute;culo Marca</label>
+											<input type="text" class="form-control_v2 is-valid" placeholder="marca" th:field="${entidad.remision.marca}"  maxlength="128"  />
+										</div>
+										<div class="col-md-3 mb-2">
+											<label for="idNombre" class="textBold9pt">Placa</label>
+											<input type="text" class="form-control_v2 is-valid" placeholder="placa" th:field="${entidad.remision.placa}"  maxlength="64" />
+										</div>
+										<div class="col-md-3 mb-2">
+											<label for="idNombre" class="textBold9pt">Nro Certificado Inscripci&oacute;n</label>
+											<input type="text" class="form-control_v2 is-valid" placeholder="numero certificado" th:field="${entidad.remision.numeroCertInscripcion}"  maxlength="64"/>
+										</div>
+										<div class="col-md-3 mb-2">
+											<label for="idNombre" class="textBold9pt">Nro Licencia de Conducir</label>
+											<input type="text" class="form-control_v2 is-valid" placeholder="numero licencia" th:field="${entidad.remision.numeroLicencia}"  maxlength="64"/>
+										</div>
+									</div>
 								</div>
 								
 							</div>
-							
+							<div class="row" th:if="${entidad.remision.tipoTransporte == '02'}">
+								<div class="col-md-2 mb-2">
+									<label for="idNombre" class="textBold9pt">DNI Conductor</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="DNI" th:field="${entidad.remision.numeroDNIConductor}" required="required" maxlength="12"/>
+								</div>
+								<div class="col-md-5 mb-2">
+									<label for="idNombre" class="textBold9pt">Nombre del Conductor</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Nombre del Conductor" th:field="${entidad.remision.nombreConductor}" required="required" maxlength="64"/>
+								</div>
+								<div class="col-md-5 mb-2">
+									<label for="idNombre" class="textBold9pt">Apellido del Conductor</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Apellido del Conductor" th:field="${entidad.remision.apellidoConductor}" required="required" maxlength="64"/>
+									<input type="hidden" class="form-control_v2 is-valid"  th:field="${entidad.remision.estadoOperacion}"/>
+								</div>
+							</div>
 							
 					</fieldset>
-
 					<br></br>
 					<div id="c_tablas" th:if="${not #lists.isEmpty(entidad.listaFacturaAsociada)}">	
 						<input type="hidden" th:field="${entidad.indiceElemento}" id="idIndice"/>
 						<table id="t01" class="table   table-bordered table-active tabla_cabecera_general">
 							<tr>
-								<th width="20%">Factura Asociada</th>
+								<th width="15%">Factura Asociada</th>
 								<th width="25%">Cliente</th>
-								<th width="30%">Descripci&oacute;n Producto</th>
+								<th width="35%">Descripci&oacute;n Producto</th>
 								<th width="10%">Unidad</th>
-								<th width="10%">Cantidad</th>
+								<th width="5%">Cantidad</th>
+								<th width="5%">Peso (KG)</th>
 								<th width="5%">Eliminar</th>
 							</tr>
 							<tr th:each="detalleComprobante, iterStat : ${entidad.listaFacturaAsociada}"  class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
@@ -116,25 +172,38 @@
 								<td th:text="${detalleComprobante.descripcion}">descripcion</td>
 								<td th:text="${detalleComprobante.unidadMedida}">unidadMedida</td>
 								<td th:text="${detalleComprobante.cantidad}">cantidad</td>
+								<td th:text="${detalleComprobante.peso}">peso</td>
 								<td align="center">
 									<a href="#" th:onclick="'jsEliminarDetalleGuiaRemision(\''+${iterStat.index}+ '\');'">
 									 <img th:src="@{/images/iconos/eliminar.png}" alt="Eliminar"
 										onclick="if(!confirm('Desea eliminar el cliente seleccionado?')){ return false;}" /></a></td>
 							</tr>
 						</table>
+						<table class="table">
+							<tr>
+								<th width="15%"> </th>
+								<th width="25%"> </th>
+								<th width="35%">  </th>
+								<th width="10%"> </th>
+								<th width="5%">Total:</th>
+								<th width="5%" class="campos2"><font th:text="${entidad.totalPesoGuia}"></font></th>
+								<th width="5%" class="campos2">KG</th>
+							</tr>
+						</table>
 					</div>
 					<div id="c_tablas" th:if="${#lists.isEmpty(entidad.listaFacturaAsociada)}">				
 						<table id="t01" class="table   table-bordered table-active tabla_cabecera_general">
 							<tr>
-								<th width="20%">Factura Asociada</th>
+								<th width="15%">Factura Asociada</th>
 								<th width="25%">Cliente</th>
-								<th width="30%">Descripci&oacute;n Producto</th>
+								<th width="35%">Descripci&oacute;n Producto</th>
 								<th width="10%">Unidad</th>
-								<th width="10%">Cantidad</th>
+								<th width="5%">Cantidad</th>
+								<th width="5%">Peso (KG)</th>
 								<th width="5%">Eliminar</th>
 							</tr>
 							<tr class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
-								<td colspan="5" align="center">No se encontr&oacute; elementos</td>
+								<td colspan="7" align="center">No se encontr&oacute; elementos</td>
 							</tr>
 						</table>
 					</div>

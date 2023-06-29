@@ -3,8 +3,7 @@ package com.pe.lima.sg.presentacion.operacion;
 import static com.pe.lima.sg.dao.operacion.ComprobanteSpecifications.conCodigoEmpresa;
 import static com.pe.lima.sg.dao.operacion.ComprobanteSpecifications.conEstado;
 import static com.pe.lima.sg.dao.operacion.ComprobanteSpecifications.conNumero;
-import static com.pe.lima.sg.dao.operacion.ComprobanteSpecifications.conSerie;
-import static com.pe.lima.sg.dao.operacion.ComprobanteSpecifications.conTipoComprobante;
+import static com.pe.lima.sg.dao.operacion.ComprobanteSpecifications.conNombreCliente;
 import static com.pe.lima.sg.dao.operacion.RemisionSpecifications.conCodigoEmpresaRemision;
 import static com.pe.lima.sg.dao.operacion.RemisionSpecifications.conEstadoRemision;
 import static com.pe.lima.sg.dao.operacion.RemisionSpecifications.conNumeroRemision;
@@ -69,13 +68,19 @@ import com.pe.lima.sg.bean.facturador.ParametroFacturadorBean;
 import com.pe.lima.sg.bean.remision.ComprobanteBean;
 import com.pe.lima.sg.bean.remision.FacturaAsociadaBean;
 import com.pe.lima.sg.bean.remision.RemisionBean;
+import com.pe.lima.sg.dao.mantenimiento.IClienteDAO;
 import com.pe.lima.sg.dao.mantenimiento.ISerieDAO;
+import com.pe.lima.sg.dao.mantenimiento.ITransporteDAO;
 import com.pe.lima.sg.dao.operacion.IComprobanteDAO;
 import com.pe.lima.sg.dao.operacion.IDetalleComprobanteDAO;
 import com.pe.lima.sg.dao.operacion.IDetalleRemisionDAO;
 import com.pe.lima.sg.dao.operacion.IFacturaAsociadaDAO;
 import com.pe.lima.sg.dao.operacion.IRemisionDAO;
+import com.pe.lima.sg.entity.mantenimiento.TblCliente;
+import com.pe.lima.sg.entity.mantenimiento.TblParametro;
+import com.pe.lima.sg.entity.mantenimiento.TblProducto;
 import com.pe.lima.sg.entity.mantenimiento.TblSerie;
+import com.pe.lima.sg.entity.mantenimiento.TblTransporte;
 import com.pe.lima.sg.entity.operacion.TblComprobante;
 import com.pe.lima.sg.entity.operacion.TblDetalleComprobante;
 import com.pe.lima.sg.entity.operacion.TblDetalleRemision;
@@ -88,7 +93,9 @@ import com.pe.lima.sg.presentacion.util.Constantes;
 import com.pe.lima.sg.presentacion.util.PageWrapper;
 import com.pe.lima.sg.presentacion.util.PageableSG;
 import com.pe.lima.sg.presentacion.util.UtilSGT;
-import com.pe.lima.sg.util.remision.util.GuiaRemision;
+import com.pe.lima.sg.util.remision.util.ConfiguracionSistema;
+import com.pe.lima.sg.util.remision.util.GuiaRemisionService;
+import com.pe.lima.sg.util.remision.util.UtilArchivoRespuesta;
 
 import lombok.extern.slf4j.Slf4j;
 @Slf4j
@@ -106,17 +113,20 @@ public class RemisionAction {
 	private IDetalleRemisionDAO detalleRemisionDao;
 	@Autowired
 	private IFacturaAsociadaDAO facturaAsociadaDao;
-
+	@Autowired
+	private ITransporteDAO transporteDao;
+	@Autowired
+	private GuiaRemisionService guiaRemisionService;
+	@Autowired
+	private IClienteDAO clienteDao;
+	@Autowired
+	private ConfiguracionSistema configuracion;
+	
 	private String urlPaginado = "/operacion/remision/paginado/"; 
 
 	private String urlPaginadoRemision = "/operacion/remision/principal/paginado/"; 
 
 	@RequestMapping(value = "/operacion/remision", method = RequestMethod.GET)
-	/**
-	 * sessionFiltroRemisionCriterio	: Filtro de la pagina de Inicio
-	 * filtro							: Filtro de la pagina de Inicio
-	 * 
-	 */
 	public String traerRegistros(Model model, String path,  PageableSG pageable, HttpServletRequest request) {
 		Filtro filtro = null;
 		try{
@@ -138,11 +148,6 @@ public class RemisionAction {
 	}
 
 	@RequestMapping(value = "/operacion/remision/q", method = RequestMethod.POST)
-	/**
-	 * sessionFiltroRemisionCriterio	: Filtro de la pagina de Inicio
-	 * filtro							: Filtro de la pagina de Inicio
-	 * 
-	 */
 	public String traerRegistrosFiltradosRemision(Model model, Filtro filtro,  PageableSG pageable, String path, HttpServletRequest request) {
 		path = "operacion/remision/rem_listado";
 		try{
@@ -160,15 +165,6 @@ public class RemisionAction {
 		return path;
 	}
 	/*** Listado de Remisiones ***/
-	/**
-	 * registros						: Listado de Remision [TblRemision]
-	 * ListadoConsultaRemision			: Listado de Remision [TblRemision]
-	 * filtro							: Filtro de la pagina de Inicio
-	 * page								: Paginado - page
-	 * PageRemisionPrincipal			: Paginado - page
-	 * SessionPrincipalPageabeSG		: pageable
-	 * 
-	 */
 	private void listarRemision(Model model, Filtro filtro,  PageableSG pageable, String url, HttpServletRequest request){
 		List<TblRemision> entidades = new ArrayList<TblRemision>();
 		Sort sort = new Sort(new Sort.Order(Direction.DESC, "numero"));
@@ -195,12 +191,7 @@ public class RemisionAction {
 			entidades = null;
 		}
 	}
-	/**
-	 * entidad							: Contiene toda la info de la remision [RemisionBean]
-	 * guiaRemisionSession				: Contiene toda la info de la remision [RemisionBean]
-	 * 
-	 * 
-	 */
+
 	@RequestMapping(value = "operacion/remision/nuevo", method = RequestMethod.GET)
 	public String crearRemision(Model model, HttpServletRequest request) {
 		RemisionBean entidad = null;
@@ -208,6 +199,7 @@ public class RemisionAction {
 			log.debug("[crearRemision] Inicio");
 			entidad = new RemisionBean();
 			entidad.setRemision(new TblRemision());
+			entidad.getRemision().setTipoTransporte(Constantes.TIPO_TRANSPORTE_PRIVADO);
 			this.obtenerSerieRemision(entidad, request);
 			this.inicializaDatosRemision(entidad);
 			entidad.setRuc(Constantes.SUNAT_RUC_EMISOR);
@@ -222,13 +214,7 @@ public class RemisionAction {
 		}
 		return "operacion/remision/rem_nuevo";
 	}
-	/**
-	 * filtro							: Filtro de la consulta 
-	 * sessionFiltroCriterio			: Filtro de la consulta 
-	 * guiaRemisionSession				: Contiene toda la info de la remision [RemisionBean]
-	 * 
-	 * 
-	 */
+
 	@RequestMapping(value = "/operacion/remision/facturas", method = RequestMethod.POST)
 	public String traerRegistrosFactura(Model model, String path,  PageableSG pageable, HttpServletRequest request, RemisionBean entidad) {
 		Filtro filtro = null;
@@ -238,6 +224,7 @@ public class RemisionAction {
 			entidadOriginal = (RemisionBean)request.getSession().getAttribute("guiaRemisionSession");
 			entidad.setListaFacturaAsociada(entidadOriginal.getListaFacturaAsociada());
 			entidad.setListaComprobante(entidadOriginal.getListaComprobante());
+			entidad.setTotalPesoGuia(entidadOriginal.getTotalPesoGuia());
 			request.getSession().setAttribute("guiaRemisionSession",entidad);
 			path = "operacion/remision/rem_listado_factura";
 			filtro = new Filtro();
@@ -257,12 +244,6 @@ public class RemisionAction {
 	}
 
 	@RequestMapping(value = "/operacion/remision/factura/q", method = RequestMethod.POST)
-	/**
-	 * filtro							: Filtro de la consulta de Factura
-	 * sessionFiltroCriterio			: Filtro de la consulta de Factura
-	 * 
-	 * 
-	 */
 	public String traerRegistrosFiltradosFactura(Model model, Filtro filtro,  PageableSG pageable, String path, HttpServletRequest request) {
 		path = "operacion/remision/rem_listado_factura";
 		try{
@@ -280,14 +261,6 @@ public class RemisionAction {
 		return path;
 	}
 	/*** Listado de Comprobante ***/
-	/**
-	 * UsuarioSession					: datos del usuario
-	 * registros						: Datos de los comprobantes [TblComprobante]
-	 * ListadoConsultaFactura			: Datos de los comprobantes [TblComprobante]
-	 * page								: Paginado - page
-	 * pageConsultaFactura				: Paginado - page
-	 * 
-	 */
 	private void listarComprobante(Model model, Filtro filtro,  PageableSG pageable, String url, HttpServletRequest request){
 		List<TblComprobante> entidades = new ArrayList<TblComprobante>();
 		Sort sort = new Sort(new Sort.Order(Direction.DESC, "numero"));
@@ -298,6 +271,7 @@ public class RemisionAction {
 
 			Specification<TblComprobante> criterio = Specifications.where(conNumero(filtro.getNumero()))
 					.and(conCodigoEmpresa(codigoEntidad))
+					.and(conNombreCliente(filtro.getNombre()))
 					.and(conEstado(Constantes.ESTADO_REGISTRO_ACTIVO));
 			pageable.setSort(sort);
 			//entidades = comprobanteDao.findAll(criterio);
@@ -315,38 +289,46 @@ public class RemisionAction {
 			entidades = null;
 		}
 	}
-	
+	@SuppressWarnings("unchecked")
+	private Map<String, TblProducto> obtenerMapProductoSession(HttpServletRequest request){
+		return (Map<String, TblProducto>)request.getSession().getAttribute("SessionMapProductoSistema");
+	}
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/operacion/remision/seleccion/{id}", method = RequestMethod.GET)
-	/**
-	 * guiaRemisionSession				: Contiene toda la info de la remision [RemisionBean]
-	 * entidad							: Contiene toda la info de la remision [RemisionBean]
-	 * ListadoConsultaFactura			: Datos de los comprobantes [TblComprobante]
-	 * 
-	 */
 	public String seleccionaraRegistroFactura(@PathVariable Integer id, HttpServletRequest request, Model model, PageableSG pageable) {
 		TblComprobante comprobante					= null;
 		String path 								= null;
 		List<TblComprobante> lista 					= null;
 		List<TblDetalleComprobante> listaDetalle 	= null;
 		RemisionBean entidad 						= null;
+		Map<String, TblProducto> mapProducto		= obtenerMapProductoSession(request);
 		try{
 			log.debug("[seleccionaraRegistroFactura] Inicio");
 			path = "operacion/remision/rem_previo_nuevo";
 			entidad = (RemisionBean)request.getSession().getAttribute("guiaRemisionSession");
 			lista = (List<TblComprobante>)request.getSession().getAttribute("ListadoConsultaFactura");
 			comprobante = lista.get(id);
-			entidad.setComprobante(comprobante);
-			entidad.getRemision().setDomicilioLlegada(entidad.getComprobante().getDireccionCliente());
+			if (entidad.getListaComprobante()== null || entidad.getListaComprobante().isEmpty()) {
+				entidad.setComprobante(comprobante);
+				entidad.getRemision().setDomicilioLlegada(entidad.getComprobante().getDireccionCliente());
+				log.debug("[seleccionaraRegistroFactura] --> Direccion Llegada:"+entidad.getRemision().getDomicilioLlegada());
+				entidad.getRemision().setUbigeoLlegada(obtenerUbigeoLlegada(entidad.getComprobante().getNumeroDocumento(),entidad.getComprobante().getTblEmpresa().getCodigoEntidad()));
+			}else {
+				entidad.setComprobante(comprobante);
+			}
+			
+			if(!mismoClienteSeleccionado(entidad)) {
+				model.addAttribute("respuesta", "La factura Seleccionada corresponde a otro cliente, no se podrá asociar ["+entidad.getListaFacturaAsociada().get(0).getNombreCliente()+"]");
+			}
 			//entidad.getRemision().setNumeroDocumentoTransportista(entidad.getComprobante().getNumeroDocumento());
 			//entidad.getRemision().setNombreTransportista(entidad.getComprobante().getNombreCliente());
 			listaDetalle = detalleComprobanteDao.listarxComprobante(comprobante.getCodigoComprobante());
 			//Actualizar cantidades
-			actualizarCantidadComprobante(listaDetalle);
+			actualizarCantidadComprobante(listaDetalle, mapProducto);
 			entidad.setListaDetalle(listaDetalle);
 			model.addAttribute("entidad", entidad);
 			request.getSession().setAttribute("guiaRemisionSession",entidad);
-			log.debug("[seleccionaraRegistroConsulta] Fin");
+			log.debug("[seleccionaraRegistroConsulta] Fin:"+entidad.getRemision().getDomicilioLlegada());
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
@@ -354,9 +336,21 @@ public class RemisionAction {
 		}
 		return path;
 	}
-	private void actualizarCantidadComprobante(List<TblDetalleComprobante> listaDetalle) {
+	private String obtenerUbigeoLlegada(String numeroDocumento, int codigoEntidad) {
+		List<TblCliente> listaCliente = clienteDao.listarClientexDocumentoxEmpresa(numeroDocumento, codigoEntidad);
+		String ubigeo = "";
+		if (listaCliente!=null && !listaCliente.isEmpty()) {
+			log.debug("[obtenerUbigeoLlegada] Tamanio Lista Cliente:"+listaCliente.size());
+			TblCliente cliente = listaCliente.get(0);
+			ubigeo = cliente.getDistrito();
+		}
+		return ubigeo;
+	}
+
+	private void actualizarCantidadComprobante(List<TblDetalleComprobante> listaDetalle, Map<String, TblProducto> mapProducto) {
 		for(TblDetalleComprobante detalle: listaDetalle) {
 			detalle.setCantidad(detalle.getCantidad().setScale(2, RoundingMode.HALF_UP));
+			obtenerUnidadMedida(detalle, mapProducto);
 			BigDecimal cantidadGuia = detalle.getCantidadGuia();
 			if (cantidadGuia !=null) {
 				detalle.setCantidad(detalle.getCantidad().subtract(cantidadGuia));
@@ -365,62 +359,95 @@ public class RemisionAction {
 		}
 
 	}
+	/*asigna unidad de medida del producto para ser visualidado en la pantalla*/
+	private void obtenerUnidadMedida(TblDetalleComprobante detalle, Map<String, TblProducto> mapProducto) {
+		String unidadMedida = null;
+		TblProducto producto = null;
+		producto = mapProducto.get(detalle.getCodigoProducto());
+		if (producto != null) {
+			unidadMedida = producto.getUnidadMedida().toUpperCase();
+			detalle.setUnidadMedida(unidadMedida);
+		}
+	}
 	@RequestMapping(value = "/operacion/remision/nuevo/asociar", method = RequestMethod.POST)
-	/**
-	 * guiaRemisionSession				: Contiene toda la info de la remision [RemisionBean]
-	 * entidad							: Contiene toda la info de la remision [RemisionBean]
-	 * ListadoConsultaFactura			: Datos de los comprobantes [TblComprobante]
-	 * 
-	 */
 	public String asociarFactura(Model model, RemisionBean entidad,  String path, HttpServletRequest request,  PageableSG pageable) {
 		path = "operacion/remision/rem_nuevo";
-		RemisionBean entidadOriginal 		= null;
-		FacturaAsociadaBean facturaAsociada	= new FacturaAsociadaBean();
-		TblComprobante comprobante			= null;
+		RemisionBean entidadOriginal 			= null;
+		FacturaAsociadaBean facturaAsociada		= new FacturaAsociadaBean();
+		TblComprobante comprobante				= null;
+		Map<String, TblProducto> mapProducto	= obtenerMapProductoSession(request);
+		BigDecimal totalPesoGuia				= new BigDecimal("0");
 		try{
 			log.debug("[asociarFactura] Inicio");
 			entidadOriginal = (RemisionBean)request.getSession().getAttribute("guiaRemisionSession");
-			//Obtenemos las cantidades
-			for(int indice=0; indice < entidad.getListaDetalle().size(); indice++) {
-				entidadOriginal.getListaDetalle().get(indice).setCantidad(entidad.getListaDetalle().get(indice).getCantidad());
-			}
-			//obtenerDetalleRemision(entidadOriginal, request);
-			if (entidadOriginal.getListaFacturaAsociada()==null) {
-				log.debug("[asociarFactura] Inicializamos la primera vez");
-				entidadOriginal.setListaFacturaAsociada(new ArrayList<>());
-			}else {
-				log.debug("[asociarFactura] Tamaño de la lista: "+entidadOriginal.getListaFacturaAsociada().size());
-			}
-			comprobante = entidadOriginal.getComprobante();
-			if (!entidadOriginal.getListaDetalle().isEmpty()) {
-				for(TblDetalleComprobante detalleComprobante: entidadOriginal.getListaDetalle()) {
-					if (detalleComprobante.getCantidad().compareTo(new BigDecimal("0"))>0) {
-						facturaAsociada = new FacturaAsociadaBean();
-						facturaAsociada.setSerieFactura(comprobante.getSerie());
-						facturaAsociada.setNumeroFactura(comprobante.getNumero());
-						facturaAsociada.setCodigoComprobante(comprobante.getCodigoComprobante());
-						facturaAsociada.setNombreCliente(comprobante.getNombreCliente());
-						facturaAsociada.setDescripcion(detalleComprobante.getDescripcion());
-						facturaAsociada.setUnidadMedida(detalleComprobante.getUnidadMedida());
-						facturaAsociada.setCantidad(detalleComprobante.getCantidad());
-						entidadOriginal.getListaFacturaAsociada().add(facturaAsociada);
+			if (mismoClienteSeleccionado(entidadOriginal)) {
+				//Validamos la misma factura
+				if (distintaFacturaSeleccionada(entidadOriginal)) {
+					//Obtenemos las cantidades de la pantalla
+					for(int indice=0; indice < entidad.getListaDetalle().size(); indice++) {
+						entidadOriginal.getListaDetalle().get(indice).setCantidad(entidad.getListaDetalle().get(indice).getCantidad());
+					}
+					//Quitamos los productos que son cero
+					quitarDetalleComprobanteConValorCero(entidadOriginal);
+					//obtenerDetalleRemision(entidadOriginal, request);
+					if (entidadOriginal.getListaFacturaAsociada()==null) {
+						log.debug("[asociarFactura] Inicializamos la primera vez");
+						entidadOriginal.setListaFacturaAsociada(new ArrayList<>());
+					}else {
+						log.debug("[asociarFactura] Tamaño de la lista: "+entidadOriginal.getListaFacturaAsociada().size());
+						for(FacturaAsociadaBean factura:entidadOriginal.getListaFacturaAsociada()) {
+							totalPesoGuia = totalPesoGuia.add(factura.getPeso());
 						}
+						log.debug("[asociarFactura] totalPesoGuia: "+totalPesoGuia);
+					}
+					comprobante = entidadOriginal.getComprobante();
+					if (!entidadOriginal.getListaDetalle().isEmpty()) {
+						for(TblDetalleComprobante detalleComprobante: entidadOriginal.getListaDetalle()) {
+							if (detalleComprobante.getCantidad().compareTo(new BigDecimal("0"))>0) {
+								facturaAsociada = new FacturaAsociadaBean();
+								facturaAsociada.setSerieFactura(comprobante.getSerie());
+								facturaAsociada.setNumeroFactura(comprobante.getNumero());
+								facturaAsociada.setCodigoComprobante(comprobante.getCodigoComprobante());
+								facturaAsociada.setCodigoDetalleComprobante(detalleComprobante.getCodigoDetalle());
+								facturaAsociada.setNombreCliente(comprobante.getNombreCliente());
+								facturaAsociada.setDescripcion(detalleComprobante.getDescripcion());
+								facturaAsociada.setUnidadMedida(detalleComprobante.getUnidadMedida());
+								facturaAsociada.setCantidad(detalleComprobante.getCantidad());
+								facturaAsociada.setPeso(calcularPesoProducto(detalleComprobante,mapProducto));
+								entidadOriginal.getListaFacturaAsociada().add(facturaAsociada);
+								totalPesoGuia = totalPesoGuia.add(facturaAsociada.getPeso());
+								facturaAsociada.setNumeroCliente(comprobante.getNumeroDocumento());
+							}
+						}
+						log.debug("[asociarFactura] totalPesoGuia: "+totalPesoGuia);
+						log.debug("[asociarFactura] Luego...Tamaño de la lista: "+entidadOriginal.getListaFacturaAsociada().size());
+					}
+					entidadOriginal.setTotalPesoGuia(totalPesoGuia);
+					//Almacenamos la información de la factura y su detalle
+					if (entidadOriginal.getListaComprobante() == null) {
+						entidadOriginal.setListaComprobante(new ArrayList<>());
+						log.debug("[asociarFactura] Inicializamos la primera vez a ComprobanteBean");
+					}else {
+						log.debug("[asociarFactura] Tamaño de la lista de ComprobanteBean:"+entidadOriginal.getListaComprobante().size());
+					}
+					ComprobanteBean comprobanteParaRegistro = new ComprobanteBean();
+					comprobanteParaRegistro.setComprobante(entidadOriginal.getComprobante());
+					comprobanteParaRegistro.setListaDetalle(entidadOriginal.getListaDetalle());
+					entidadOriginal.getListaComprobante().add(comprobanteParaRegistro);
+				}else {
+					log.error("[asociarFactura] No se puede asociar porque la misma factura");
+					model.addAttribute("respuesta", "No se puede asociar la misma factura");
+					path = "operacion/remision/rem_previo_nuevo";
 				}
-				log.debug("[asociarFactura] Luego...Tamaño de la lista: "+entidadOriginal.getListaFacturaAsociada().size());
-			}
-			//Almacenamos la información de la factura y su detalle
-			if (entidadOriginal.getListaComprobante() == null) {
-				entidadOriginal.setListaComprobante(new ArrayList<>());
-				log.debug("[asociarFactura] Inicializamos la primera vez a ComprobanteBean");
 			}else {
-				log.debug("[asociarFactura] Tamaño de la lista de ComprobanteBean:"+entidadOriginal.getListaComprobante().size());
+				log.error("[asociarFactura] No se puede asociar porque son clientes diferentes");
+				model.addAttribute("respuesta", "No se puede asociar porque son clientes diferentes");
+				path = "operacion/remision/rem_previo_nuevo";
 			}
-			ComprobanteBean comprobanteParaRegistro = new ComprobanteBean();
-			comprobanteParaRegistro.setComprobante(entidadOriginal.getComprobante());
-			comprobanteParaRegistro.setListaDetalle(entidadOriginal.getListaDetalle());
-			entidadOriginal.getListaComprobante().add(comprobanteParaRegistro);
 			model.addAttribute("entidad", entidadOriginal);
 			request.getSession().setAttribute("guiaRemisionSession", entidadOriginal);
+			
+			log.debug("[asociarFactura] entidadOriginal:"+entidadOriginal.getRemision().getDomicilioLlegada());
 			log.debug("[asociarFactura] Luego...Tamaño de la lista de ComprobanteBean:"+entidadOriginal.getListaComprobante().size());
 			log.debug("[asociarFactura] Fin");
 		}catch(Exception e){
@@ -432,6 +459,57 @@ public class RemisionAction {
 		log.debug("[asociarFactura] Fin");
 		return path;
 	}
+	//Elimina de la lista los productos cuyo valor sea CERO
+	private void quitarDetalleComprobanteConValorCero(RemisionBean entidadOriginal) {
+		List<TblDetalleComprobante> listaDetalleComprobante = new ArrayList<>();
+		if (entidadOriginal.getListaDetalle()!= null && !entidadOriginal.getListaDetalle().isEmpty()) {
+			for(TblDetalleComprobante tblDetalleComprobante: entidadOriginal.getListaDetalle()) {
+				if (tblDetalleComprobante.getCantidad().compareTo(new BigDecimal("0"))>0) {
+					listaDetalleComprobante.add(tblDetalleComprobante);
+				}
+			}
+		}
+		entidadOriginal.setListaDetalle(listaDetalleComprobante);
+	}
+
+	private boolean distintaFacturaSeleccionada(RemisionBean entidadOriginal) {
+		boolean resultado = true;
+		if (entidadOriginal!= null && entidadOriginal.getListaFacturaAsociada()!=null && !entidadOriginal.getListaFacturaAsociada().isEmpty()) {
+			for(FacturaAsociadaBean facturaAsociada:entidadOriginal.getListaFacturaAsociada()) {
+				if (entidadOriginal.getComprobante().getNumero().equals(facturaAsociada.getNumeroFactura())) {
+					return false;
+				}
+			}
+			
+		}else {
+			return true;
+		}
+		return resultado;
+	}
+	private boolean mismoClienteSeleccionado(RemisionBean entidadOriginal) {
+		if (entidadOriginal!= null && entidadOriginal.getListaFacturaAsociada()!=null && !entidadOriginal.getListaFacturaAsociada().isEmpty()) {
+			FacturaAsociadaBean facturaAsociada		= entidadOriginal.getListaFacturaAsociada().get(0);
+			if (entidadOriginal.getComprobante().getNumeroDocumento().equals(facturaAsociada.getNumeroCliente())) {
+				return true;
+			}else {
+				return false;
+			}
+			
+		}else {
+			return true;
+		}
+	}
+
+	private BigDecimal calcularPesoProducto(TblDetalleComprobante detalleComprobante, Map<String, TblProducto> mapProducto) {
+		TblProducto producto = null;
+		producto = mapProducto.get(detalleComprobante.getCodigoProducto());
+		if (producto !=null) {
+			return detalleComprobante.getCantidad().multiply(producto.getPeso()).setScale(2, RoundingMode.HALF_UP);
+		}
+		log.error("[calcularPesoProducto] Error en el producto:"+detalleComprobante.getCodigoProducto()+ " Detalle Comprobante:"+detalleComprobante.getCodigoDetalle());
+		return new BigDecimal("0");
+	}
+
 	@RequestMapping(value = "/operacion/remision/detalle/eliminar", method = RequestMethod.POST)
 	public String eliminarDetalleProducto(Model model, RemisionBean entidad, HttpServletRequest request) {
 		RemisionBean entidadOriginal		= null;
@@ -444,7 +522,11 @@ public class RemisionAction {
 				removerProductoDeListadeComprobante(entidadOriginal, entidadOriginal.getListaFacturaAsociada().get(entidad.getIndiceElemento().intValue()));
 				entidadOriginal.getListaFacturaAsociada().remove(entidad.getIndiceElemento().intValue());
 			}
+			
 			entidad.setListaFacturaAsociada(entidadOriginal.getListaFacturaAsociada());
+			entidad.setListaComprobante(entidadOriginal.getListaComprobante());
+			entidad.setTotalPesoGuia(entidadOriginal.getTotalPesoGuia());
+			
 			model.addAttribute("entidad", entidad);
 			request.getSession().setAttribute("guiaRemisionSession",entidad);
 			path = "operacion/remision/rem_nuevo";
@@ -460,22 +542,30 @@ public class RemisionAction {
 		String numeroFactura = facturaAsociadaBean.getNumeroFactura();
 		String nombreProducto = facturaAsociadaBean.getDescripcion();
 		int indexComprobante = -1;
+		log.info("[removerProductoDeListadeComprobante] Inicio:"+numeroFactura+":"+nombreProducto);
 		for(ComprobanteBean comprobante:entidadOriginal.getListaComprobante()) {
 			indexComprobante++;
 			String numeroFacturaParaRegistro = comprobante.getComprobante().getNumero();
+			log.info("[removerProductoDeListadeComprobante] numeroFacturaParaRegistro:"+numeroFacturaParaRegistro);
 			if (numeroFactura.equals(numeroFacturaParaRegistro)){
 				int indexDetalle = -1;
 				for(TblDetalleComprobante detalle: comprobante.getListaDetalle()) {
 					indexDetalle++;
+					log.info("[removerProductoDeListadeComprobante] detalle.getDescripcion():"+detalle.getDescripcion());
 					if (detalle.getDescripcion().equals(nombreProducto)) {
 						comprobante.getListaDetalle().remove(indexDetalle);
+						log.info("[removerProductoDeListadeComprobante] Eliminado:"+indexDetalle+" Tamaño Lista Detalle:"+comprobante.getListaDetalle().size());
+						break;
 					}
 				}
 				if (comprobante.getListaDetalle().size()==0) {
+					log.info("[removerProductoDeListadeComprobante] Tamaño de Lista Comprobante:"+entidadOriginal.getListaComprobante().size());
 					entidadOriginal.getListaComprobante().remove(indexComprobante);
+					break;
 				}
 			}
 		}
+		log.info("[removerProductoDeListadeComprobante] Fin:getListaComprobante().size:"+entidadOriginal.getListaComprobante().size());
 	}
 
 	@RequestMapping(value = "operacion/remision/all/eliminar/{id}", method = RequestMethod.GET)
@@ -490,7 +580,7 @@ public class RemisionAction {
 			remision = remisionDao.save(remision);
 			log.debug("[eliminarRemision] Eliminado Remision:"+remision.getCodigoRemision());
 			//Reversion de las cantidades
-			List<TblDetalleRemision> listaDetalleRemision = detalleRemisionDao.findAllxIdFacturaAsociada(id);
+			List<TblDetalleRemision> listaDetalleRemision = detalleRemisionDao.findAllxIdRemision(id);
 			for(TblDetalleRemision detalle: listaDetalleRemision) {
 				TblDetalleComprobante detComprobante = detalleComprobanteDao.findOne(detalle.getCodigoDetalleComprobante());
 				detComprobante.setCantidadGuia(detComprobante.getCantidadGuia().subtract(detalle.getCantidad()));
@@ -556,6 +646,7 @@ public class RemisionAction {
 		return path;
 	}*/
 
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/operacion/remision/nuevo/guardar", method = RequestMethod.POST)
 	public String guardarRemision(Model model, RemisionBean entidad,  String path, HttpServletRequest request,  PageableSG pageable) {
 		path = "operacion/remision/rem_listado";
@@ -563,6 +654,7 @@ public class RemisionAction {
 		try{
 			log.debug("[guardarRemision] Inicio");
 			entidadOriginal = (RemisionBean)request.getSession().getAttribute("guiaRemisionSession");
+			List<TblProducto> listaProductoSistema = (List<TblProducto>)request.getSession().getAttribute("SessionListaProductoxEntidad");
 			actualizarFaltantes(entidadOriginal,entidad,request);
 			//obtener serie
 			obtenerSerieRemision(entidadOriginal, request);
@@ -575,11 +667,14 @@ public class RemisionAction {
 				for(ComprobanteBean comprobanteBean: entidadOriginal.getListaComprobante()) {
 					TblFacturaAsociada facturaAsociada = new TblFacturaAsociada();
 					facturaAsociada.setTblRemision(remision);
-					facturaAsociada.setPesoTotal(new BigDecimal("5")); //TODO: PENDIENTE EL PESO
+					List<TblDetalleRemision> listaDetalleRemision = obtenerDetalleRemision(comprobanteBean.getListaDetalle(), request);
+					BigDecimal totalPesoFactura = calcularPesoProductoxFactura(listaDetalleRemision,listaProductoSistema);
+					facturaAsociada.setPesoTotal(totalPesoFactura); 
 					facturaAsociada.setCodigoComprobante(comprobanteBean.getComprobante().getCodigoComprobante());
+					facturaAsociada.setObservacion(comprobanteBean.getComprobante().getSerie()+"-"+comprobanteBean.getComprobante().getNumero());
 					TblFacturaAsociada tblFacturaAsociada = facturaAsociadaDao.save(facturaAsociada);
 					log.debug("[guardarRemision] tblFacturaAsociada registrada:"+tblFacturaAsociada.getCodigoFacturaAsociada());
-					List<TblDetalleRemision> listaDetalleRemision = obtenerDetalleRemision(comprobanteBean.getListaDetalle(), request);
+					
 					for(TblDetalleRemision detRemision : listaDetalleRemision) {
 						detRemision.setTblFacturaAsociada(tblFacturaAsociada);
 						TblDetalleRemision tblDetalleRemision = detalleRemisionDao.save(detRemision);
@@ -620,6 +715,25 @@ public class RemisionAction {
 		log.debug("[guardarRemision] Fin");
 		return path;
 	}
+	private BigDecimal calcularPesoProductoxFactura(List<TblDetalleRemision> listaDetalleRemision,	List<TblProducto> listaProductoSistema) {
+		BigDecimal totalPeso = new BigDecimal("0");
+		Map<String, TblProducto> mapProducto = new HashMap<>();
+		for(TblProducto producto: listaProductoSistema) {
+			mapProducto.put(producto.getCodigoEmpresa(), producto);
+		}
+		for(TblDetalleRemision detalle: listaDetalleRemision) {
+			TblProducto producto = mapProducto.get(detalle.getCodigoProducto());
+			if (producto!=null) {
+				log.debug("[calcularPesoProductoxFactura] Producto:"+producto.getNombre()+" Peso: "+producto.getPeso()+" Cantidad:"+detalle.getCantidad());
+				totalPeso = totalPeso.add(producto.getPeso().multiply(detalle.getCantidad()));
+				log.debug("[calcularPesoProductoxFactura] totalPeso:"+totalPeso);
+			}else {
+				log.error("[calcularPesoProductoxFactura] Producto no encontrado:"+detalle.getCodigoProducto());
+			}
+		}
+		return totalPeso;
+	}
+
 	@RequestMapping(value = "/operacion/remision/ver/{id}", method = RequestMethod.GET)
 	public String verRemision(@PathVariable Integer id, Model model, HttpServletRequest request) {
 		RemisionBean entidad 							= null;
@@ -646,13 +760,16 @@ public class RemisionAction {
 					comprobanteBean = new ComprobanteBean();
 					comprobanteBean.setComprobante(comprobanteDao.findOne(factura.getCodigoComprobante()));
 					listaDetRemision = detalleRemisionDao.findAllxIdFacturaAsociada(factura.getCodigoFacturaAsociada());
-					listaDetComprobante = detalleComprobanteDao.listarxComprobante(factura.getCodigoComprobante());
+					listaDetComprobante = detalleComprobanteDao.listarxComprobanteTodos(factura.getCodigoComprobante());
 					for(TblDetalleComprobante detComprobante: listaDetComprobante) {
 						mapDetComprobante.put(detComprobante.getCodigoDetalle(), detComprobante);
 					}
 					comprobanteBean.setListaDetalle(new ArrayList<>());
 					for(TblDetalleRemision detRemision: listaDetRemision) {
-						comprobanteBean.getListaDetalle().add(mapDetComprobante.get(detRemision.getCodigoDetalleComprobante()));
+						TblDetalleComprobante detalleComprobante = mapDetComprobante.get(detRemision.getCodigoDetalleComprobante());
+						detalleComprobante.setCantidad(detRemision.getCantidad());
+						comprobanteBean.getListaDetalle().add(detalleComprobante);
+						
 					}
 					
 					listaComprobante.add(comprobanteBean);
@@ -662,16 +779,18 @@ public class RemisionAction {
 			if (listaComprobante != null) {
 				listaFacAsoVer = new ArrayList<>();
 				for(ComprobanteBean comprobante: listaComprobante) {
-					for(TblDetalleComprobante detalleComprobante: comprobante.getListaDetalle()) {
-						facturaBean = new FacturaAsociadaBean();
-						facturaBean.setSerieFactura(comprobante.getComprobante().getSerie());
-						facturaBean.setNumeroFactura(comprobante.getComprobante().getNumero());
-						facturaBean.setCodigoComprobante(comprobante.getComprobante().getCodigoComprobante());
-						facturaBean.setNombreCliente(comprobante.getComprobante().getNombreCliente());
-						facturaBean.setDescripcion(detalleComprobante.getDescripcion());
-						facturaBean.setUnidadMedida(detalleComprobante.getUnidadMedida());
-						facturaBean.setCantidad(detalleComprobante.getCantidad());
-						listaFacAsoVer.add(facturaBean);
+					if (comprobante.getListaDetalle()!=null) {
+						for(TblDetalleComprobante detalleComprobante: comprobante.getListaDetalle()) {
+							facturaBean = new FacturaAsociadaBean();
+							facturaBean.setSerieFactura(comprobante.getComprobante().getSerie());
+							facturaBean.setNumeroFactura(comprobante.getComprobante().getNumero());
+							facturaBean.setCodigoComprobante(comprobante.getComprobante().getCodigoComprobante());
+							facturaBean.setNombreCliente(comprobante.getComprobante().getNombreCliente());
+							facturaBean.setDescripcion(detalleComprobante.getDescripcion());
+							facturaBean.setUnidadMedida(detalleComprobante.getUnidadMedida());
+							facturaBean.setCantidad(detalleComprobante.getCantidad());
+							listaFacAsoVer.add(facturaBean);
+						}
 					}
 				}
 			}
@@ -684,80 +803,27 @@ public class RemisionAction {
 		}
 		return path;
 	}
-	/*** Retorna a la consulta de facturas ***/
-	/**
-	 * entidad							: Contiene toda la info de la remision [RemisionBean]	--> guiaRemisionSession
-	 * filtro							: Filtro de la consulta de Factura						--> sessionFiltroCriterio
-	 * registros						: Datos de los comprobantes [TblComprobante]			--> ListadoConsultaFactura
-	 * page								: Paginado - page										--> pageConsultaFactura
-	 * 
-	 */
-	@RequestMapping(value = "/operacion/regresar/listafactura", method = RequestMethod.GET)
-	public String regresarListadoFactura(Model model, Filtro filtro, String path, HttpServletRequest request) {
+	@RequestMapping(value = "/operacion/remision/tipotransporte/actualizar", method = RequestMethod.POST)
+	public String actualizarTipoTransporte(Model model, RemisionBean entidad, HttpServletRequest request) {
+		RemisionBean entidadOriginal		= null;
+		String path							= null;
 		try{
-			log.debug("[regresarListadoFactura] Inicio");
-			path = "operacion/remision/rem_listado_factura";
-			model.addAttribute("entidad", request.getSession().getAttribute("guiaRemisionSession"));
-			model.addAttribute("filtro", request.getSession().getAttribute("sessionFiltroCriterio"));
-			model.addAttribute("registros", request.getSession().getAttribute("ListadoConsultaFactura"));
-			model.addAttribute("page", request.getSession().getAttribute("pageConsultaFactura"));
-			log.debug("[regresarListadoFactura] Fin");
-		}catch(Exception e){
-			log.debug("[regresarListadoFactura] Error:"+e.getMessage());
-			e.printStackTrace();
-		}finally{
-			filtro = null;
-		}
-
-		return path;
-	}
-	/*Retorna a la pantalla de nueva remision*/
-	@RequestMapping(value = "/operacion/remision/regresar", method = RequestMethod.GET)
-	/**
-	 * guiaRemisionSession				: Contiene toda la info de la remision [RemisionBean]
-	 * 
-	 */
-	public String regresarNuevoRemision(Model model, Filtro filtro, String path, HttpServletRequest request) {
-		try{
-			log.debug("[regresarComprobante] Inicio");
+			log.debug("[actualizarTipoTransporte] Inicio");
+			entidadOriginal = (RemisionBean)request.getSession().getAttribute("guiaRemisionSession");
+			entidad.setListaFacturaAsociada(entidadOriginal.getListaFacturaAsociada());
+			entidad.setListaComprobante(entidadOriginal.getListaComprobante());
+			entidad.setComprobante(entidadOriginal.getComprobante());
+			
+			model.addAttribute("entidad", entidad);
+			request.getSession().setAttribute("guiaRemisionSession",entidad);
 			path = "operacion/remision/rem_nuevo";
-			model.addAttribute("entidad", request.getSession().getAttribute("guiaRemisionSession"));
-			log.debug("[regresarComprobante] Fin");
+			log.debug("[actualizarTipoTransporte] Fin");
 		}catch(Exception e){
-			log.debug("[regresarComprobante] Error:"+e.getMessage());
 			e.printStackTrace();
-		}finally{
-			filtro = null;
 		}
-
 		return path;
 	}
-	/*Retorna a la pantalla de guias de remision*/
-	@RequestMapping(value = "/operacion/regresar", method = RequestMethod.GET)
-	/**
-	 * filtro							: Filtro de la pagina de Inicio							--> sessionFiltroRemisionCriterio
-	 * page								: Paginado - page										--> PageRemisionPrincipal
-	 * registros						: Listado de Remision [TblRemision]						--> ListadoConsultaRemision
-	 * 
-	 */
-	public String regresarRemision(Model model, Filtro filtro, String path, HttpServletRequest request) {
-		try{
-			log.debug("[regresarRemision] Inicio");
-			path = "operacion/remision/rem_listado";
-			model.addAttribute("filtro", request.getSession().getAttribute("sessionFiltroRemisionCriterio"));
-			model.addAttribute("page", request.getSession().getAttribute("PageRemisionPrincipal"));
-			model.addAttribute("registros", request.getSession().getAttribute("ListadoConsultaRemision"));
-
-			log.debug("[regresarRemision] Fin");
-		}catch(Exception e){
-			log.debug("[regresarRemision] Error:"+e.getMessage());
-			e.printStackTrace();
-		}finally{
-			filtro = null;
-		}
-
-		return path;
-	}
+	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/operacion/remision/xml/{id}", method = RequestMethod.GET)
 	public String obtenerXMLGuia(@PathVariable Integer id, Model model, HttpServletRequest request) {
@@ -766,6 +832,7 @@ public class RemisionAction {
 		try{
 			log.debug("[obtenerXMLGuia] Inicio");
 			path = "operacion/remision/rem_listado";
+			String rutaXml = obtenerRutaDirectorioXML(request);
 			entidad = new RemisionBean();
 			TblRemision remision = remisionDao.findOne(id);
 			List<TblFacturaAsociada> listaFacturaAsociada = facturaAsociadaDao.findAllxIdRemision(remision.getCodigoRemision());
@@ -786,16 +853,19 @@ public class RemisionAction {
 			Map<String, String> mapTipoMotivoTraslado = (Map<String, String>)request.getSession().getAttribute("SessionMapMotivoTrasladoDescripcion");
 			String descripcionMotivo = mapTipoMotivoTraslado.get(entidad.getRemision().getMarca());
 			entidad.setDescripcionMotivo(descripcionMotivo);
-			Map<String, String> mapDomicilioFiscalSession = (Map<String, String>)request.getSession().getAttribute("SessionMapDomicilioFiscalDescripcion");
-			String direccionFiscal = mapDomicilioFiscalSession.get(entidad.getRemision().getCodigoDomicilioPartida());
-			log.debug("[obtenerXMLGuia] direccionFiscal:"+direccionFiscal);
-			entidad.setDireccionPartida(direccionFiscal);
-			entidad.setPesoBruto(new BigDecimal("1"));
+			Map<String, String> mapDomicilioPartidaDatos = (Map<String, String>)request.getSession().getAttribute("SessionMapDomicilioPartidaDatos");
+			String direccionPartida = mapDomicilioPartidaDatos.get(entidad.getRemision().getCodigoDomicilioPartida());
+			String[] ubigeo = entidad.getRemision().getCodigoDomicilioPartida().split(":");
+			entidad.setUbigeoPartida(ubigeo[1]);
+			log.debug("[obtenerXMLGuia] direccion Partida Ubigeo:"+ubigeo[1]);
+			log.debug("[obtenerXMLGuia] direccionFiscal:"+direccionPartida);
+			entidad.setDireccionPartida(direccionPartida);
+			entidad.setPesoBruto(obtenerPesoBruto(listaFacturaAsociada));
 			//Llamada a la generación XML
-			GuiaRemision.generarGuiaRemisionXML(entidad);
+			guiaRemisionService.generarGuiaRemisionXML(entidad,rutaXml);
 			//Guardamos el nombre
 			remision.setEstadoOperacion(Constantes.ESTADO_XML_GENERADO);
-			remision.setObservacion(entidad.getNombreArchivoXML());
+			remision.setRutaXML(entidad.getNombreArchivoXML());
 			remisionDao.save(remision);
 			//Refrescando la pantalla
 			Integer page = obtenerPage(request);
@@ -811,6 +881,23 @@ public class RemisionAction {
 		return path;
 	}
 
+
+	@SuppressWarnings("unchecked")
+	private String obtenerRutaDirectorioXML(HttpServletRequest request) {
+		Map<String, TblParametro> mapParametro = (Map<String, TblParametro>)request.getSession().getAttribute("SessionMapParametroSistema");
+		TblParametro TblParametro =  mapParametro.get(Constantes.RUTA_XML_GUIA_REMISION);
+		String rutaXml = TblParametro.getDato();
+		return rutaXml;
+	}
+
+	private BigDecimal obtenerPesoBruto(List<TblFacturaAsociada> listaFacturaAsociada) {
+		BigDecimal totalPeso = new BigDecimal("0");
+		for(TblFacturaAsociada factura: listaFacturaAsociada) {
+			totalPeso = totalPeso.add(factura.getPesoTotal());
+		}
+		return totalPeso;
+	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/operacion/remision/descargar/xml/{id}", method = RequestMethod.GET)
 	public ResponseEntity descargarXMLGuia(@PathVariable Integer id, Model model, HttpServletRequest request)  {
@@ -818,7 +905,27 @@ public class RemisionAction {
 		HttpHeaders headers = null;
 		try {
 			List<TblRemision> lista = (List<TblRemision>)request.getSession().getAttribute("ListadoConsultaRemision");
-			String filePath = ((TblRemision)lista.get(id)).getObservacion();
+			String filePath = ((TblRemision)lista.get(id)).getRutaXML();
+			File file = new File(filePath);
+			headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+			headers.setContentDispositionFormData(file.getName(), file.getName());
+			headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+
+			content = Files.readAllBytes(new File(filePath).toPath());
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return new ResponseEntity(content, headers, HttpStatus.OK);
+	}
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/operacion/remision/descargar/cdr/{id}", method = RequestMethod.GET)
+	public ResponseEntity descargarCDRGuia(@PathVariable Integer id, Model model, HttpServletRequest request)  {
+		byte[] content = null;
+		HttpHeaders headers = null;
+		try {
+			List<TblRemision> lista = (List<TblRemision>)request.getSession().getAttribute("ListadoConsultaRemision");
+			String filePath = ((TblRemision)lista.get(id)).getRutaCDR();
 			File file = new File(filePath);
 			headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
@@ -846,10 +953,12 @@ public class RemisionAction {
 			log.info("[pdfComprobante] Inicio");
 			entidad = new RemisionBean();
 			TblRemision remision = remisionDao.findOne(id);
-			TblComprobante comprobante = comprobanteDao.findOne(1);//TODO:ERROR(remision.getCodigoComprobante());
-			List<TblDetalleRemision> listaDetalleRemision = detalleRemisionDao.findAllxIdFacturaAsociada(id);
+			//TblComprobante comprobante = comprobanteDao.findOne(1);//TODO:ERROR(remision.getCodigoComprobante());
+			List<TblFacturaAsociada> listaFacturaAsociada = facturaAsociadaDao.findAllxIdRemision(id);
+			List<TblDetalleRemision> listaDetalleRemision = detalleRemisionDao.findAllxIdRemision(id);
 			entidad.setRemision(remision);
-			entidad.setComprobante(comprobante);
+			//entidad.setComprobante(comprobante);
+			entidad.setListaTblFacturaAsociada(listaFacturaAsociada);
 			entidad.setListaDetalleRemision(listaDetalleRemision);
 			//Datos adicionales para la guia XML
 			TblUsuario usuario = (TblUsuario)request.getSession().getAttribute("UsuarioSession");
@@ -859,10 +968,10 @@ public class RemisionAction {
 			String descripcionMotivo = mapTipoMotivoTraslado.get(entidad.getRemision().getMotivoTraslado());
 			log.info("[pdfComprobante] descripcionMotivo:"+descripcionMotivo +" codigo:"+entidad.getRemision().getMotivoTraslado());
 			entidad.setDescripcionMotivo(descripcionMotivo);
-			Map<String, String> mapDomicilioFiscalSession = (Map<String, String>)request.getSession().getAttribute("SessionMapDomicilioFiscalDescripcion");
-			String direccionFiscal = mapDomicilioFiscalSession.get(entidad.getRemision().getCodigoDomicilioPartida());
-			entidad.setDireccionPartida(direccionFiscal);
-			entidad.setPesoBruto(new BigDecimal("1"));
+			Map<String, String> mapDomicilioPartidaDatos = (Map<String, String>)request.getSession().getAttribute("SessionMapDomicilioPartidaDatos");
+			String direccionPartida = mapDomicilioPartidaDatos.get(entidad.getRemision().getCodigoDomicilioPartida());
+			entidad.setDireccionPartida(direccionPartida);
+			entidad.setPesoBruto(obtenerPesoBruto(listaFacturaAsociada));
 			entidad.setListaParametro((List<ParametroFacturadorBean>)request.getSession().getAttribute("SessionListParametro"));
 			bis = guiaPdf.comprobanteReporte(entidad);
 			headers.add("Content-Disposition", "attachment; filename="+remision.getSerie()+"-"+remision.getNumero()+".pdf");
@@ -879,25 +988,34 @@ public class RemisionAction {
 				.contentType(MediaType.APPLICATION_PDF)
 				.body(new InputStreamResource(bis));
 	}
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/operacion/remision/envio/xml/{id}", method = RequestMethod.GET)
 	public String envioXMLGuia(@PathVariable Integer id, Model model, HttpServletRequest request) {
 		RemisionBean entidad 				= null;
 		String path							= null;
 		try{
 			log.debug("[envioXMLGuia] Inicio");
+			Map<String, TblParametro> mapParametro = (Map<String, TblParametro>)request.getSession().getAttribute("SessionMapParametroSistema");
+			TblParametro TblParametro =  mapParametro.get(Constantes.RUTA_XML_GUIA_REMISION);
+			String rutaXml = TblParametro.getDato();
 			path = "operacion/remision/rem_listado";
 			entidad = new RemisionBean();
 			TblRemision remision = remisionDao.findOne(id);
 			String accessToken = obtenerTokenGuiaRemision(remision,entidad);
 			String ticket = obtenerTicketGuia(accessToken, remision,entidad);
-			String status = obtenerEstadoGuia(accessToken, ticket,entidad);
-			log.debug("[envioXMLGuia] status:"+status);
-			if (status != null) {
+			entidad.setRemision(remision);
+			if (ticket != null) {
 				//Guardamos el ticket
 				remision.setTicket(ticket);
 				remision.setEstadoOperacion(Constantes.ESTADO_XML_GENERADO);
 				remisionDao.save(remision);
-				model.addAttribute("respuesta", "Envio Realizado:"+status);
+				String status = obtenerEstadoGuia(accessToken, ticket,entidad, rutaXml);
+				log.debug("[envioXMLGuia] status:"+status);
+				if (status.equals("0")) {
+					model.addAttribute("respuesta", "Envio CDR Generado");
+				}else {
+					model.addAttribute("respuesta", "Ticket generado: "+status);
+				}
 			}else {
 				model.addAttribute("respuesta", "Error en el envio:"+entidad.getMensajeRpta());
 			}
@@ -919,7 +1037,7 @@ public class RemisionAction {
 		try { 
 			log.info("[obtenerTokenGuiaRemision] Inicio");
 			/*Se establece el cliente POST para el servidor de autenticación */				   
-			String resource = "https://gre-test.nubefact.com/v1/clientessol/test-85e5b0ae-255c-4891-a595-0b98c65c9854/oauth2/token"; 
+			String resource = configuracion.getApiTokenSunatUrl(); 
 			CloseableHttpClient httpclient = HttpClients.createDefault();
 			//HttpClient httpclient = httpClientSecury();
 			HttpPost httpPost = new HttpPost(resource);
@@ -929,10 +1047,10 @@ public class RemisionAction {
 			/*Se agregan los datos de autenticación para la plataforma Efact OSE*/
 			List<NameValuePair> params = new ArrayList<>(); 
 			params.add(new BasicNameValuePair("grant_type", "password")); 
-			params.add(new BasicNameValuePair("client_id", "test-85e5b0ae-255c-4891-a595-0b98c65c9854")); 
-			params.add(new BasicNameValuePair("client_secret", "test-Hty/M6QshYvPgItX2P0+Kw=="));
-			params.add(new BasicNameValuePair("username", "20602620337MODDATOS")); 
-			params.add(new BasicNameValuePair("password", "MODDATOS")); 
+			params.add(new BasicNameValuePair("client_id", configuracion.getApiTokenSunatClientId())); 
+			params.add(new BasicNameValuePair("client_secret", configuracion.getApiTokenSunatClientSecret()));
+			params.add(new BasicNameValuePair("username", configuracion.getApiTokenSunatUsername())); 
+			params.add(new BasicNameValuePair("password", configuracion.getApiTokenSunatPassword())); 
 			params.add(new BasicNameValuePair("scope", "https://api-cpe.sunat.gob.pe")); 
 			httpPost.setEntity(new UrlEncodedFormEntity(params));
 			/*Se envía la petición y se recibe el json con el token*/
@@ -961,10 +1079,10 @@ public class RemisionAction {
 			return null;
 		}
 		try {
-			File file = new File(remision.getObservacion());
+			File file = new File(remision.getRutaXML());
 			String nombreSinExtension = file.getName().substring(0,file.getName().indexOf("."));
 
-			String resource = "https://gre-test.nubefact.com/v1/contribuyente/gem/comprobantes/"+nombreSinExtension; 
+			String resource = configuracion.getApiTicketSunatUrl()+nombreSinExtension; 
 			log.info("[obtenerTicketGuia] resource:"+resource);
 
 			//Path source = Paths.get("D:\\03.Gregorio\\06.2023\\02.Willy\\02.GuiaRemision\\02.DatosDysalim\\20602620337-09-TTT1-2.xml");
@@ -1006,11 +1124,12 @@ public class RemisionAction {
 		}
 		return ticket;
 	}
-	private  String obtenerEstadoGuia(String accessToken, String ticket,RemisionBean entidad) {
+	private  String obtenerEstadoGuia(String accessToken, String ticket,RemisionBean entidad, String rutaXml) {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		JsonNode nameNode = null;
+		String codRespuesta = null;
 		/*Se establece el cliente GET para el servidor de autenticación*/
-		HttpGet httpget = new HttpGet("https://gre-test.nubefact.com/v1/contribuyente/gem/comprobantes/envios/" + ticket);
+		HttpGet httpget = new HttpGet(configuracion.getApiEnvioSunatUrl() + ticket);
 		/*Se agrega un Header de autorización con el token recibido por el servidor de autenticación*/
 		httpget.setHeader("Authorization", "Bearer " + accessToken);
 		/* Se envía la petición a la plataforma Efact OSE*/
@@ -1021,6 +1140,15 @@ public class RemisionAction {
 			String data = EntityUtils.toString(response.getEntity());
 			ObjectMapper mapper = new ObjectMapper();
 			nameNode = mapper.readTree(data);
+			codRespuesta = nameNode.get("codRespuesta").asText();
+			if (codRespuesta.equals("0")) {
+				TblRemision remision = remisionDao.findOne(entidad.getRemision().getCodigoRemision());
+				String arcCdr = nameNode.get("arcCdr").asText();
+				String xmlFileRespuesta = UtilArchivoRespuesta.obtenerCDRXML(arcCdr, rutaXml);
+				remision.setRutaCDR(rutaXml+"\\"+xmlFileRespuesta);
+				remision.setEstadoOperacion(Constantes.ESTADO_XML_CDR);
+				remisionDao.save(remision);
+			}
 
 			System.out.println("data: " + data );
 			int status = response.getStatusLine().getStatusCode(); 
@@ -1033,6 +1161,9 @@ public class RemisionAction {
 			e.printStackTrace();
 			return null;
 		} 
+		
+		
+		
 		/*Se valida el código de estado de la petición*/
 		return nameNode.get("codRespuesta").asText();
 
@@ -1112,24 +1243,28 @@ public class RemisionAction {
 		return size;
 	}
 	private void actualizarFaltantes(RemisionBean entidadOriginal, RemisionBean entidad, HttpServletRequest request) {
-		if (!entidad.getDatosTransporte().equals("-1")) {
-			String[] arrTransporte = entidad.getDatosTransporte().split(":");
-			entidadOriginal.getRemision().setPlaca(arrTransporte[3]);
-			entidadOriginal.getRemision().setMarca(arrTransporte[2]);
-			entidadOriginal.getRemision().setNumeroCertInscripcion(arrTransporte[4]);
-			entidadOriginal.getRemision().setNumeroLicencia(arrTransporte[5]);
-			entidadOriginal.getRemision().setNombreTransportista(arrTransporte[1]);
-			entidadOriginal.getRemision().setNumeroDocumentoTransportista(arrTransporte[0]);
-			entidadOriginal.getRemision().setTipoDocumentoTransportista("RUC");
-			entidadOriginal.getRemision().setEstadoOperacion("00");
-		}
 		TblUsuario usuario = (TblUsuario)request.getSession().getAttribute("UsuarioSession");
 		entidadOriginal.getRemision().setCodigoEntidad(usuario.getTblEmpresa().getCodigoEntidad());
-		entidadOriginal.getRemision().setTipoDocumentoCliente(entidadOriginal.getComprobante().getTipoDocumento());
-		entidadOriginal.getRemision().setNumeroDocumentoCliente(entidadOriginal.getComprobante().getNumeroDocumento());
-		entidadOriginal.getRemision().setNombreCliente(entidadOriginal.getComprobante().getNombreCliente());
-		
-
+		entidadOriginal.getRemision().setNombreConductor(entidad.getRemision().getNombreConductor());
+		entidadOriginal.getRemision().setApellidoConductor(entidad.getRemision().getApellidoConductor());
+		entidadOriginal.getRemision().setNumeroDNIConductor(entidad.getRemision().getNumeroDNIConductor());
+		entidadOriginal.getRemision().setUbigeoLlegada(entidad.getRemision().getUbigeoLlegada());
+		entidadOriginal.getRemision().setMotivoTraslado(entidad.getRemision().getMotivoTraslado());
+		entidadOriginal.getRemision().setFechaEmision(entidad.getRemision().getFechaEmision());
+		entidadOriginal.getRemision().setFechaInicioTraslado(entidad.getRemision().getFechaInicioTraslado());
+		entidadOriginal.getRemision().setHoraInicioTraslado(entidad.getRemision().getHoraInicioTraslado());
+		entidadOriginal.getRemision().setCodigoDomicilioPartida(entidad.getRemision().getCodigoDomicilioPartida());
+		entidadOriginal.getRemision().setDomicilioLlegada(entidad.getRemision().getDomicilioLlegada());
+		entidadOriginal.getRemision().setNumeroDocumentoTransportista(entidad.getRemision().getNumeroDocumentoTransportista());
+		entidadOriginal.getRemision().setNombreTransportista(entidad.getRemision().getNombreTransportista());
+		entidadOriginal.getRemision().setNumeroCertInscripcion(entidad.getRemision().getNumeroCertInscripcion());
+		entidadOriginal.getRemision().setNumeroLicencia(entidad.getRemision().getNumeroLicencia());
+		if (entidadOriginal.getListaComprobante()!= null && !entidadOriginal.getListaComprobante().isEmpty()) {
+			ComprobanteBean comprobanteBean = entidadOriginal.getListaComprobante().get(0);
+			entidadOriginal.getRemision().setTipoDocumentoCliente(comprobanteBean.getComprobante().getTipoDocumento());
+			entidadOriginal.getRemision().setNumeroDocumentoCliente(comprobanteBean.getComprobante().getNumeroDocumento());
+			entidadOriginal.getRemision().setNombreCliente(comprobanteBean.getComprobante().getNombreCliente());
+		}
 	}
 
 	private List<TblDetalleRemision> obtenerDetalleRemision(List<TblDetalleComprobante> listDetalleComprobante, HttpServletRequest request) {
@@ -1225,7 +1360,7 @@ public class RemisionAction {
 		entidad.getRemision().setHoraInicioTraslado(UtilSGT.getHora());
 		entidad.getRemision().setMotivoTraslado(Constantes.SUNAT_TIPO_OPERACION_VENTA_INTERNA);
 		entidad.getRemision().setTipoComprobante(Constantes.TIPO_COMPROBANTE_GUIA_REMISION);
-		entidad.getRemision().setCodigoDomicilioPartida(Constantes.CODIGO_DOMICILIO_FISCAL);
+		entidad.getRemision().setCodigoDomicilioPartida(Constantes.CODIGO_DOMICILIO_PARTIDAD);
 	}
 	private boolean okDatosRemision(RemisionBean entidad, Model model) {
 		boolean exitoso = true;
@@ -1269,6 +1404,7 @@ public class RemisionAction {
 			model.addAttribute("respuesta", "Debe ingresar el domicilio de llegada");
 			return exitoso;
 		}
+
 		if (entidad.getRemision().getNumeroDocumentoTransportista().trim().equals("")){
 			exitoso = false;
 			model.addAttribute("respuesta", "Debe ingresar el RUC del transportista");
@@ -1302,6 +1438,11 @@ public class RemisionAction {
 		if (entidad.getListaFacturaAsociada().isEmpty()){
 			exitoso = false;
 			model.addAttribute("respuesta", "Debe ingresar la lista de factura - productos");
+			return exitoso;
+		}
+		if (entidad.getRemision().getNombreCliente() == null || entidad.getRemision().getNombreCliente().isEmpty() ){
+			exitoso = false;
+			model.addAttribute("respuesta", "Debe seleccionar al cliente");
 			return exitoso;
 		}
 		return exitoso;
@@ -1373,4 +1514,175 @@ public class RemisionAction {
 		}
 		return path;
 	}
+	/*** Retorna a la consulta de facturas ***/
+	/**
+	 * entidad							: Contiene toda la info de la remision [RemisionBean]	--> guiaRemisionSession
+	 * filtro							: Filtro de la consulta de Factura						--> sessionFiltroCriterio
+	 * registros						: Datos de los comprobantes [TblComprobante]			--> ListadoConsultaFactura
+	 * page								: Paginado - page										--> pageConsultaFactura
+	 * 
+	 */
+	@RequestMapping(value = "/operacion/regresar/listafactura", method = RequestMethod.GET)
+	public String regresarListadoFactura(Model model, Filtro filtro, String path, HttpServletRequest request) {
+		try{
+			log.debug("[regresarListadoFactura] Inicio");
+			path = "operacion/remision/rem_listado_factura";
+			model.addAttribute("entidad", request.getSession().getAttribute("guiaRemisionSession"));
+			model.addAttribute("filtro", request.getSession().getAttribute("sessionFiltroCriterio"));
+			model.addAttribute("registros", request.getSession().getAttribute("ListadoConsultaFactura"));
+			model.addAttribute("page", request.getSession().getAttribute("pageConsultaFactura"));
+			log.debug("[regresarListadoFactura] Fin");
+		}catch(Exception e){
+			log.debug("[regresarListadoFactura] Error:"+e.getMessage());
+			e.printStackTrace();
+		}finally{
+			filtro = null;
+		}
+
+		return path;
+	}
+	/*Retorna a la pantalla de nueva remision*/
+	@RequestMapping(value = "/operacion/remision/regresar", method = RequestMethod.GET)
+	/**
+	 * guiaRemisionSession				: Contiene toda la info de la remision [RemisionBean]
+	 * 
+	 */
+	public String regresarNuevoRemision(Model model, Filtro filtro, String path, HttpServletRequest request) {
+		try{
+			log.debug("[regresarComprobante] Inicio");
+			path = "operacion/remision/rem_nuevo";
+			model.addAttribute("entidad", request.getSession().getAttribute("guiaRemisionSession"));
+			log.debug("[regresarComprobante] Fin");
+		}catch(Exception e){
+			log.debug("[regresarComprobante] Error:"+e.getMessage());
+			e.printStackTrace();
+		}finally{
+			filtro = null;
+		}
+
+		return path;
+	}
+	/*Retorna a la pantalla de guias de remision*/
+	@RequestMapping(value = "/operacion/regresar", method = RequestMethod.GET)
+	/**
+	 * filtro							: Filtro de la pagina de Inicio							--> sessionFiltroRemisionCriterio
+	 * page								: Paginado - page										--> PageRemisionPrincipal
+	 * registros						: Listado de Remision [TblRemision]						--> ListadoConsultaRemision
+	 * 
+	 */
+	public String regresarRemision(Model model, Filtro filtro, String path, HttpServletRequest request) {
+		try{
+			log.debug("[regresarRemision] Inicio");
+			path = "operacion/remision/rem_listado";
+			model.addAttribute("filtro", request.getSession().getAttribute("sessionFiltroRemisionCriterio"));
+			model.addAttribute("page", request.getSession().getAttribute("PageRemisionPrincipal"));
+			model.addAttribute("registros", request.getSession().getAttribute("ListadoConsultaRemision"));
+
+			log.debug("[regresarRemision] Fin");
+		}catch(Exception e){
+			log.debug("[regresarRemision] Error:"+e.getMessage());
+			e.printStackTrace();
+		}finally{
+			filtro = null;
+		}
+
+		return path;
+	}
+	
+	@RequestMapping(value = "/operacion/remision/transporte", method = RequestMethod.POST)
+	public String traerRegistrosTransporte(Model model, String path, HttpServletRequest request, RemisionBean entidad) {
+		Filtro filtro = null;
+		RemisionBean entidadOriginal = null;
+		try{
+			log.debug("[traerRegistrosTransporte] Inicio");
+			path = "operacion/remision/rem_listado_transporte";
+			
+			entidadOriginal = (RemisionBean)request.getSession().getAttribute("guiaRemisionSession");
+			entidad.setListaFacturaAsociada(entidadOriginal.getListaFacturaAsociada());
+			entidad.setListaComprobante(entidadOriginal.getListaComprobante());
+			entidad.setTotalPesoGuia(entidadOriginal.getTotalPesoGuia());
+			request.getSession().setAttribute("guiaRemisionSession",entidad);
+			filtro = new Filtro();
+			model.addAttribute("filtro", filtro);
+			filtro.setNumero("");;
+			log.debug("[traerRegistrosTransporte] Fin");
+		}catch(Exception e){
+			log.debug("[traerRegistrosTransporte] Error:"+e.getMessage());
+			e.printStackTrace();
+		}finally{
+			filtro = null;
+		}
+		return path;
+	}
+	@RequestMapping(value = "/operacion/remision/transporte/q", method = RequestMethod.POST)
+	public String traerRegistrosFiltradosTransporte(Model model, Filtro filtro,  String path, HttpServletRequest request) {
+		path = "operacion/remision/rem_listado_transporte";
+		String[] criterio = null;
+		List<TblTransporte> listaTransporte = null;
+		try{
+			log.debug("[traerRegistrosFiltradosTransporte] Inicio");
+			criterio = obtenerCriterios(filtro);
+			listaTransporte = transporteDao.buscarTransportexCriterios(criterio[0], criterio[1], criterio[2],criterio[3]);
+			request.getSession().setAttribute("ListadoConsultaTransporte",listaTransporte);
+			model.addAttribute("filtro", filtro);
+			model.addAttribute("registros", listaTransporte);
+			log.debug("[traerRegistrosFiltradosTransporte] Fin");
+		}catch(Exception e){
+			log.debug("[traerRegistrosFiltradosTransporte] Error: "+e.getMessage());
+			e.printStackTrace();
+			model.addAttribute("respuesta", "Se produco un Error:"+e.getMessage());
+		}
+		log.debug("[traerRegistrosFiltradosTransporte] Fin");
+		return path;
+	}
+
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/operacion/remision/transporte/seleccion/{id}", method = RequestMethod.GET)
+	public String seleccionaraRegistroTransporte(@PathVariable Integer id, HttpServletRequest request, Model model) {
+		String path 								= null;
+		RemisionBean entidad 						= null;
+		List<TblTransporte> listaTransporte 		= null;
+		TblTransporte transporte					= null;
+		try{
+			log.debug("[seleccionaraRegistroTransporte] Inicio");
+			path = "operacion/remision/rem_nuevo";
+			entidad = (RemisionBean)request.getSession().getAttribute("guiaRemisionSession");
+			listaTransporte = (List<TblTransporte>)request.getSession().getAttribute("ListadoConsultaTransporte");
+			transporte = listaTransporte.get(id);
+			
+			entidad.getRemision().setNumeroDocumentoTransportista(transporte.getRuc());
+			entidad.getRemision().setNombreTransportista(transporte.getNombre());
+			entidad.getRemision().setMarca(transporte.getMarca());
+			entidad.getRemision().setPlaca(transporte.getPlaca());
+			entidad.getRemision().setNumeroCertInscripcion(transporte.getNumeroCertificadoInscripcion());
+			entidad.getRemision().setNumeroLicencia(transporte.getNumeroLicencia());
+			entidad.getRemision().setTipoDocumentoTransportista("RUC");
+			entidad.getRemision().setEstadoOperacion("00");
+			
+			model.addAttribute("entidad", entidad);
+			request.getSession().setAttribute("guiaRemisionSession",entidad);
+			log.debug("[seleccionaraRegistroTransporte] Fin");
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			entidad 	= null;			
+		}
+		return path;
+	}
+	
+	private String[] obtenerCriterios(Filtro filtro) {
+		String[] criterio = new String[4];
+		criterio[0] = validarCriterio(filtro.getRuc());
+		criterio[1] = validarCriterio(filtro.getNombre());
+		criterio[2] = validarCriterio(filtro.getMarca());
+		criterio[3] = validarCriterio(filtro.getPlaca());
+		return criterio;
+	}
+	private String validarCriterio(String dato) {
+		if (dato== null || dato.isEmpty()) {
+			return "%";
+		}else {
+			return dato.trim().toUpperCase()+"%";
+		}
+	}	
 }

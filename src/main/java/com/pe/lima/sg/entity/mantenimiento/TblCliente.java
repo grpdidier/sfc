@@ -45,7 +45,10 @@ public class TblCliente implements java.io.Serializable {
 	private String ipModificacion;
 	private Set<TblVentaCredito> tblVentaCreditos = new HashSet<TblVentaCredito>(0);
 	private TblEmpresa tblEmpresa;
-
+	private String departamento;
+	private String provincia;
+	private String distrito;
+	
 	public TblCliente() {
 	}
 
@@ -216,5 +219,32 @@ public class TblCliente implements java.io.Serializable {
 
 	public void setTblEmpresa(TblEmpresa tblEmpresa) {
 		this.tblEmpresa = tblEmpresa;
+	}
+
+	@Column(name = "departamento", length = 8)
+	public String getDepartamento() {
+		return departamento;
+	}
+
+	public void setDepartamento(String departamento) {
+		this.departamento = departamento;
+	}
+
+	@Column(name = "provincia", length = 8)
+	public String getProvincia() {
+		return provincia;
+	}
+
+	public void setProvincia(String provincia) {
+		this.provincia = provincia;
+	}
+
+	@Column(name = "distrito", length = 8)
+	public String getDistrito() {
+		return distrito;
+	}
+
+	public void setDistrito(String distrito) {
+		this.distrito = distrito;
 	}
 }

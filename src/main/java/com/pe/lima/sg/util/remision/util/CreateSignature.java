@@ -1,12 +1,9 @@
 package com.pe.lima.sg.util.remision.util;
-import java.io.ByteArrayOutputStream;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.Key;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
@@ -15,25 +12,22 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.xml.security.Init;
-import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
-import org.apache.xml.security.utils.Constants;
-import org.apache.xml.security.utils.ElementProxy;
 import org.apache.xml.security.utils.XMLUtils;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 @Service
 public class CreateSignature {
-	private static final String PRIVATE_KEY_ALIAS = "20602620337";
-    private static final String PRIVATE_KEY_PASS = "20602620337";
-    private static final String KEY_STORE_PASS = "Admin74123";
-    private static final String KEY_STORE_TYPE = "JKS";
+	
 
 
-    public static void firmar(String nameFileInicio , String fileName, File privateKeyFile) {
+
+    public void firmar(String nameFileInicio , String fileName, File privateKeyFile, ConfiguracionSistema configuracion) {
+    	String PRIVATE_KEY_ALIAS = configuracion.getPrivateKeyAlias();//"20602620337";
+        String PRIVATE_KEY_PASS = configuracion.getPrivateKeyPass();//"20602620337";
+        String KEY_STORE_PASS = configuracion.getKeyStorePass();//"Admin74123";
+        String KEY_STORE_TYPE = configuracion.getKeyStoreType();//"JKS";
+        
         try {
             // Inicializar Apache XML Security
             Init.init();
@@ -49,7 +43,7 @@ public class CreateSignature {
             issueTimeNode.setTextContent(obtenerHHMMSS(issueTimeNode.getTextContent()));
 
             // Cargar el archivo JKS
-            KeyStore keystore = loadKeyStore(privateKeyFile);
+            KeyStore keystore = loadKeyStore(privateKeyFile,KEY_STORE_PASS,KEY_STORE_TYPE);
 
             // Obtener la clave privada y el certificado del alias
             PrivateKey privateKey = (PrivateKey) keystore.getKey(PRIVATE_KEY_ALIAS, PRIVATE_KEY_PASS.toCharArray());
@@ -100,11 +94,11 @@ public class CreateSignature {
             e.printStackTrace();
         }
     }
-    private static String obtenerHHMMSS(String textContent) {
+    private  String obtenerHHMMSS(String textContent) {
     	return textContent.substring(0,8);
 
 	}
-	public static void FirmarConError(String nameFileInicio , String fileName, File privateKeyFile) throws IOException {
+	/*public  void FirmarConError(String nameFileInicio , String fileName, File privateKeyFile) throws IOException {
     	OutputStream fileOutputStream = null;
         try {
         	ByteArrayOutputStream signedOutputStream = firmarArchivo(nameFileInicio, privateKeyFile);
@@ -117,8 +111,8 @@ public class CreateSignature {
         finally {
             IOUtils.closeQuietly(fileOutputStream);
         }
-    }
-    public static ByteArrayOutputStream firmarArchivo(String nameFileInicio, File privateKeyFile) throws Exception {
+    }*/
+    /*public  ByteArrayOutputStream firmarArchivo(String nameFileInicio, File privateKeyFile) throws Exception {
     	
     	final InputStream xmlFile = new FileInputStream(nameFileInicio);
         final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(xmlFile);
@@ -157,53 +151,11 @@ public class CreateSignature {
         final ByteArrayOutputStream outputStream2 = new ByteArrayOutputStream();
         outputStream2.write(signedOutputStream.getBytes());
         return outputStream2;
-    }
+    }*/
     
 
-   /* public static ByteArrayOutputStream signFile(InputStream xmlFile, File privateKeyFile) throws Exception {
-        final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(xmlFile);
-        Init.init();
-        ElementProxy.setDefaultPrefix(Constants.SignatureSpecNS, "");
-        final KeyStore keyStore = loadKeyStore(privateKeyFile);
-        final XMLSignature sig = new XMLSignature(doc, null, XMLSignature.ALGO_ID_SIGNATURE_RSA);
-        final Transforms transforms = new Transforms(doc);
-        transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
-        sig.addDocument("", transforms, Constants.ALGO_ID_DIGEST_SHA1);
-        final Key privateKey = keyStore.getKey(PRIVATE_KEY_ALIAS, PRIVATE_KEY_PASS.toCharArray());
-        final X509Certificate cert = (X509Certificate)keyStore.getCertificate(PRIVATE_KEY_ALIAS);
-        sig.addKeyInfo(cert);
-        sig.addKeyInfo(cert.getPublicKey());
-        sig.sign(privateKey);
-        doc.getDocumentElement().appendChild(sig.getElement());
-        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        outputStream.write(Canonicalizer.getInstance(Canonicalizer.ALGO_ID_C14N_WITH_COMMENTS).canonicalizeSubtree(doc));
-        return outputStream;
-    }
-    //public static String signFile2(InputStream xmlFile, File privateKeyFile) throws Exception {
-    /*public static String signFile2( File privateKeyFile) throws Exception {
-        //final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(xmlFile);
-    	final Document doc = XMLFactory.newDocument ();
-        Init.init();
-        ElementProxy.setDefaultPrefix(Constants.SignatureSpecNS, "");
-        final KeyStore keyStore = loadKeyStore(privateKeyFile);
-        final XMLSignature sig = new XMLSignature(doc, null, XMLSignature.ALGO_ID_SIGNATURE_RSA);
-        final Transforms transforms = new Transforms(doc);
-        transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
-        sig.addDocument("", transforms, Constants.ALGO_ID_DIGEST_SHA1);
-        final Key privateKey = keyStore.getKey(PRIVATE_KEY_ALIAS, PRIVATE_KEY_PASS.toCharArray());
-        final X509Certificate cert = (X509Certificate)keyStore.getCertificate(PRIVATE_KEY_ALIAS);
-        sig.addKeyInfo(cert);
-        sig.addKeyInfo(cert.getPublicKey());
-        sig.sign(privateKey);
-        //doc.getDocumentElement().appendChild(sig.getElement());
-        final Node eRoot = doc.appendChild (doc.createElementNS (null, "ExtensionContent"));
-        doc.getDocumentElement().appendChild(sig.getElement());
-        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        outputStream.write(Canonicalizer.getInstance(Canonicalizer.ALGO_ID_C14N_WITH_COMMENTS).canonicalizeSubtree(doc));
-        return outputStream.toString();
-    }*/
 
-    private static KeyStore loadKeyStore(File privateKeyFile) throws Exception {
+    private  KeyStore loadKeyStore(File privateKeyFile, String KEY_STORE_PASS,String KEY_STORE_TYPE) throws Exception {
         final InputStream fileInputStream = new FileInputStream(privateKeyFile);
         try {
             final KeyStore keyStore = KeyStore.getInstance(KEY_STORE_TYPE);
@@ -215,15 +167,5 @@ public class CreateSignature {
         }
     }
 
-    /*private static void output(ByteArrayOutputStream signedOutputStream, String fileName) throws IOException {
-        final OutputStream fileOutputStream = new FileOutputStream(fileName);
-        try {
-            fileOutputStream.write(signedOutputStream.toByteArray());
-            fileOutputStream.flush();
-        }
-        finally {
-            IOUtils.closeQuietly(fileOutputStream);
-        }
-    }*/
-    
+
 }
