@@ -77,7 +77,9 @@ public class GuiaRemisionService {
 			log.info("[generarGuiaRemisionXML] Archivo creado:"+fileNamePrevio);
 			//CreateSignature.Firmar("target/20602620337-09-TTT1-2.xml", "target/20602620337-09-TTT1-2_firmado.xml", new File("target/llamaKeystore.jks"));
 			//createSignature.firmar(fileNamePrevio, fileName, new File(configuracion.getKeystore()),configuracion);
+			log.info("[generarGuiaRemisionXML] keystore:"+remision.getKeystore());
 			createSignature.firmar(fileNamePrevio, fileName, new File(remision.getKeystore()),remision);
+			log.info("[generarGuiaRemisionXML] fileName:"+fileName);
 			remision.setNombreArchivoXML(fileName);
 		}
 		log.info("[generarGuiaRemisionXML] Fin");

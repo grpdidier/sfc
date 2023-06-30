@@ -18,7 +18,10 @@ import org.apache.xml.security.utils.XMLUtils;
 import org.springframework.stereotype.Service;
 
 import com.pe.lima.sg.bean.remision.RemisionBean;
+
+import lombok.extern.slf4j.Slf4j;
 @Service
+@Slf4j
 public class CreateSignature {
 	
 
@@ -31,6 +34,7 @@ public class CreateSignature {
         String KEY_STORE_TYPE = remision.getKeyStoreType();//"JKS";
         
         try {
+        	log.info("[firmar] Inicio");
             // Inicializar Apache XML Security
             Init.init();
 
@@ -87,13 +91,15 @@ public class CreateSignature {
 
             // Agregar el namespace "xmlns:ds" a la etiqueta DespatchAdvice
             despatchAdviceElement.setAttribute("xmlns:ds", "http://www.w3.org/2000/09/xmldsig#");
-
+            log.info("[firmar] fileName:"+fileName);
             // Guardar el archivo XML firmado
             XMLUtils.outputDOM(document, new FileOutputStream(fileName), true);
 
             System.out.println("Firma agregada correctamente al archivo XML.");
+            log.info("[firmar] fin");
         } catch (Exception e) {
             e.printStackTrace();
+            log.error("[firmar] Error:"+e.getMessage());
             throw e;
         }
     }
