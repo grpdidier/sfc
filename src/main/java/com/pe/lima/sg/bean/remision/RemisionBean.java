@@ -3,6 +3,8 @@ package com.pe.lima.sg.bean.remision;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import com.pe.lima.sg.bean.facturador.ParametroFacturadorBean;
 import com.pe.lima.sg.entity.operacion.TblComprobante;
 import com.pe.lima.sg.entity.operacion.TblDetalleComprobante;
@@ -30,13 +32,9 @@ public class RemisionBean {
 	private List<TblComprobante> listaTblComprobante;
 	//Para mostrar el total del peso de la remision
 	private BigDecimal totalPesoGuia;
-	
-	//private TblDetalleRemision detalleRemision;
+
 	private List<TblDetalleRemision> listaDetalleRemision;
 	private String ruc;
-	
-	
-	//private TblDetalleComprobante detalleComprobante;
 	
 	//Datos para la guia xml
 	private String razonSocial;
@@ -55,4 +53,30 @@ public class RemisionBean {
 	private Integer indiceElemento;
 	//Datos del transporte
 	private String datosTransporte;
+	
+	//Datos para la configuración de las apis de la sunat
+	//remision.keystore.jks:01
+    private String keystore;
+    //remision.private.key.alias:02
+    private String privateKeyAlias;
+	//remision.private.key.pass:03
+    private String privateKeyPass;
+	//remision.key.store.pass:04
+    private String keyStorePass;
+	//remision.key.store.type:05
+    private String keyStoreType;
+	//remision.api.token.sunat.url:06
+	private String apiTokenSunatUrl;
+	//remision.api.token.sunat.client.id:07
+	private String apiTokenSunatClientId;
+	//remision.api.token.sunat.client.secret:08
+	private String apiTokenSunatClientSecret;
+	//remision.api.token.sunat.username:09
+	private String apiTokenSunatUsername;       	
+	//remision.api.token.sunat.password:10
+	private String apiTokenSunatPassword;
+	//remision.api.ticket.sunat.url:11
+	private String apiTicketSunatUrl;
+	//remision.api.envio.sunat.url:12
+	private String apiEnvioSunatUrl;
 }

@@ -60,8 +60,7 @@ import oasis.names.specification.ubl.schema.xsd.despatchadvice_21.DespatchAdvice
 @Slf4j
 @Service
 public class GuiaRemisionService {
-	@Autowired
-	private ConfiguracionSistema configuracion;
+
 	@Autowired
 	private CreateSignature createSignature;
 
@@ -77,7 +76,8 @@ public class GuiaRemisionService {
 		if (eSuccessDespatch.isSuccess()) {
 			log.info("[generarGuiaRemisionXML] Archivo creado:"+fileNamePrevio);
 			//CreateSignature.Firmar("target/20602620337-09-TTT1-2.xml", "target/20602620337-09-TTT1-2_firmado.xml", new File("target/llamaKeystore.jks"));
-			createSignature.firmar(fileNamePrevio, fileName, new File(configuracion.getKeystore()),configuracion);
+			//createSignature.firmar(fileNamePrevio, fileName, new File(configuracion.getKeystore()),configuracion);
+			createSignature.firmar(fileNamePrevio, fileName, new File(remision.getKeystore()),remision);
 			remision.setNombreArchivoXML(fileName);
 		}
 		log.info("[generarGuiaRemisionXML] Fin");

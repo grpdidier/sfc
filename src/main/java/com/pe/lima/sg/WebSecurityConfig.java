@@ -56,7 +56,6 @@ import com.pe.lima.sg.entity.seguridad.TblUsuario;
 import com.pe.lima.sg.presentacion.Filtro;
 import com.pe.lima.sg.presentacion.util.Constantes;
 import com.pe.lima.sg.presentacion.util.ListaUtilAction;
-import com.pe.lima.sg.util.remision.util.ConfiguracionSistema;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -299,6 +298,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				Map<String, String> mapDomicilioPartidaDysalimDatos	= new HashMap<String, String>();
 				Map<String, Object> mapDomicilioPartidaDistcen		= new LinkedHashMap<String, Object>();
 				Map<String, String> mapDomicilioPartidaDistcenDatos	= new HashMap<String, String>();
+				//Configuracion de la guia de remision
+				Map<String, String> mapConfiguracionGreDysalim		= new HashMap<String, String>();
+				Map<String, String> mapConfiguracionGreDistcen		= new HashMap<String, String>();
 				
 				List<TblCatalogo> listaCatalogo 		= null;
 				IOperacionFacturador operacionFacturador		= null;
@@ -406,9 +408,26 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 									mapDomicilioPartidaDistcen.put(entidad.getCodigoSunat() + " : " +entidad.getNombre(), entidad.getCodigoSunat());
 									mapDomicilioPartidaDistcenDatos.put(entidad.getCodigoSunat(),entidad.getNombre());
 								}
-								
+							}
+							//Configuación de Guias de Remision
+							if (entidad.getTblTipoCatalogo().getNombre().equals(Constantes.TIPO_CATALAGO_CONFIGURACION_GUIA)){
+								if (entidad.getCodigoEmpresa().compareTo(Constantes.ENTIDAD_DYSALIM)==0) {
+									mapConfiguracionGreDysalim.put(entidad.getCodigoSunat(),entidad.getDescripcion());
+								}
+								if (entidad.getCodigoEmpresa().compareTo(Constantes.ENTIDAD_DISTCEN)==0) {
+									mapConfiguracionGreDistcen.put(entidad.getCodigoSunat(),entidad.getDescripcion());
+								}
 							}
 						}
+						//Configuracion de guias
+
+						if (codigoEntidad.compareTo(Constantes.ENTIDAD_DYSALIM)==0) {
+							request.getSession().setAttribute("SessionMapConfiguracionGuiaRemision",mapConfiguracionGreDysalim);
+						}
+						if (codigoEntidad.compareTo(Constantes.ENTIDAD_DISTCEN)==0) {
+							request.getSession().setAttribute("SessionMapConfiguracionGuiaRemision",mapConfiguracionGreDistcen);
+						}
+						//Domicilio de Partida
 						if (codigoEntidad.compareTo(Constantes.ENTIDAD_DYSALIM)==0) {
 							request.getSession().setAttribute("SessionMapDomicilioPartida",mapDomicilioPartidaDysalim);
 							request.getSession().setAttribute("SessionMapDomicilioPartidaDatos",mapDomicilioPartidaDysalimDatos);

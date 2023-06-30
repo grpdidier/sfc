@@ -16,17 +16,19 @@ import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.utils.XMLUtils;
 import org.springframework.stereotype.Service;
+
+import com.pe.lima.sg.bean.remision.RemisionBean;
 @Service
 public class CreateSignature {
 	
 
 
 
-    public void firmar(String nameFileInicio , String fileName, File privateKeyFile, ConfiguracionSistema configuracion) {
-    	String PRIVATE_KEY_ALIAS = configuracion.getPrivateKeyAlias();//"20602620337";
-        String PRIVATE_KEY_PASS = configuracion.getPrivateKeyPass();//"20602620337";
-        String KEY_STORE_PASS = configuracion.getKeyStorePass();//"Admin74123";
-        String KEY_STORE_TYPE = configuracion.getKeyStoreType();//"JKS";
+    public void firmar(String nameFileInicio , String fileName, File privateKeyFile, RemisionBean remision) throws Exception {
+    	String PRIVATE_KEY_ALIAS = remision.getPrivateKeyAlias();//"20602620337";
+        String PRIVATE_KEY_PASS = remision.getPrivateKeyPass();//"20602620337";
+        String KEY_STORE_PASS = remision.getKeyStorePass();//"Admin74123";
+        String KEY_STORE_TYPE = remision.getKeyStoreType();//"JKS";
         
         try {
             // Inicializar Apache XML Security
@@ -92,6 +94,7 @@ public class CreateSignature {
             System.out.println("Firma agregada correctamente al archivo XML.");
         } catch (Exception e) {
             e.printStackTrace();
+            throw e;
         }
     }
     private  String obtenerHHMMSS(String textContent) {

@@ -338,6 +338,7 @@ public class Constantes {
 	public static String TIPO_CATALAGO_NOTA_DEBITO							= "TIPO_NOTA_DEBITO";
 	public static String TIPO_CATALAGO_MOTIVO_TRASLADO						= "TIPO_MOTIVO_TRASLADO";
 	public static String TIPO_CATALAGO_DIRECCION_PARTIDA					= "DIRECCION_PARTIDA_GRE";
+	public static String TIPO_CATALAGO_CONFIGURACION_GUIA					= "CONFIGURACION_GUIA_REMISION_ELECTRONICA";
 	
 	public static String TIPO_CATALAGO_TIPO_OPERACION_SFS_1_2				= "TIPO_OPERACION_SFS_1_2";
 	
@@ -443,5 +444,19 @@ public class Constantes {
 	public static Integer ENTIDAD_DYSALIM									= 2;
 	public static Integer ENTIDAD_DISTCEN									= 3;
 	public static String CODIGO_DOMICILIO_PARTIDAD							= "1:150103";
+	
+	public static String CONF_01_REMISION_KEYSTORE_JKS						= "01";
+	public static String CONF_02_REMISION_PRIVATE_KEY_ALIAS					= "02";
+	public static String CONF_03_REMISION_PRIVATE_KEY_PASS					= "03";
+	public static String CONF_04_REMISION_KEY_STORE_PASS					= "04";
+	public static String CONF_05_REMISION_KEY_STORE_TYPE					= "05";
+	public static String CONF_06_REMISION_API_TOKEN_SUNAT_URL				= "06";
+	public static String CONF_07_REMISION_API_TOKEN_SUNAT_CLIENT_ID			= "07";
+	public static String CONF_08_REMISION_API_TOKEN_SUNAT_CLIENT_SECRET		= "08";
+	public static String CONF_09_REMISION_API_TOKEN_SUNAT_USERNAME			= "09";
+	public static String CONF_10_REMISION_API_TOKEN_SUNAT_PASSWORD			= "10";
+	public static String CONF_11_REMISION_API_TICKET_SUNAT_URL				= "11";
+	public static String CONF_12_REMISION_API_ENVIO_SUNAT_URL				= "12";
+	
 	
 }

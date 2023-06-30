@@ -93,7 +93,6 @@ import com.pe.lima.sg.presentacion.util.Constantes;
 import com.pe.lima.sg.presentacion.util.PageWrapper;
 import com.pe.lima.sg.presentacion.util.PageableSG;
 import com.pe.lima.sg.presentacion.util.UtilSGT;
-import com.pe.lima.sg.util.remision.util.ConfiguracionSistema;
 import com.pe.lima.sg.util.remision.util.GuiaRemisionService;
 import com.pe.lima.sg.util.remision.util.UtilArchivoRespuesta;
 
@@ -119,8 +118,7 @@ public class RemisionAction {
 	private GuiaRemisionService guiaRemisionService;
 	@Autowired
 	private IClienteDAO clienteDao;
-	@Autowired
-	private ConfiguracionSistema configuracion;
+
 	
 	private String urlPaginado = "/operacion/remision/paginado/"; 
 
@@ -660,6 +658,7 @@ public class RemisionAction {
 			obtenerSerieRemision(entidadOriginal, request);
 			if (okDatosRemision(entidadOriginal, model)) {
 				entidadOriginal.getRemision().setAuditoriaCreacion(request);
+				
 				//entidadOriginal.getRemision();//TODO:ERROR.setCodigoComprobante(entidadOriginal.getComprobante().getCodigoComprobante());
 				TblRemision remision = remisionDao.save(entidadOriginal.getRemision());
 				log.debug("[guardarRemision] remision registrado:"+remision.getCodigoRemision());
@@ -715,6 +714,25 @@ public class RemisionAction {
 		log.debug("[guardarRemision] Fin");
 		return path;
 	}
+	@SuppressWarnings("unchecked")
+	private void obtenerConfiguracionApi(RemisionBean entidadOriginal, HttpServletRequest request) {
+		Map<String, String> mapConfiguracionGre = (Map<String, String>)request.getSession().getAttribute("SessionMapConfiguracionGuiaRemision");	
+		
+		entidadOriginal.setKeystore(mapConfiguracionGre.get(Constantes.CONF_01_REMISION_KEYSTORE_JKS));
+	    entidadOriginal.setPrivateKeyAlias(mapConfiguracionGre.get(Constantes.CONF_02_REMISION_PRIVATE_KEY_ALIAS));
+	    entidadOriginal.setPrivateKeyPass(mapConfiguracionGre.get(Constantes.CONF_03_REMISION_PRIVATE_KEY_PASS));
+	    entidadOriginal.setKeyStorePass(mapConfiguracionGre.get(Constantes.CONF_04_REMISION_KEY_STORE_PASS));
+	    entidadOriginal.setKeyStoreType(mapConfiguracionGre.get(Constantes.CONF_05_REMISION_KEY_STORE_TYPE));
+		entidadOriginal.setApiTokenSunatUrl(mapConfiguracionGre.get(Constantes.CONF_06_REMISION_API_TOKEN_SUNAT_URL));
+		entidadOriginal.setApiTokenSunatClientId(mapConfiguracionGre.get(Constantes.CONF_07_REMISION_API_TOKEN_SUNAT_CLIENT_ID));
+		entidadOriginal.setApiTokenSunatClientSecret(mapConfiguracionGre.get(Constantes.CONF_08_REMISION_API_TOKEN_SUNAT_CLIENT_SECRET));
+		entidadOriginal.setApiTokenSunatUsername(mapConfiguracionGre.get(Constantes.CONF_09_REMISION_API_TOKEN_SUNAT_USERNAME));       	
+		entidadOriginal.setApiTokenSunatPassword(mapConfiguracionGre.get(Constantes.CONF_10_REMISION_API_TOKEN_SUNAT_PASSWORD));
+		entidadOriginal.setApiTicketSunatUrl(mapConfiguracionGre.get(Constantes.CONF_11_REMISION_API_TICKET_SUNAT_URL));
+		entidadOriginal.setApiEnvioSunatUrl(mapConfiguracionGre.get(Constantes.CONF_12_REMISION_API_ENVIO_SUNAT_URL));
+		
+	}
+
 	private BigDecimal calcularPesoProductoxFactura(List<TblDetalleRemision> listaDetalleRemision,	List<TblProducto> listaProductoSistema) {
 		BigDecimal totalPeso = new BigDecimal("0");
 		Map<String, TblProducto> mapProducto = new HashMap<>();
@@ -862,6 +880,7 @@ public class RemisionAction {
 			entidad.setDireccionPartida(direccionPartida);
 			entidad.setPesoBruto(obtenerPesoBruto(listaFacturaAsociada));
 			//Llamada a la generación XML
+			obtenerConfiguracionApi(entidad,request);
 			guiaRemisionService.generarGuiaRemisionXML(entidad,rutaXml);
 			//Guardamos el nombre
 			remision.setEstadoOperacion(Constantes.ESTADO_XML_GENERADO);
@@ -877,6 +896,7 @@ public class RemisionAction {
 			log.debug("[obtenerXMLGuia] Fin");
 		}catch(Exception e){
 			e.printStackTrace();
+			model.addAttribute("respuesta", "Error:"+e.getMessage());
 		}
 		return path;
 	}
@@ -1001,6 +1021,7 @@ public class RemisionAction {
 			path = "operacion/remision/rem_listado";
 			entidad = new RemisionBean();
 			TblRemision remision = remisionDao.findOne(id);
+			obtenerConfiguracionApi(entidad, request);
 			String accessToken = obtenerTokenGuiaRemision(remision,entidad);
 			String ticket = obtenerTicketGuia(accessToken, remision,entidad);
 			entidad.setRemision(remision);
@@ -1037,7 +1058,7 @@ public class RemisionAction {
 		try { 
 			log.info("[obtenerTokenGuiaRemision] Inicio");
 			/*Se establece el cliente POST para el servidor de autenticación */				   
-			String resource = configuracion.getApiTokenSunatUrl(); 
+			String resource = entidad.getApiTokenSunatUrl(); 
 			CloseableHttpClient httpclient = HttpClients.createDefault();
 			//HttpClient httpclient = httpClientSecury();
 			HttpPost httpPost = new HttpPost(resource);
@@ -1047,10 +1068,10 @@ public class RemisionAction {
 			/*Se agregan los datos de autenticación para la plataforma Efact OSE*/
 			List<NameValuePair> params = new ArrayList<>(); 
 			params.add(new BasicNameValuePair("grant_type", "password")); 
-			params.add(new BasicNameValuePair("client_id", configuracion.getApiTokenSunatClientId())); 
-			params.add(new BasicNameValuePair("client_secret", configuracion.getApiTokenSunatClientSecret()));
-			params.add(new BasicNameValuePair("username", configuracion.getApiTokenSunatUsername())); 
-			params.add(new BasicNameValuePair("password", configuracion.getApiTokenSunatPassword())); 
+			params.add(new BasicNameValuePair("client_id", entidad.getApiTokenSunatClientId())); 
+			params.add(new BasicNameValuePair("client_secret", entidad.getApiTokenSunatClientSecret()));
+			params.add(new BasicNameValuePair("username", entidad.getApiTokenSunatUsername())); 
+			params.add(new BasicNameValuePair("password", entidad.getApiTokenSunatPassword())); 
 			params.add(new BasicNameValuePair("scope", "https://api-cpe.sunat.gob.pe")); 
 			httpPost.setEntity(new UrlEncodedFormEntity(params));
 			/*Se envía la petición y se recibe el json con el token*/
@@ -1082,7 +1103,7 @@ public class RemisionAction {
 			File file = new File(remision.getRutaXML());
 			String nombreSinExtension = file.getName().substring(0,file.getName().indexOf("."));
 
-			String resource = configuracion.getApiTicketSunatUrl()+nombreSinExtension; 
+			String resource = entidad.getApiTicketSunatUrl()+nombreSinExtension; 
 			log.info("[obtenerTicketGuia] resource:"+resource);
 
 			//Path source = Paths.get("D:\\03.Gregorio\\06.2023\\02.Willy\\02.GuiaRemision\\02.DatosDysalim\\20602620337-09-TTT1-2.xml");
@@ -1129,7 +1150,7 @@ public class RemisionAction {
 		JsonNode nameNode = null;
 		String codRespuesta = null;
 		/*Se establece el cliente GET para el servidor de autenticación*/
-		HttpGet httpget = new HttpGet(configuracion.getApiEnvioSunatUrl() + ticket);
+		HttpGet httpget = new HttpGet(entidad.getApiEnvioSunatUrl() + ticket);
 		/*Se agrega un Header de autorización con el token recibido por el servidor de autenticación*/
 		httpget.setHeader("Authorization", "Bearer " + accessToken);
 		/* Se envía la petición a la plataforma Efact OSE*/
