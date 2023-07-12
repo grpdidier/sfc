@@ -11,39 +11,58 @@
 				<div class="col-md-4 mb-3">
 					<a href="#" th:href="@{/producto/regresar}"><img th:src="@{/images/iconos/regresar.png}" alt="Regresar" /></a>
 				</div>
-				<div class="col-md-8 mb-3 tituloPrincipal" align="left" ><br/> Mantenimiento de Cliente - Edici&oacute;n</div>
+				<div class="col-md-8 mb-3 tituloPrincipal" align="left" ><br/> Mantenimiento de Producto - Edici&oacute;n</div>
 			</div>
 			
 			<form id="form" th:object="${entidad}" th:action="@{/producto/nuevo/editar}" method="post">
 			<input type="hidden" th:field="${entidad.codigoProducto}" />
 				<div id="informacion" class="container_v3">
 					<fieldset class="scheduler-border">
-						<legend class="scheduler-border title10pt">Datos de Edici&oacute;n del Inmueble</legend>
+						<legend class="scheduler-border title10pt">Datos de Edici&oacute;n del Producto</legend>
 							
 							<div class="row">
 								<div class="col-md-2 mb-3">
 									<label for="idDireccion" class="textBold9pt">C&oacute;digo</label>
 									<input type="text" class="form-control_v2 is-valid" placeholder="Codigo Producto" th:field="${entidad.codigoEmpresa}" required="required" maxlength="30"/>
 								</div>
-								<div class="col-md-6 mb-3">
+								<div class="col-md-10 mb-3">
 									<label for="idDireccion" class="textBold9pt">Nombre Producto</label>
-									<input type="text" class="form-control_v2 " placeholder="Nombre" th:field="${entidad.nombre}" required="required" maxlength="200" />
+									<input type="text" class="form-control_v2 is-valid" placeholder="Nombre" th:field="${entidad.nombre}" required="required" maxlength="200"/>
 								</div>
+								
+							</div>
+							<div class="row">
+								
 								<div class="col-md-2 mb-3">
 									<label for="idDireccion" class="textBold9pt">Precio</label>
 									<input type="text" class="form-control_v2 is-valid" placeholder="Precio" th:field="${entidad.precio}" required="required" maxlength="12"/>
 								</div>
 								<div class="col-md-2 mb-3">
-									<label for="idNombre" class="textBold9pt">Unidad Medida</label>
+									<label for="idNombre" class="textBold9pt">Moneda</label>
 									<div th:fragment="combo">
-										<label> <select th:field="${entidad.tblCatalogo.codigoSunat}" disabled="disabled"
-											class="form-control_v2 ">
+										<label> <select th:field="${entidad.tblCatalogo.codigoSunat}" 
+											class="form-control_v2 is-valid">
 												<option value="-1">--Seleccionar--</option>
 												<option th:each="entry : ${session.SessionMapTipoMoneda}" th:value="${entry.value}"
 													th:text="${entry.key}">opcion</option>
 										</select>
 										</label>
 									</div>
+								</div>
+								<div class="col-md-2 mb-3">
+									<label for="idDireccion" class="textBold9pt">Peso (Kg)</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Peso Kg" th:field="${entidad.peso}" required="required" maxlength="12"/>
+								</div>
+								<div class="col-md-2 mb-3">
+									<label for="idDireccion" class="textBold9pt">Unidad de Medida</label>
+									<select th:field="${entidad.unidadMedida}" 
+										class="form-control_v2 is-valid">
+											<option value="-1">--Seleccionar--</option>
+											<option th:each="entry : ${session.SessionUnidadMedidaGuia}" th:value="${entry.value}"
+												th:text="${entry.key}">opcion</option>
+									</select>
+								</div>
+								<div class="col-md-4 mb-3">
 								</div>
 							</div>
 							

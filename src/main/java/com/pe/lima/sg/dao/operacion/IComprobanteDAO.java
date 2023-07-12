@@ -22,4 +22,5 @@ public interface IComprobanteDAO extends BaseOperacionDAO<TblComprobante, Intege
 	@Query(value = "select * from ope.tbl_comprobante where codigo_entidad = :codigoEmpresa AND estado = '1' AND estado_operacion in ('00','01','02')", nativeQuery = true)
 	List<TblComprobante> findAllxEstado(@Param("codigoEmpresa") Integer intCodigoEmpresa);
 	
+	
 }

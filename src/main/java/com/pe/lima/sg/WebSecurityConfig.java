@@ -532,6 +532,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 					request.getSession().setAttribute("SessionMapProvinciaInei", obtenerTodasLasProvincias());
 					request.getSession().setAttribute("SessionMapDistritoInei", obtenerTodosLosDistritos());
 					
+					/*Unidad de Medida*/
+					request.getSession().setAttribute("SessionUnidadMedidaGuia", listaUtil.obtenerValoresUnidadMedida());
 					
 					//Cargar todas las empresa
 					listaEmpresa = empresaDao.listarAllActivos();

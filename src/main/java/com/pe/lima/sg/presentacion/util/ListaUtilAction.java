@@ -350,4 +350,18 @@ public class ListaUtilAction {
 		resultados.put(Constantes.DESC_TIPO_TRANSPORTE_PRIVADO, Constantes.TIPO_TRANSPORTE_PRIVADO);
 		return resultados;
 	}
+	
+	/**
+	 * Listado de Formas de Pago
+	 * 
+	 */
+	public Map<String, Object> obtenerValoresUnidadMedida() {
+		Map<String, Object> resultados = new LinkedHashMap<String, Object>();
+		resultados.put("CAJA", "CAJA");
+		resultados.put("DISPLAY", "DISPLAY");
+		resultados.put("DOCENA", "DOCENA");
+		resultados.put("PAQUETE", "PAQUETE");
+		resultados.put("UNIDAD", "UNIDAD");
+		return resultados;
+	}
 }

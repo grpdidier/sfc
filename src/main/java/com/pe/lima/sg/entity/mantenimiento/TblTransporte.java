@@ -39,6 +39,8 @@ public class TblTransporte implements java.io.Serializable {
 	private Integer usuarioModificacion;
 	private String ipCreacion;
 	private String ipModificacion;
+	private String numeroRegistroMtc;
+	private String remolque;
 	
 	public TblTransporte() {
 	}
@@ -257,6 +259,27 @@ public class TblTransporte implements java.io.Serializable {
 
 	public void setRuc(String ruc) {
 		this.ruc = ruc;
+	}
+
+	@Column(name = "numero_registro_mtc", length = 20)
+	public String getNumeroRegistroMtc() {
+		return numeroRegistroMtc;
+	}
+
+
+	public void setNumeroRegistroMtc(String numeroRegistroMtc) {
+		this.numeroRegistroMtc = numeroRegistroMtc;
+	}
+
+
+	@Column(name = "remolque", length = 32)
+	public String getRemolque() {
+		return remolque;
+	}
+
+
+	public void setRemolque(String remolque) {
+		this.remolque = remolque;
 	}
 	
 }

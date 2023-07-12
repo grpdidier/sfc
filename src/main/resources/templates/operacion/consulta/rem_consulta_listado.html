@@ -114,7 +114,7 @@
 								<td th:text="${comprobante.fechaInicioTraslado}">fecha</td>
 								<td th:text="${comprobante.nombreCliente}">nombreCliente</td>
 								<td align="center">
-									<div th:replace="fragments/util :: estadoFactura(tipo=${comprobante.estadoOperacion})"></div>
+									<div th:replace="fragments/util :: estadoGuiaRemision(tipo=${comprobante.estadoOperacion})"></div>
 								</td>
 								<td align="center">
 									<a	th:href="${'/operacion/remision/consulta/ver/' + comprobante.codigoRemision}">
@@ -136,13 +136,32 @@
 										-
 									</div>
 									<div th:if="${comprobante.estadoOperacion == '03'}">
-										<a	th:href="${'/operacion/remision/consulta/descargar/cdr/' +  iterStat.index}">
+										<img th:src="@{/images/iconos/enviado.png}" alt="ENVIADO"  width="30px"/>
+									</div>
+									<div th:if="${comprobante.estadoOperacion == '04'}">
+										<img th:src="@{/images/iconos/enviado.png}" alt="ENVIADO"  width="30px"/>
+									</div>
+									<div th:if="${comprobante.estadoOperacion == '05'}">
+										<img th:src="@{/images/iconos/enviado.png}" alt="ENVIADO"  width="30px"/>
+									</div>
+								</td>
+								<td align="center">
+									<div th:if="${comprobante.estadoOperacion == '03'}">
+										-
+									</div>
+									<div th:if="${comprobante.estadoOperacion == '04'}">
+										<a	th:href="${'/operacion/remision/descargar/cdr/' +  iterStat.index}">
+											<img th:src="@{/images/iconos/cdr.png}" alt="CDR"  width="30px"/>
+										</a>
+									</div>
+									<div th:if="${comprobante.estadoOperacion == '05'}">
+										<a	th:href="${'/operacion/remision/descargar/cdr/' +  iterStat.index}">
 											<img th:src="@{/images/iconos/cdr.png}" alt="CDR"  width="30px"/>
 										</a>
 									</div>
 								</td>
 								<td >
-									<div th:if="${comprobante.estadoOperacion == '03'}">
+									<div th:if="${comprobante.estadoOperacion == '04'}">
 										<a	th:href="${'/operacion/remision/consulta/pdf/' + comprobante.codigoRemision}">
 											<img th:src="@{/images/iconos/doc_pdf.png}" alt="pdf" width="35px"/>
 										</a>
@@ -163,11 +182,12 @@
 								<th>Estado</th>								
 								<th>Ver</th>
 								<th>Xml</th>
-								<th>Enviar</th>
+								<th>Envio</th>
+								<th>Cdr</th>
 								<th>Pdf</th>
 							</tr>
 							<tr class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
-								<td colspan="10" align="center">No se encontr&oacute; elementos</td>
+								<td colspan="11" align="center">No se encontr&oacute; elementos</td>
 							</tr>
 						</table>
 					</div>

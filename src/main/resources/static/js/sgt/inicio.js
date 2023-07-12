@@ -406,6 +406,41 @@ function jsListarTransporte(){
 	document.forms[0].method = 'POST';
 	document.forms[0].submit();
 }
+function jsActualizarMotivoTraslado(){
+	if (confirm('Los datos ingresados se limpiaran. Esta seguro de modificar el motivo de traslado?')){
+		document.forms[0].action = '/operacion/remision/motivotraslado/actualizar' ;
+		document.forms[0].method = 'POST';
+		document.forms[0].submit();
+	}
+}
+function jsNuevoProductoRemision(){
+	document.forms[0].action = '/operacion/remision/comprobantes/nuevo' ;
+	document.forms[0].method = 'POST';
+	document.forms[0].submit();	
+}
+//Busqueda de Cliente
+function jsListarClienteRemision(){
+	document.forms[0].action = '/operacion/remision/comprobantes/clientes' ;
+	document.forms[0].method = 'POST';
+	document.forms[0].submit();
+}
+function jsRegresarRemisionSinComprobante(){
+	document.forms[0].action = '/operacion/remision/comprobantes/regresar' ;
+	document.forms[0].method = 'POST';
+	document.forms[0].submit();	
+}
+//Busqueda de Producto
+function jsListarProductoRemision(){
+	document.forms[0].action = '/operacion/remision/comprobantes/productos' ;
+	document.forms[0].method = 'POST';
+	document.forms[0].submit();
+}
+//Adicion del detalle
+function jsAdicionarDetalleRemision(){
+	document.forms[0].action = '/operacion/remision/comprobantes/adicionarDetalle' ;
+	document.forms[0].method = 'POST';
+	document.forms[0].submit();
+}
 /* *********************************************************************************************************************************
  * MODULO DE CLIENTE
  ********************************************************************************************************************************* */
@@ -418,4 +453,12 @@ function jsCargarDistritoInei(obj){
 	document.forms[0].action = '/persona/distrito' ;
 	document.forms[0].method = 'POST';
 	document.forms[0].submit();
+}
+
+function  jsValidarNumerosYPunto(obj){
+	var valor = obj.value;
+	// Eliminar cualquier carácter que no sea un número o un punto decimal
+	var valorNumerico = valor.replace(/[^0-9.]/g, "");
+	// Establecer el valor numérico en el campo de texto
+	obj.value = valorNumerico;
 }

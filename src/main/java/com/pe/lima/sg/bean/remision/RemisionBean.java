@@ -24,6 +24,8 @@ public class RemisionBean {
 	private TblComprobante comprobante;
 	//Datos del detalle de la factura  [datos intermedios]
 	private List<TblDetalleComprobante> listaDetalle;
+	//Datos para el caso de consignacion
+	private TblDetalleComprobante detalleComprobante;
 	//Datos de las facturas asociada [presentacion en el html]
 	private List<FacturaAsociadaBean> listaFacturaAsociada;
 	//Lista de la facturas [contiene info para el registro]

@@ -12,7 +12,7 @@
 					<a href="#" th:href="@{/operacion/regresar}"><img th:src="@{/images/iconos/regresar.png}" alt="Regresar" /></a>
 				</div>
 				<div class="col-md-8 mb-3 tituloPrincipal" align="left" ><br/> M&oacute;dulo de Remisi&oacute;n - Nuevo - RUC: <label th:text="${entidad.ruc}" style="color: RED"></label></div>
-				
+				<input type="hidden" class="form-control_v2 is-valid"  th:field="${entidad.ruc}"/>
 			</div>
 			
 			<form id="form" th:object="${entidad}" th:action="@{/operacion/remision/nuevo/guardar}" method="post">
@@ -25,7 +25,7 @@
 							<div class="row">
 								<div class="col-md-4 mb-0">
 									<label for="idNombre" class="textBold9pt">Motivo de Traslado</label>
-										<select th:field="${entidad.remision.motivoTraslado}" class="form-control_v2 is-valid" >
+										<select th:field="${entidad.remision.motivoTraslado}" class="form-control_v2 is-valid" onchange="jsActualizarMotivoTraslado()">
 											<option value="-1">--Seleccionar--</option>
 											<option th:each="entry : ${session.SessionMapMotivoTraslado}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
 										</select>
@@ -43,11 +43,11 @@
 									<div class="row">
 										<div class="col-md-4 mb-0" >
 											<label for="idNombre" class="textBold9pt">Fec. de Emisi&oacute;n</label>
-											<input type="text" class="form-control_v2 is-valid" placeholder="dd/MM/yyyy" th:field="${entidad.remision.fechaEmision}" required="required"/>
+											<input type="text" class="form-control_v2 is-valid" id="fechaEmision" placeholder="dd/MM/yyyy" th:field="${entidad.remision.fechaEmision}" required="required"/>
 										</div>
 										<div class="col-md-4 mb-0" >
 											<label for="idNombre" class="textBold9pt">Fec. de Traslado</label>
-											<input type="text" class="form-control_v2 is-valid" placeholder="dd/MM/yyyy" th:field="${entidad.remision.fechaInicioTraslado}" />
+											<input type="text" class="form-control_v2 is-valid" id="fechaInicioTraslado" placeholder="dd/MM/yyyy" th:field="${entidad.remision.fechaInicioTraslado}" />
 										</div>
 										<div class="col-md-4 mb-0" >
 											<label for="idNombre" class="textBold9pt">Hora de Traslado</label>
@@ -56,8 +56,21 @@
 									</div>
 								</div>
 								<div class="col-md-1 mb-0" >
-									<label for="idNombre" class="textBold9pt">Asociar Facturas</label>
-									<button class="btn btn-success" onclick="jsListarFacturas();">...</button>
+									<!-- Venta -->
+									<div th:if="${entidad.remision.motivoTraslado == '01'}">
+										<label for="idNombre" class="textBold9pt">Asociar Facturas</label>
+										<button class="btn btn-success" onclick="jsListarFacturas();">...</button>
+									</div>
+									<!-- Consignacion -->
+									<div th:if="${entidad.remision.motivoTraslado == '05'}">
+										<label for="idNombre" class="textBold9pt">Asociar Producto</label>
+										<button class="btn btn-danger" onclick="jsNuevoProductoRemision();">...</button>
+									</div>
+									<!-- Otros -->
+									<div th:if="${entidad.remision.motivoTraslado == '13'}">
+										<label for="idNombre" class="textBold9pt">Asociar Producto</label>
+										<button class="btn btn-danger" onclick="jsNuevoProductoRemision();">...</button>
+									</div>
 								</div>
 							</div>
 							<div class="row">
@@ -90,15 +103,19 @@
 								</div>
 							</div>
 							<div class="row">
-								<div class="col-md-3 mb-2">
+								<div class="col-md-2 mb-2">
 									<label for="idNombre" class="textBold9pt">Ruc Transportista</label>
 									<input type="text" class="form-control_v2 is-valid" placeholder="ruc del transportista" th:field="${entidad.remision.numeroDocumentoTransportista}"  maxlength="16"  />
 									
 								</div>
-								<div class="col-md-8 mb-2">
+								<div class="col-md-7 mb-2">
 									<label for="idNombre" class="textBold9pt">Nombre Transportista</label>
 									<input type="text" class="form-control_v2 is-valid" placeholder="nombre del transportista" th:field="${entidad.remision.nombreTransportista}"  maxlength="256"/>
 									
+								</div>
+								<div class="col-md-2 mb-2">
+									<label for="idNombre" class="textBold9pt">Nro Registro MTC</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="numero certificado" th:field="${entidad.remision.numeroRegistroMtc}"  maxlength="20"/>
 								</div>
 								<div class="col-md-1 mb-2">
 									<label for="idNombre" class="textBold9pt">Asociar Transporte</label>
@@ -116,13 +133,17 @@
 								</div>
 								<div class="col-md-9 mb-2">
 									<div class="row">
-										<div class="col-md-3 mb-2">
+										<div class="col-md-2 mb-2">
 											<label for="idNombre" class="textBold9pt">Veh&iacute;culo Marca</label>
 											<input type="text" class="form-control_v2 is-valid" placeholder="marca" th:field="${entidad.remision.marca}"  maxlength="128"  />
 										</div>
-										<div class="col-md-3 mb-2">
+										<div class="col-md-2 mb-2">
 											<label for="idNombre" class="textBold9pt">Placa</label>
-											<input type="text" class="form-control_v2 is-valid" placeholder="placa" th:field="${entidad.remision.placa}"  maxlength="64" />
+											<input type="text" class="form-control_v2 is-valid" placeholder="placa" th:field="${entidad.remision.placa}"  maxlength="32" />
+										</div>
+										<div class="col-md-2 mb-2">
+											<label for="idNombre" class="textBold9pt">Placa 2</label>
+											<input type="text" class="form-control_v2 is-valid" placeholder="placa" th:field="${entidad.remision.remolque}"  maxlength="32" />
 										</div>
 										<div class="col-md-3 mb-2">
 											<label for="idNombre" class="textBold9pt">Nro Certificado Inscripci&oacute;n</label>
@@ -151,7 +172,16 @@
 									<input type="hidden" class="form-control_v2 is-valid"  th:field="${entidad.remision.estadoOperacion}"/>
 								</div>
 							</div>
-							
+							<div class="row">
+								<div class="col-md-10 mb-2">
+									<label for="idNombre" class="textBold9pt">Observaci&oacute;n (Obligatorio cuando el motivo de traslado es OTROS)</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Descripcion del motivo de traslado Otros" th:field="${entidad.remision.observacion}" maxlength="256"/>
+									
+								</div>
+								<div class="col-md-2 mb-2">
+									
+								</div>
+							</div>
 					</fieldset>
 					<br></br>
 					<div id="c_tablas" th:if="${not #lists.isEmpty(entidad.listaFacturaAsociada)}">	
@@ -183,10 +213,12 @@
 							<tr>
 								<th width="15%"> </th>
 								<th width="25%"> </th>
-								<th width="35%">  </th>
+								<th width="25%">  </th>
 								<th width="10%"> </th>
-								<th width="5%">Total:</th>
-								<th width="5%" class="campos2"><font th:text="${entidad.totalPesoGuia}"></font></th>
+								<th width="10%">Total:</th>
+								<th width="10%" class="campos2">
+									<input type="text" class="form-control_v2 is-valid" placeholder="Total" th:field="${entidad.totalPesoGuia}" required="required" maxlength="12" />
+								</th>
 								<th width="5%" class="campos2">KG</th>
 							</tr>
 						</table>

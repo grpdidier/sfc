@@ -79,52 +79,79 @@
 								</div>
 							</div>
 							<div class="row">
-								<div class="col-md-3 mb-2">
+								<div class="col-md-2 mb-2">
 									<label for="idNombre" class="textBold9pt">Ruc Transportista</label>
 									<input type="text" class="form-control_v2 is-valid" placeholder="ruc del transportista" th:field="${entidad.remision.numeroDocumentoTransportista}"  disabled="disabled" maxlength="16"  style="background-color: #ECECEC;"/>
 									
 								</div>
-								<div class="col-md-9 mb-2">
+								<div class="col-md-7 mb-2">
 									<label for="idNombre" class="textBold9pt">Nombre Transportista</label>
 									<input type="text" class="form-control_v2 is-valid" placeholder="nombre del transportista" th:field="${entidad.remision.nombreTransportista}"  disabled="disabled" maxlength="256"  style="background-color: #ECECEC;"/>
-									
 								</div>
+								<div class="col-md-2 mb-2">
+									<label for="idNombre" class="textBold9pt">Nro Registro MTC</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="numero certificado" th:field="${entidad.remision.numeroRegistroMtc}"  disabled="disabled" maxlength="20"  style="background-color: #ECECEC;"/>
+								</div>
+								<div class="col-md-1 mb-2"></div>
 							</div>
 							
 							<div class="row">
 								<div class="col-md-3 mb-2">
-									<label for="idNombre" class="textBold9pt">Veh&iacute;culo Marca</label>
-									<input type="text" class="form-control_v2 is-valid" placeholder="marca" th:field="${entidad.remision.marca}"  disabled="disabled" maxlength="128"  style="background-color: #ECECEC;"/>
+									<label for="idNombre" class="textBold9pt">Tipo de Transporte</label>
+									<select th:field="${entidad.remision.tipoTransporte}" class="form-control_v2 is-valid" onchange="jsActualizarTipoTransporte()" disabled="disabled">
+										<option value="-1">--Seleccionar--</option>
+										<option th:each="entry : ${session.SessionTipoTransporteGuia}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+									</select>
 								</div>
-								<div class="col-md-3 mb-2">
-									<label for="idNombre" class="textBold9pt">Placa</label>
-									<input type="text" class="form-control_v2 is-valid" placeholder="placa" th:field="${entidad.remision.placa}"  disabled="disabled" maxlength="64"  style="background-color: #ECECEC;"/>
+								<div class="col-md-9 mb-2">
+									<div class="row">
+										<div class="col-md-2 mb-2">
+											<label for="idNombre" class="textBold9pt">Veh&iacute;culo Marca</label>
+											<input type="text" class="form-control_v2 is-valid" placeholder="marca" th:field="${entidad.remision.marca}"  disabled="disabled" maxlength="128"  style="background-color: #ECECEC;"/>
+										</div>
+										<div class="col-md-2 mb-2">
+											<label for="idNombre" class="textBold9pt">Placa</label>
+											<input type="text" class="form-control_v2 is-valid" placeholder="placa" th:field="${entidad.remision.placa}"  disabled="disabled" maxlength="64"  style="background-color: #ECECEC;"/>
+										</div>
+										<div class="col-md-2 mb-2">
+											<label for="idNombre" class="textBold9pt">Placa 2</label>
+											<input type="text" class="form-control_v2 is-valid" placeholder="placa" th:field="${entidad.remision.remolque}"  style="background-color: #ECECEC;" disabled="disabled" />
+										</div>
+										<div class="col-md-3 mb-2">
+											<label for="idNombre" class="textBold9pt">Nro Certificado Inscripci&oacute;n</label>
+											<input type="text" class="form-control_v2 is-valid" placeholder="numero certificado" th:field="${entidad.remision.numeroCertInscripcion}"  disabled="disabled" maxlength="64"  style="background-color: #ECECEC;"/>
+										</div>
+										<div class="col-md-3 mb-2">
+											<label for="idNombre" class="textBold9pt">Nro Licencia de Conducir</label>
+											<input type="text" class="form-control_v2 is-valid" placeholder="numero licencia" th:field="${entidad.remision.numeroLicencia}"  disabled="disabled" maxlength="64"  style="background-color: #ECECEC;"/>
+										</div>
+									</div>
 								</div>
-								<div class="col-md-3 mb-2">
-									<label for="idNombre" class="textBold9pt">Nro Certificado Inscripci&oacute;n</label>
-									<input type="text" class="form-control_v2 is-valid" placeholder="numero certificado" th:field="${entidad.remision.numeroCertInscripcion}"  disabled="disabled" maxlength="64"  style="background-color: #ECECEC;"/>
-								</div>
-								<div class="col-md-3 mb-2">
-									<label for="idNombre" class="textBold9pt">Nro Licencia de Conducir</label>
-									<input type="text" class="form-control_v2 is-valid" placeholder="numero licencia" th:field="${entidad.remision.numeroLicencia}"  disabled="disabled" maxlength="64"  style="background-color: #ECECEC;"/>
-								</div>
-								
 							</div>
 							<div class="row" th:if="${entidad.remision.tipoTransporte == '02'}">
 								<div class="col-md-2 mb-2">
 									<label for="idNombre" class="textBold9pt">DNI Conductor</label>
-									<input type="text" class="form-control_v2 is-valid" placeholder="DNI" th:field="${entidad.remision.numeroDNIConductor}" required="required" maxlength="12" style="background-color: #ECECEC;" disabled="disabled"/>
+									<input type="text" class="form-control_v2 is-valid" placeholder="DNI" th:field="${entidad.remision.numeroDNIConductor}"  maxlength="12" style="background-color: #ECECEC;" disabled="disabled"/>
 								</div>
 								<div class="col-md-5 mb-2">
 									<label for="idNombre" class="textBold9pt">Nombre del Conductor</label>
-									<input type="text" class="form-control_v2 is-valid" placeholder="Nombre del Conductor" th:field="${entidad.remision.nombreConductor}" required="required" maxlength="64" style="background-color: #ECECEC;" disabled="disabled"/>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Nombre del Conductor" th:field="${entidad.remision.nombreConductor}"  maxlength="64" style="background-color: #ECECEC;" disabled="disabled"/>
 								</div>
 								<div class="col-md-5 mb-2">
 									<label for="idNombre" class="textBold9pt">Apellido del Conductor</label>
-									<input type="text" class="form-control_v2 is-valid" placeholder="Apellido del Conductor" th:field="${entidad.remision.apellidoConductor}" required="required" maxlength="64" style="background-color: #ECECEC;" disabled="disabled"/>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Apellido del Conductor" th:field="${entidad.remision.apellidoConductor}"  maxlength="64" style="background-color: #ECECEC;" disabled="disabled"/>
 								</div>
 							</div>
-							
+							<div class="row">
+								<div class="col-md-10 mb-2">
+									<label for="idNombre" class="textBold9pt">Observaci&oacute;n (Obligatorio cuando el motivo de traslado es OTROS)</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Descripcion del motivo de traslado Otros" th:field="${entidad.remision.observacion}"  maxlength="256" style="background-color: #ECECEC;" disabled="disabled"/>
+									
+								</div>
+								<div class="col-md-2 mb-2">
+									
+								</div>
+							</div>
 					</fieldset>
 					
 					<br></br>
@@ -134,17 +161,32 @@
 						<table id="t01" class="table   table-bordered table-active tabla_cabecera_general">
 							<tr>
 								<th width="20%">Factura Asociada</th>
-								<th width="30%">Cliente</th>
-								<th width="30%">Descripci&oacute;n Producto</th>
+								<th width="25%">Cliente</th>
+								<th width="25%">Descripci&oacute;n Producto</th>
 								<th width="10%">Unidad</th>
 								<th width="10%">Cantidad</th>
+								<th width="10%">Peso (KG)</th>
 							</tr>
 							<tr th:each="detalleComprobante, iterStat : ${entidad.listaFacturaAsociada}"  class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
 								<td th:text="${detalleComprobante.serieFactura + '-' +  detalleComprobante.numeroFactura}">factura</td>
 								<td th:text="${detalleComprobante.nombreCliente}">nombreCliente</td>
 								<td th:text="${detalleComprobante.descripcion}">descripcion</td>
 								<td th:text="${detalleComprobante.unidadMedida}">unidadMedida</td>
-									<td th:text="${#numbers.formatDecimal(detalleComprobante.cantidad, 1, 'DEFAULT', 2, 'DEFAULT')}">cantidad</td>
+								<td th:text="${#numbers.formatDecimal(detalleComprobante.cantidad, 1, 'DEFAULT', 2, 'DEFAULT')}">cantidad</td>
+								<td th:text="${#numbers.formatDecimal(detalleComprobante.peso, 1, 'DEFAULT', 2, 'DEFAULT')}">cantidad</td>
+								
+							</tr>
+						</table>
+						<table class="table">
+							<tr>
+								<th width="20%"> </th>
+								<th width="25%"> </th>
+								<th width="25%">  </th>
+								<th width="10%"> </th>
+								<th width="10%">Total:</th>
+								<th width="10%" class="campos2">
+									<input type="text" class="form-control_v2 is-valid" placeholder="Total" th:field="${entidad.totalPesoGuia}"  maxlength="12" style="background-color: #ECECEC;" disabled="disabled" />
+								</th>
 								
 							</tr>
 						</table>
@@ -157,9 +199,10 @@
 								<th width="30%">Descripci&oacute;n Producto</th>
 								<th width="10%">Unidad</th>
 								<th width="10%">Cantidad</th>
+								<th width="10%">Peso (KG)</th>
 							</tr>
 							<tr class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
-								<td colspan="5" align="center">No se encontr&oacute; elementos</td>
+								<td colspan="6" align="center">No se encontr&oacute; elementos</td>
 							</tr>
 						</table>
 					</div>

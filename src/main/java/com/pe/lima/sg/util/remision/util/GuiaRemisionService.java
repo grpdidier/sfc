@@ -40,6 +40,7 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.Shi
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.SupplierPartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.TransportEquipmentType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_21.TransportHandlingUnitType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.CompanyIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.CustomerAssignedAccountIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.DeliveredQuantityType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.DescriptionType;
@@ -48,7 +49,9 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.Documen
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.DocumentTypeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.GrossWeightMeasureType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.HandlingCodeType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.HandlingInstructionsType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IDType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.InformationType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IssueDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.IssueTimeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_21.LineIDType;
@@ -119,35 +122,37 @@ public class GuiaRemisionService {
 		
 		List<DocumentReferenceType> aListDocument = new ArrayList<>();
 		aDespatchAdvice.setAdditionalDocumentReference(aListDocument);
-		
-		for(TblComprobante comprobante: remision.getListaTblComprobante()) {
-			DocumentReferenceType documentReferenceType = new DocumentReferenceType();
-			DocumentTypeType documentType = new DocumentTypeType();
-			documentReferenceType.setDocumentType(documentType);
-			documentType.setValue("FACTURA");
-			DocumentTypeCodeType documentTypeCodeType = new DocumentTypeCodeType();
-			documentReferenceType.setDocumentTypeCode(documentTypeCodeType);
-			documentTypeCodeType.setValue("01"); //Factura
-			documentTypeCodeType.setListAgencyName("PE:SUNAT");
-			documentTypeCodeType.setListName("Documento relacionado al transporte");
-			documentTypeCodeType.setListURI("urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo61");
-			IDType idType = new IDType();
-			documentReferenceType.setID(idType);
-			idType.setValue(comprobante.getSerie()+"-"+comprobante.getNumero());
-			PartyType partyType = new PartyType();
-			documentReferenceType.setIssuerParty(partyType);
-			PartyIdentificationType partyIdentificationType = new PartyIdentificationType();
-			partyType.addPartyIdentification(partyIdentificationType);
-			//partyIdentificationType.setID(remision.getRuc());
-			IDType idTypeRuc = new IDType();
-			partyIdentificationType.setID(idTypeRuc);
-			//idTypeRuc.setSchemeAgencyID("6");
-			idTypeRuc.setSchemeID("6");
-			idTypeRuc.setSchemeName("Documento de Identidad");
-			idTypeRuc.setSchemeAgencyName("PE:SUNAT");
-			idTypeRuc.setSchemeURI("urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06");
-			idTypeRuc.setValue(remision.getRuc());
-			aListDocument.add(documentReferenceType);
+		//Si no es consigación entonces tiene documento relacionado
+		if (!remision.getRemision().getMotivoTraslado().equals("05") && !remision.getRemision().getMotivoTraslado().equals("13")) {
+			for(TblComprobante comprobante: remision.getListaTblComprobante()) {
+				DocumentReferenceType documentReferenceType = new DocumentReferenceType();
+				DocumentTypeType documentType = new DocumentTypeType();
+				documentReferenceType.setDocumentType(documentType);
+				documentType.setValue("FACTURA");
+				DocumentTypeCodeType documentTypeCodeType = new DocumentTypeCodeType();
+				documentReferenceType.setDocumentTypeCode(documentTypeCodeType);
+				documentTypeCodeType.setValue("01"); //Factura
+				documentTypeCodeType.setListAgencyName("PE:SUNAT");
+				documentTypeCodeType.setListName("Documento relacionado al transporte");
+				documentTypeCodeType.setListURI("urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo61");
+				IDType idType = new IDType();
+				documentReferenceType.setID(idType);
+				idType.setValue(comprobante.getSerie()+"-"+comprobante.getNumero());
+				PartyType partyType = new PartyType();
+				documentReferenceType.setIssuerParty(partyType);
+				PartyIdentificationType partyIdentificationType = new PartyIdentificationType();
+				partyType.addPartyIdentification(partyIdentificationType);
+				//partyIdentificationType.setID(remision.getRuc());
+				IDType idTypeRuc = new IDType();
+				partyIdentificationType.setID(idTypeRuc);
+				//idTypeRuc.setSchemeAgencyID("6");
+				idTypeRuc.setSchemeID("6");
+				idTypeRuc.setSchemeName("Documento de Identidad");
+				idTypeRuc.setSchemeAgencyName("PE:SUNAT");
+				idTypeRuc.setSchemeURI("urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06");
+				idTypeRuc.setValue(remision.getRuc());
+				aListDocument.add(documentReferenceType);
+			}
 		}
 	}
 	private  void asignarDatosDelBien(DespatchAdviceType aDespatchAdvice, RemisionBean remision) {
@@ -219,14 +224,20 @@ public class GuiaRemisionService {
 		handlingCodeType.setListURI("urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo20");
 		//handlingCodeType.setValue("01");
 		handlingCodeType.setValue(remision.getRemision().getMotivoTraslado());
-		/*C.Descripción de motivo de traslado*/
-		//final InformationType informationType = new InformationType();
-		//informationType.setValue("VENTA");
-		/*Solo aplica si el motivo es 08 o 09*/
-		/*informationType.setValue(remision.getDescripcionMotivo());
-		final List<InformationType> aListInformation = new ArrayList<>();
-		aListInformation.add(informationType);
-		shipmentType.setInformation(aListInformation);*/
+		if (remision.getRemision().getMotivoTraslado().equals("13")) {
+			/*C.Descripción de motivo de traslado*/
+			/*final InformationType informationType = new InformationType();
+			//informationType.setValue(obtenerDescripcionMotivoTraslado(remision.getRemision().getMotivoTraslado()));
+			informationType.setValue(remision.getRemision().getObservacion());
+			final List<InformationType> aListInformation = new ArrayList<>();
+			aListInformation.add(informationType);
+			shipmentType.setInformation(aListInformation);*/
+			List<HandlingInstructionsType> listHandlingInstruccionsType = new ArrayList<>();
+			HandlingInstructionsType handlingInstructionsType = new HandlingInstructionsType();
+			handlingInstructionsType.setValue(remision.getRemision().getObservacion());
+			listHandlingInstruccionsType.add(handlingInstructionsType);
+			shipmentType.setHandlingInstructions(listHandlingInstruccionsType);
+		}
 		/*M.Peso bruto total de la carga*/
 		final GrossWeightMeasureType grossWeightMeasureType = new GrossWeightMeasureType();
 		shipmentType.setGrossWeightMeasure(grossWeightMeasureType);
@@ -252,6 +263,7 @@ public class GuiaRemisionService {
 		periodType.setStartDate(convertirFechaAStartDate(remision.getRemision().getFechaInicioTraslado()));
 		shipmentStageType.setTransitPeriod(periodType);
 		/*Datos del transportista*/
+		
 		if (transportModeCodeType.getValue().equals("01")) {
 			/*C.Número de RUC transportista*/
 			final PartyType partyType = new PartyType();
@@ -259,7 +271,7 @@ public class GuiaRemisionService {
 			final IDType aIDType = new IDType();
 			aIDType.setSchemeID("6");
 			//aIDType.setValue("20000000001");
-			aIDType.setValue(remision.getRemision().getNumeroDocumentoCliente());
+			aIDType.setValue(remision.getRemision().getNumeroDocumentoTransportista());
 			partyIdentificationType.setID(aIDType);
 			final List<PartyIdentificationType> aListPartyIdentificationType = new ArrayList<>();
 			aListPartyIdentificationType.add(partyIdentificationType);
@@ -268,14 +280,22 @@ public class GuiaRemisionService {
 			final PartyLegalEntityType partyLegalEntityType = new PartyLegalEntityType();
 			final RegistrationNameType registrationNameType = new RegistrationNameType();
 			//registrationNameType.setValue("EMPRESA DE TRANSPORTE PRUEBA SA");
-			registrationNameType.setValue(remision.getRemision().getNombreCliente());
+			registrationNameType.setValue(remision.getRemision().getNombreTransportista());
 			partyLegalEntityType.setRegistrationName(registrationNameType);
+			CompanyIDType companyIDType = new CompanyIDType();
+			/* NUMERO DE REGISTRO DEL MTC*/
+			//companyIDType.setValue(remision.getRemision().getNumeroCertInscripcion().replace("-", ""));
+			companyIDType.setValue(remision.getRemision().getNumeroRegistroMtc().replace("-", ""));
+			log.info("[asignarDatosEnvio] getNumeroCertInscripcion:"+remision.getRemision().getNumeroCertInscripcion().replace("-", ""));
+			partyLegalEntityType.setCompanyID(companyIDType);
 			final List<PartyLegalEntityType> aListPartyLegalEntityType = new ArrayList<>();
 			aListPartyLegalEntityType.add(partyLegalEntityType);
 			partyType.setPartyLegalEntity(aListPartyLegalEntityType);
 			final List<PartyType> aListPartyType = new ArrayList<>();
 			aListPartyType.add(partyType);
 			shipmentStageType.setCarrierParty(aListPartyType);
+			
+			
 		}else {
 			TransportHandlingUnitType transportHandlingUnitType = new TransportHandlingUnitType();
 			List<TransportHandlingUnitType> listTransport = new ArrayList<>();
@@ -342,6 +362,41 @@ public class GuiaRemisionService {
 		shipmentType.setDelivery(deliveryType);
 
 	}
+	/*private String obtenerDescripcionMotivoTraslado(String motivoTraslado) {
+		String descripcion = "";
+		if (motivoTraslado.equals("01")) {
+			descripcion = "Venta";
+		}
+		if (motivoTraslado.equals("02")) {
+			descripcion = "Compra";
+		}
+		if (motivoTraslado.equals("03")) {
+			descripcion = "Venta con entrega a terceros";
+		}
+		if (motivoTraslado.equals("04")) {
+			descripcion = "Traslado entre establecimientos de la misma empresa";
+		}
+		if (motivoTraslado.equals("05")) {
+			descripcion = "Consignación";
+		}
+		if (motivoTraslado.equals("06")) {
+			descripcion = "Devolución";
+		}
+		if (motivoTraslado.equals("07")) {
+			descripcion = "Recojo de bienes transformados";
+		}
+		if (motivoTraslado.equals("08")) {
+			descripcion = "Importación";
+		}
+		if (motivoTraslado.equals("09")) {
+			descripcion = "Exportación";
+		}
+		if (motivoTraslado.equals("10")) {
+			descripcion = "Otros";
+		}
+		
+		return descripcion;
+	}*/
 	private  StartDateType convertirFechaAStartDate(String fechaEmision) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LocalDate fechaLocalDate = LocalDate.parse(fechaEmision, formatter);

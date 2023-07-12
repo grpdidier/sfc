@@ -54,7 +54,8 @@
 								<th>Nombre de Producto</th>
 								<th>Precio Unitario</th>
 								<th>Moneda</th>
-								<th>RUC</th>
+								<th>Peso (KG)</th>
+								<th>Unidad Medida</th>
 								<th>Editar</th>
 								<th>Eliminar</th>
 							</tr>
@@ -63,7 +64,8 @@
 								<td th:text="${producto.nombre}">nombre</td>
 								<td th:text="${producto.precio}">precio</td>
 								<td th:text="${producto.tblCatalogo.nombre}">nombre</td>
-								<td th:text="${producto.tblEmpresa == null? '': producto.tblEmpresa.ruc }">RUC</td>
+								<td th:text="${producto.peso}">peso</td>
+								<td th:text="${producto.unidadMedida}">unidadMedida</td>
 								<td align="center"><a
 									th:href="${'/producto/editar/' + producto.codigoProducto}"><img
 										th:src="@{/images/iconos/editar.png}" alt="Editar" /></a></td>
@@ -81,12 +83,13 @@
 								<th>Nombre de Producto</th>
 								<th>Precio Unitario</th>
 								<th>Moneda</th>
-								<th>RUC</th>
+								<th>Peso (KG)</th>
+								<th>Unidad Medida</th>
 								<th>Editar</th>
 								<th>Eliminar</th>
 							</tr>
 							<tr class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
-								<td colspan="7" align="center">No se encontr&oacute; elementos</td>
+								<td colspan="8" align="center">No se encontr&oacute; elementos</td>
 							</tr>
 						</table>
 					</div>

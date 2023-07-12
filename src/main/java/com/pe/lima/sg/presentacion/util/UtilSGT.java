@@ -46,6 +46,17 @@ public class UtilSGT {
 
 		return  dt1.format(date);
 	}
+	public static String getDateStringFormatddMMyyyy(Date date){
+		SimpleDateFormat dt1 = null;
+		try{
+			dt1 = new SimpleDateFormat("dd/MM/yyyy");
+
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+
+		return  dt1.format(date);
+	}
 	/**
 	 * Obtiene una fecha en formato String
 	 */

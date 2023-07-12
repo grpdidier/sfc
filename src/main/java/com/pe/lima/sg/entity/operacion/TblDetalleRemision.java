@@ -42,7 +42,7 @@ public class TblDetalleRemision implements java.io.Serializable {
 	private String ipModificacion;
 	private String codigoProducto;
 	private Integer codigoDetalleComprobante;
-
+	private BigDecimal peso;
 	public TblDetalleRemision() {
 	}
 
@@ -246,5 +246,14 @@ public class TblDetalleRemision implements java.io.Serializable {
 			idUsuario 		= null;
 			strIdUsuario	= null;
 		}
+	}
+
+	@Column(name = "peso", precision = 12, scale = 2)
+	public BigDecimal getPeso() {
+		return peso;
+	}
+
+	public void setPeso(BigDecimal peso) {
+		this.peso = peso;
 	}
 }

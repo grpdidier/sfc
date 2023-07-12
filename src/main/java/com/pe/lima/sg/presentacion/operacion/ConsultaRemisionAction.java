@@ -74,8 +74,6 @@ public class ConsultaRemisionAction {
 	@Autowired
 	private IComprobanteDAO comprobanteDao;
 	@Autowired
-	private IDetalleComprobanteDAO detalleComprobanteDao;
-	@Autowired
 	private IRemisionDAO remisionDao;
 	@Autowired
 	private IDetalleRemisionDAO detalleRemisionDao;
@@ -154,20 +152,20 @@ public class ConsultaRemisionAction {
 		}
 	}
 
-
+	
 	@RequestMapping(value = "/operacion/remision/consulta/ver/{id}", method = RequestMethod.GET)
 	public String verRemision(@PathVariable Integer id, Model model, HttpServletRequest request) {
 		RemisionBean entidad 							= null;
 		String path										= null;
 		TblRemision remision 							= null;
 		List<TblFacturaAsociada> listaFacturaAsociada 	= null;
-		List<ComprobanteBean> listaComprobante			= null;
-		ComprobanteBean comprobanteBean					= null;
+		//List<ComprobanteBean> listaComprobante			= null;
+		//ComprobanteBean comprobanteBean					= null;
 		List<FacturaAsociadaBean> listaFacAsoVer		= null;
 		FacturaAsociadaBean facturaBean					= null;
 		List<TblDetalleRemision> listaDetRemision		= null;
-		List<TblDetalleComprobante> listaDetComprobante	= null;
-		Map<Integer,TblDetalleComprobante> mapDetComprobante = new HashMap<>();
+		//List<TblDetalleComprobante> listaDetComprobante	= null;
+		//Map<Integer,TblDetalleComprobante> mapDetComprobante = new HashMap<>();
 		try{
 			log.debug("[verRemision] Inicio");
 			//Leer los comprobantes - detalle y armar la presentación
@@ -176,48 +174,27 @@ public class ConsultaRemisionAction {
 			remision = remisionDao.findOne(id);
 			listaFacturaAsociada = facturaAsociadaDao.findAllxIdRemision(remision.getCodigoRemision());
 			if (listaFacturaAsociada!=null) {
-				listaComprobante = new ArrayList<>();
-				for(TblFacturaAsociada factura: listaFacturaAsociada) {
-					comprobanteBean = new ComprobanteBean();
-					comprobanteBean.setComprobante(comprobanteDao.findOne(factura.getCodigoComprobante()));
-					listaDetRemision = detalleRemisionDao.findAllxIdFacturaAsociada(factura.getCodigoFacturaAsociada());
-					listaDetComprobante = detalleComprobanteDao.listarxComprobanteTodos(factura.getCodigoComprobante());
-					for(TblDetalleComprobante detComprobante: listaDetComprobante) {
-						mapDetComprobante.put(detComprobante.getCodigoDetalle(), detComprobante);
-					}
-					comprobanteBean.setListaDetalle(new ArrayList<>());
-					for(TblDetalleRemision detRemision: listaDetRemision) {
-						TblDetalleComprobante detalleComprobante = mapDetComprobante.get(detRemision.getCodigoDetalleComprobante());
-						detalleComprobante.setCantidad(detRemision.getCantidad());
-						comprobanteBean.getListaDetalle().add(detalleComprobante);
-						
-					}
-					
-					listaComprobante.add(comprobanteBean);
-				}
-			}
-			//Visualizamos la información como una lista
-			if (listaComprobante != null) {
 				listaFacAsoVer = new ArrayList<>();
-				for(ComprobanteBean comprobante: listaComprobante) {
-					if (comprobante.getListaDetalle()!=null) {
-						for(TblDetalleComprobante detalleComprobante: comprobante.getListaDetalle()) {
-							facturaBean = new FacturaAsociadaBean();
-							facturaBean.setSerieFactura(comprobante.getComprobante().getSerie());
-							facturaBean.setNumeroFactura(comprobante.getComprobante().getNumero());
-							facturaBean.setCodigoComprobante(comprobante.getComprobante().getCodigoComprobante());
-							facturaBean.setNombreCliente(comprobante.getComprobante().getNombreCliente());
-							facturaBean.setDescripcion(detalleComprobante.getDescripcion());
-							facturaBean.setUnidadMedida(detalleComprobante.getUnidadMedida());
-							facturaBean.setCantidad(detalleComprobante.getCantidad());
-							listaFacAsoVer.add(facturaBean);
-						}
+				for(TblFacturaAsociada factura: listaFacturaAsociada) {
+					listaDetRemision = detalleRemisionDao.findAllxIdFacturaAsociada(factura.getCodigoFacturaAsociada());
+					for(TblDetalleRemision detRemision: listaDetRemision) {
+						facturaBean = new FacturaAsociadaBean();
+						String[] serieNumero = obtenerDatosSerieNumero(factura.getObservacion(),factura.getCodigoComprobante());
+						facturaBean.setSerieFactura(serieNumero[0]);
+						facturaBean.setNumeroFactura(serieNumero[1]);
+						facturaBean.setCodigoComprobante(factura.getCodigoComprobante());
+						facturaBean.setNombreCliente(remision.getNombreCliente());
+						facturaBean.setDescripcion(detRemision.getDescripcion());
+						facturaBean.setUnidadMedida(detRemision.getUnidadMedida());
+						facturaBean.setCantidad(detRemision.getCantidad());
+						listaFacAsoVer.add(facturaBean);
 					}
 				}
 			}
 			entidad.setRemision(remision);
 			entidad.setListaFacturaAsociada(listaFacAsoVer);
 			model.addAttribute("entidad", entidad);
+			
 			log.debug("[verRemision] Fin");
 		}catch(Exception e){
 			e.printStackTrace();
@@ -225,6 +202,16 @@ public class ConsultaRemisionAction {
 		return path;
 	}
 
+	private String[] obtenerDatosSerieNumero(String observacion, Integer codigoComprobante) {
+		String[] serieNumero = new String[2];
+		if (codigoComprobante > 0) {
+			serieNumero = observacion.split("-");
+		}else {
+			serieNumero[0] = "";
+			serieNumero[1] = "";
+		}
+		return serieNumero;
+	}
 	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/operacion/remision/consulta/xml/{id}", method = RequestMethod.GET)

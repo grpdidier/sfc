@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+<!--/*/ <th:block th:include="fragments/headerinc :: head"></th:block> /*/-->
+</head>
+<body>
+	<!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+	<main>
+		<div id="container">	
+			<div id="actionbar" class="row">
+				<div class="col-md-4 mb-3">
+					<a href="#" th:href="@{/operacion/remision/comprobantes/regresar}"><img th:src="@{/images/iconos/regresar.png}" alt="Regresar" /></a>
+				</div>
+				<div class="col-md-8 mb-3 tituloPrincipal" align="left" ><br/> Remisi&oacute;n - Productos - Nuevo - RUC: <label th:text="${entidad.ruc}" style="color: RED"></label></div>
+			</div>
+			
+			<form id="form" th:object="${entidad}" th:action="@{/operacion/remision/comprobantes/nuevo/asociar}" method="post">
+				<div id="informacion" class="container_v3">
+					
+					<fieldset class="scheduler-border">
+						<legend class="scheduler-border title10pt">Datos del Cliente</legend>
+							<div class="row">
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">N&uacute;mero Documento</label>
+									<input type="text" class="form-control_v2 " placeholder="numero" th:field="${entidad.comprobante.numeroDocumento}" required="required" maxlength="32" onkeyup="jsValidarNumeroDocumento(event);"  style="background-color: #ECECEC;" readonly="readonly"/>
+								</div>
+								<div class="col-md-1 mb-0" align="left">
+									<br/>
+									<button class="btn btn-success" onclick="jsListarClienteRemision();">...</button>
+								</div>
+								<div class="col-md-3 mb-0">
+									<label for="idNombre" class="textBold9pt">Tipo Documento</label>
+									<label> 
+										<select th:field="${entidad.comprobante.tipoDocumento}" class="form-control_v2 "  style="background-color: #ECECEC;">
+											<option value="">--Seleccionar--</option>
+											<option th:each="entry : ${session.SessionMapTipoDocumento}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+										</select>
+									</label>
+								</div>
+								<div class="col-md-6 mb-0">
+									<label for="idNombre" class="textBold9pt">Nombre Apellido / Raz&oacute;n Social</label>
+									<input type="text" class="form-control_v2 " placeholder="Nombre y Apellido / Razon Social" th:field="${entidad.comprobante.nombreCliente}" required="required" maxlength="256"  style="background-color: #ECECEC;" readonly="readonly"/>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-11 mb-0">
+									<label for="idNombre" class="textBold9pt">Direcci&oacute;n</label>
+									<input type="text" class="form-control_v2 " placeholder="numero" th:field="${entidad.comprobante.direccionCliente}" required="required" maxlength="128"  style="background-color: #ECECEC;" readonly="readonly"/>
+								</div>
+								<div class="col-md-1 mb-0">
+									<label for="idNombre" class="textBold9pt">Ubigeo</label>
+									<input type="text" class="form-control_v2 " placeholder="Ubigeo" th:field="${entidad.remision.ubigeoLlegada}" required="required" maxlength="256"  style="background-color: #ECECEC;" readonly="readonly"/>
+								</div>
+							</div>
+					</fieldset>
+					<br></br>
+					<fieldset class="scheduler-border">
+						<legend class="scheduler-border title10pt">Detalle del Producto</legend>
+							<div class="row">
+								
+								<div class="col-md-3 mb-1">
+									<label for="idNombre" class="textBold9pt">U. Medida</label>
+									<input type="text" class="form-control_v2 " placeholder="nombre producto" th:field="${entidad.detalleComprobante.unidadMedida}"  maxlength="32" size="16"  style="background-color: #ECECEC;" readonly="readonly"/>
+									
+								</div>
+								
+								<div class="col-md-2 mb-1">
+									<label for="idNombre" class="textBold9pt">C&oacute;digo Producto</label>
+									<input type="text" class="form-control_v2 " placeholder="precio" th:field="${entidad.detalleComprobante.codigoProducto}"  maxlength="12"  style="background-color: #ECECEC;" readonly="readonly"/>
+								</div>
+								<div class="col-md-1 mb-1" align="left">
+									<br/>
+									<button class="btn btn-success" onclick="jsListarProductoRemision();">...</button>
+								</div>
+								
+								<div class="col-md-2 mb-1">
+									<label for="idNombre" class="textBold9pt">Cantidad</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="cantidad" th:field="${entidad.detalleComprobante.cantidad}"  maxlength="12" onkeyup="jsValidarNumerosYPunto(this);"/>
+								</div>
+								<div class="col-md-2 mb-1">
+									<label for="idNombre" class="textBold9pt">Peso</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="cantidad" th:field="${entidad.detalleComprobante.valorReferencia}" maxlength="12"  onkeyup="jsValidarNumerosYPunto(this);"/>
+								</div>
+								<div class="col-md-2 mb-1" align="center">
+									<br/>
+									<button class="btn btn-primary" onclick="jsAdicionarDetalleRemision();">Adicionar</button>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-12 mb-1">
+									<label for="idNombre" class="textBold9pt">Nombre Producto</label>
+									<input type="text" class="form-control_v2 " placeholder="nombre producto" th:field="${entidad.detalleComprobante.descripcion}" maxlength="256" size="80"  style="background-color: #ECECEC;"  readonly="readonly"/>
+								</div>
+							</div>
+							<p style="color: red" th:text="${respuesta}" /> 
+							
+					</fieldset>
+					<br></br>
+					<div id="c_tablas" th:if="${not #lists.isEmpty(entidad.listaDetalle)}">	
+						<table id="t01" class="table   table-bordered table-active tabla_cabecera_general">
+							<tr>
+								<th>C&oacute;digo</th>
+								<th>Descripci&oacute;n Producto</th>
+								<th>Cantidad</th>
+								<th>Unidad</th>
+								<th>Peso Total (KG)</th>
+								<th>Eliminar</th>
+							</tr>
+							<tr th:each="detalleComprobante, status : ${entidad.listaDetalle}"  class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
+								<td th:text="${detalleComprobante.codigoProducto}">codigoProducto</td>
+								<td th:text="${detalleComprobante.descripcion}">descripcion</td>
+								<td th:text="${detalleComprobante.cantidad}">cantidad</td>
+								<td th:text="${detalleComprobante.unidadMedida}">unidadMedida</td>
+								<td th:text="${detalleComprobante.valorReferencia}">peso</td>
+								<td align="center">
+									<a th:href="${'/operacion/remision/comprobantes/eliminar/' + status.index}"><img
+										th:src="@{/images/iconos/eliminar.png}" alt="Eliminar"
+										onclick="if(!confirm('Desea eliminar el elemento seleccionado?')){ return false;}" /></a>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div id="c_tablas" th:if="${#lists.isEmpty(entidad.listaDetalle)}">				
+						<table id="t01" class="table   table-bordered table-active tabla_cabecera_general">
+							<tr>
+								<th>C&oacute;digo</th>
+								<th>Descripci&oacute;n Producto</th>
+								<th>Cantidad</th>
+								<th>Unidad</th>
+								<th>Peso Total (KG)</th>
+								<th>Eliminar</th>
+							</tr>
+							<tr class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
+								<td colspan="6" align="center">No se encontr&oacute; elementos</td>
+							</tr>
+						</table>
+					</div>
+					
+					<div class="container_v4" align="center">
+						<div class="row">
+							<div class="col-md-3 mb-3"></div>
+							
+			  				<div class="col-md-6 mb-3">
+			  					<br/>
+			  					<button class="btn btn-success" type="submit" onclick="">Asociar Producto</button>
+			  				</div>
+			  				<div class="col-md-3 mb-3"></div>
+			  			</div>
+			  		</div>
+			  	</div>
+			</form>
+
+		</div>
+	</main>
+	<nav id="nav" >
+		<!--/*/ <th:block th:include="fragments/util :: menu"></th:block> /*/-->
+	</nav>	
+</body>
+</html>

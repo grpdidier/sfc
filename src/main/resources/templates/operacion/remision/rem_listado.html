@@ -45,6 +45,11 @@
 			  					<p style="color: red" th:text="${respuesta}" />
 			  				</div>
 			  			</div>
+			  			<div class="row">
+			  				<div class="col-md-12 mb-3">
+			  					<p style="color: red" th:text="${detalleRespuesta}" />
+			  				</div>
+			  			</div>
 			  		</div>
 					<div id="c_tablas" th:if="${not #lists.isEmpty(registros)}">	
 						<!--Pagination -->
@@ -103,6 +108,7 @@
 								<th>Estado</th>								
 								<th>Ver</th>
 								<th>Xml</th>
+								<th>Envio</th>
 								<th>Cdr</th>
 								<th>Pdf</th>
 								<th>Eliminar</th>
@@ -116,13 +122,15 @@
 								<td th:text="${comprobante.fechaInicioTraslado}">fecha</td>
 								<td th:text="${comprobante.nombreCliente}">nombreCliente</td>
 								<td align="center">
-									<div th:replace="fragments/util :: estadoFactura(tipo=${comprobante.estadoOperacion})"></div>
+									<div th:replace="fragments/util :: estadoGuiaRemision(tipo=${comprobante.estadoOperacion})"></div>
 								</td>
+								<!-- Ver el regitro de la remision -->
 								<td align="center">
 									<a	th:href="${'/operacion/remision/ver/' + comprobante.codigoRemision}">
 										<img th:src="@{/images/iconos/documento.png}" alt="Editar" />
 									</a>
 								</td>
+								<!-- Generar el xml con firma -->
 								<td align="center">
 									<div th:if="${comprobante.estadoOperacion == '00'}">
 										<a	th:href="${'/operacion/remision/xml/' + comprobante.codigoRemision}">
@@ -135,6 +143,7 @@
 										</a>
 									</div>
 								</td>
+								<!-- Envio y consulta de estado -->
 								<td align="center">
 									<div th:if="${comprobante.estadoOperacion == '02'}">
 										<a	th:href="${'/operacion/remision/envio/xml/' + comprobante.codigoRemision}">
@@ -142,13 +151,35 @@
 										</a>
 									</div>
 									<div th:if="${comprobante.estadoOperacion == '03'}">
+										<img th:src="@{/images/iconos/enviado.png}" alt="ENVIADO"  width="30px"/>
+									</div>
+									<div th:if="${comprobante.estadoOperacion == '04'}">
+										<img th:src="@{/images/iconos/enviado.png}" alt="ENVIADO"  width="30px"/>
+									</div>
+									<div th:if="${comprobante.estadoOperacion == '05'}">
+										<img th:src="@{/images/iconos/enviado.png}" alt="ENVIADO"  width="30px"/>
+									</div>
+								</td>
+								<!-- Consulta de estado -->
+								<td align="center">
+									<div th:if="${comprobante.estadoOperacion == '03'}">
+										<a	th:href="${'/operacion/remision/estado/xml/' + comprobante.codigoRemision}">
+											<img th:src="@{/images/iconos/descargar2.png}" alt="Editar" width="30px" />
+										</a>
+									</div>
+									<div th:if="${comprobante.estadoOperacion == '04'}">
+										<a	th:href="${'/operacion/remision/descargar/cdr/' +  iterStat.index}">
+											<img th:src="@{/images/iconos/cdr.png}" alt="CDR"  width="30px"/>
+										</a>
+									</div>
+									<div th:if="${comprobante.estadoOperacion == '05'}">
 										<a	th:href="${'/operacion/remision/descargar/cdr/' +  iterStat.index}">
 											<img th:src="@{/images/iconos/cdr.png}" alt="CDR"  width="30px"/>
 										</a>
 									</div>
 								</td>
 								<td >
-									<div th:if="${comprobante.estadoOperacion == '03'}">
+									<div th:if="${comprobante.estadoOperacion == '04'}">
 										<a	th:href="${'/operacion/remision/pdf/' + comprobante.codigoRemision}">
 											<img th:src="@{/images/iconos/doc_pdf.png}" alt="pdf" width="35px"/>
 										</a>
@@ -176,12 +207,13 @@
 								<th>Estado</th>								
 								<th>Ver</th>
 								<th>Xml</th>
-								<th>Enviar</th>
+								<th>Envio</th>
+								<th>Cdr</th>
 								<th>Pdf</th>
 								<th>Eliminar</th>
 							</tr>
 							<tr class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
-								<td colspan="11" align="center">No se encontr&oacute; elementos</td>
+								<td colspan="12" align="center">No se encontr&oacute; elementos</td>
 							</tr>
 						</table>
 					</div>

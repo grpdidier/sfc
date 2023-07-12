@@ -73,6 +73,8 @@ public class TblRemision implements java.io.Serializable {
 	private String numeroDNIConductor;
 	private String rutaCDR;
 	private String ubigeoLlegada;
+	private String numeroRegistroMtc;
+	private String remolque;
 	
 	private Set<TblFacturaAsociada> tblFacturaAsociadas = new HashSet<>(0);
 
@@ -565,6 +567,24 @@ public class TblRemision implements java.io.Serializable {
 
 	public void setUbigeoLlegada(String ubigeoLlegada) {
 		this.ubigeoLlegada = ubigeoLlegada;
+	}
+
+	@Column(name = "numero_registro_mtc", length = 20)
+	public String getNumeroRegistroMtc() {
+		return numeroRegistroMtc;
+	}
+
+	public void setNumeroRegistroMtc(String numeroRegistroMtc) {
+		this.numeroRegistroMtc = numeroRegistroMtc;
+	}
+
+	@Column(name = "remolque", length = 32)
+	public String getRemolque() {
+		return remolque;
+	}
+
+	public void setRemolque(String remolque) {
+		this.remolque = remolque;
 	}
 }
 

@@ -431,7 +431,10 @@ public class Constantes {
 	public static String CODIGO_DOMICILIO_FISCAL							= "03";
 	
 	public static String ESTADO_XML_GENERADO								= "02";
-	public static String ESTADO_XML_CDR										= "03";
+	public static String ESTADO_XML_ENVIADO									= "03";
+	public static String ESTADO_XML_CON_CDR									= "04";
+	public static String ESTADO_XML_CON_CDR_ERROR							= "05";
+	public static String ESTADO_XML_ANULADO									= "06";
 	
 	//Variable para el tipo de transporte
 	public static String TIPO_TRANSPORTE_PUBLICO 							= "01";

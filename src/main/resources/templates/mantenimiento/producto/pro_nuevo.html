@@ -24,10 +24,14 @@
 									<label for="idDireccion" class="textBold9pt">C&oacute;digo</label>
 									<input type="text" class="form-control_v2 is-valid" placeholder="Codigo Producto" th:field="${entidad.codigoEmpresa}" required="required" maxlength="30"/>
 								</div>
-								<div class="col-md-6 mb-3">
+								<div class="col-md-10 mb-3">
 									<label for="idDireccion" class="textBold9pt">Nombre Producto</label>
 									<input type="text" class="form-control_v2 is-valid" placeholder="Nombre" th:field="${entidad.nombre}" required="required" maxlength="200"/>
 								</div>
+								
+							</div>
+							<div class="row">
+								
 								<div class="col-md-2 mb-3">
 									<label for="idDireccion" class="textBold9pt">Precio</label>
 									<input type="text" class="form-control_v2 is-valid" placeholder="Precio" th:field="${entidad.precio}" required="required" maxlength="12"/>
@@ -44,8 +48,22 @@
 										</label>
 									</div>
 								</div>
+								<div class="col-md-2 mb-3">
+									<label for="idDireccion" class="textBold9pt">Peso (Kg)</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Peso Kg" th:field="${entidad.peso}" required="required" maxlength="12"/>
+								</div>
+								<div class="col-md-2 mb-3">
+									<label for="idDireccion" class="textBold9pt">Unidad de Medida</label>
+									<select th:field="${entidad.unidadMedida}" 
+										class="form-control_v2 is-valid">
+											<option value="-1">--Seleccionar--</option>
+											<option th:each="entry : ${session.SessionUnidadMedidaGuia}" th:value="${entry.value}"
+												th:text="${entry.key}">opcion</option>
+									</select>
+								</div>
+								<div class="col-md-4 mb-3">
+								</div>
 							</div>
-							
 							
 					</fieldset>
 					<br></br>

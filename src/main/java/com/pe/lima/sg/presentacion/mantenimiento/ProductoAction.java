@@ -147,6 +147,9 @@ public class ProductoAction extends BaseOperacionPresentacion<TblProducto> {
 		TblProducto entidad 			= null;
 		try{
 			entidad = productoDao.findOne(id);
+			if (entidad.getUnidadMedida()!=null) {
+				entidad.setUnidadMedida(entidad.getUnidadMedida().toUpperCase());
+			}
 			model.addAttribute("entidad", entidad);
 		}catch(Exception e){
 			e.printStackTrace();
@@ -242,6 +245,11 @@ public class ProductoAction extends BaseOperacionPresentacion<TblProducto> {
 				model.addAttribute("respuesta", "Debe ingresar el precio");
 				return exitoso;
 			}
+			if (entidad.getUnidadMedida()== null || entidad.getUnidadMedida().equals("-1")){
+				exitoso = false;
+				model.addAttribute("respuesta", "Debe seleccionar la Unidad de Medida");
+				return exitoso;
+			}
 			//Validando la existencia del producto
 			total = productoDao.totalNombreProducto(entidad.getNombre());
 			if (total > 0){
@@ -331,7 +339,8 @@ public class ProductoAction extends BaseOperacionPresentacion<TblProducto> {
 			entidadEnBd.setCodigoEmpresa(entidad.getCodigoEmpresa());
 			entidadEnBd.setPrecio(entidad.getPrecio());
 			entidadEnBd.setNombre(entidad.getNombre());
-			
+			entidadEnBd.setPeso(entidad.getPeso());
+			entidadEnBd.setUnidadMedida(entidad.getUnidadMedida());
 			this.preEditar(entidadEnBd, request);
 			boolean exitoso = super.guardar(entidadEnBd, model);
 			LOGGER.debug("[guardarEntidad] Guardado..." );

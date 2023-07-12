@@ -100,6 +100,26 @@
 				<span>ENVIADO Y VALIDADO POR OSE</span>
 			</div>
 		</div>
+		<div th:fragment="estadoGuiaRemision">
+			<div th:if="${tipo} == '00'">
+				<span>PENDIENTE</span>
+			</div>
+			<div th:if="${tipo} == '02'">
+				<span>XML GENERADO</span>
+			</div>
+			<div th:if="${tipo} == '03'">
+				<span>ENVIADO Y EN PROCESO</span>
+			</div>
+			<div th:if="${tipo} == '04'">
+				<span>ENVIADO Y ACEPTADO SUNAT</span>
+			</div>
+			<div th:if="${tipo} == '05'">
+				<span>ENVIADO Y ANULADO por SUNAT</span>
+			</div>
+			<div th:if="${tipo} == '06'">
+				<span>GUIA ANULADA</span>
+			</div>
+		</div>
 		<div th:fragment="nombreTipoCobro">
 			<div th:if="${tipo} == 'ALQ'">
 				<span>ALQUILER</span>
