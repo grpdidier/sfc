@@ -19,4 +19,7 @@ public interface IDetalleComprobanteDAO extends BaseOperacionDAO<TblDetalleCompr
 	@Query(value = "select * from ope.tbl_detalle_comprobante where codigo_comprobante = :codigoComprobante AND estado = '1' order by 1", nativeQuery = true)
 	List<TblDetalleComprobante> listarxComprobanteTodos(@Param("codigoComprobante") Integer intCodigoComprobante);
 	
+	@Query(value = "select * from ope.tbl_detalle_comprobante where codigo_comprobante = :codigoComprobante AND estado = '1'  order by 1", nativeQuery = true)
+	List<TblDetalleComprobante> listarxComprobantePDF(@Param("codigoComprobante") Integer intCodigoComprobante);
+	
 }

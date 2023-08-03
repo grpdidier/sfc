@@ -227,6 +227,7 @@ public class RemisionAction {
 		try{
 			log.debug("[traerRegistrosFactura] Inicio");
 			entidadOriginal = (RemisionBean)request.getSession().getAttribute("guiaRemisionSession");
+			recuperarNombreProducto(entidad,entidadOriginal);
 			entidad.setListaFacturaAsociada(entidadOriginal.getListaFacturaAsociada());
 			entidad.setListaComprobante(entidadOriginal.getListaComprobante());
 			//entidad.setTotalPesoGuia(entidadOriginal.getTotalPesoGuia());
@@ -246,6 +247,16 @@ public class RemisionAction {
 		}
 
 		return path;
+	}
+	//Recupera el valor obtenido
+	private void recuperarNombreProducto(RemisionBean entidad, RemisionBean entidadOriginal) {
+		if (entidad.getListaFacturaAsociada()!=null && !entidad.getListaFacturaAsociada().isEmpty()) {
+			for(int indice=0; indice < entidad.getListaFacturaAsociada().size(); indice++) {
+				FacturaAsociadaBean factura = entidad.getListaFacturaAsociada().get(indice);
+				entidadOriginal.getListaFacturaAsociada().get(indice).setDescripcion(factura.getDescripcion());				
+			}
+		}
+		
 	}
 
 	@RequestMapping(value = "/operacion/remision/factura/q", method = RequestMethod.POST)
@@ -1412,11 +1423,18 @@ public class RemisionAction {
 
 	private List<TblDetalleRemision> obtenerDetalleRemision(List<TblDetalleComprobante> listDetalleComprobante, HttpServletRequest request) {
 		TblDetalleRemision detRemision = null;
+		RemisionBean entidadOriginal = (RemisionBean)request.getSession().getAttribute("guiaRemisionSession");
+		int indice = 0;
+		List<FacturaAsociadaBean> listaFacturaAsociada = entidadOriginal.getListaFacturaAsociada();
+		
 		List<TblDetalleRemision> listaDetalleRemision = new ArrayList<>();
 		for(TblDetalleComprobante detComprobante:listDetalleComprobante) {
 			if (detComprobante.getCantidad().compareTo(new BigDecimal("0"))>0) {
 				detRemision = new TblDetalleRemision();
-				detRemision.setDescripcion(detComprobante.getDescripcion());
+				detRemision.setDescripcion(listaFacturaAsociada.get(indice).getDescripcion());
+				//detRemision.setDescripcion(detComprobante.getDescripcion());
+				log.info("[obtenerDetalleRemision] Antes:"+detComprobante.getDescripcion()+ " Ahora:"+listaFacturaAsociada.get(indice).getDescripcion());
+				indice++;
 				detRemision.setCantidad(detComprobante.getCantidad());
 				detRemision.setPeso(detComprobante.getValorReferencia());
 				detRemision.setUnidadMedida(detComprobante.getUnidadMedida());
@@ -1772,6 +1790,7 @@ public class RemisionAction {
 			path = "operacion/remision/rem_listado_transporte";
 			
 			entidadOriginal = (RemisionBean)request.getSession().getAttribute("guiaRemisionSession");
+			this.recuperarNombreProducto(entidad, entidadOriginal);
 			entidad.setListaFacturaAsociada(entidadOriginal.getListaFacturaAsociada());
 			entidad.setListaComprobante(entidadOriginal.getListaComprobante());
 			//entidad.setTotalPesoGuia(entidadOriginal.getTotalPesoGuia());
@@ -1871,6 +1890,7 @@ public class RemisionAction {
 		try{
 			log.debug("[traerNuevoProductoClienteComprobante] Inicio");
 			entidadOriginal = (RemisionBean)request.getSession().getAttribute("guiaRemisionSession");
+			this.recuperarNombreProducto(entidad, entidadOriginal);
 			entidad.setListaFacturaAsociada(entidadOriginal.getListaFacturaAsociada());
 			entidad.setListaComprobante(entidadOriginal.getListaComprobante());
 			//entidad.setTotalPesoGuia(entidadOriginal.getTotalPesoGuia());

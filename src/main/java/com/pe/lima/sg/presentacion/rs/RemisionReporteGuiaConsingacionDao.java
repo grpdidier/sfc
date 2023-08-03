@@ -12,14 +12,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.pe.lima.sg.bean.remision.SaldoMercaderiaBean;
+import com.pe.lima.sg.bean.remision.GuiaConsignacionBean;
 import com.pe.lima.sg.presentacion.Filtro;
 import com.pe.lima.sg.presentacion.util.UtilSGT;
 
 import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
-public class RemisionReporteSaldoMercaderiaDao {
+public class RemisionReporteGuiaConsingacionDao {
 	
 	@Value("${spring.datasource.url}")
 	private String urlTienda;
@@ -35,45 +35,43 @@ public class RemisionReporteSaldoMercaderiaDao {
 	
 	private String url;
 	
-	public List<SaldoMercaderiaBean> getReporteSaldoMercaderiaXls(Filtro filtro){
+	public List<GuiaConsignacionBean> getReporteGuiaxConsignacionXls(Filtro filtro){
 
-		SaldoMercaderiaBean saldoMercaderiaBean = null;
-		List<SaldoMercaderiaBean> listaSaldoMercaderiaBean 	= null;
+		GuiaConsignacionBean guiaConsignacionBean = null;
+		List<GuiaConsignacionBean> listaGuiaConsignacionBean	= null;
 		Connection con = null;
-		//String url = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		//String query = null;
 		try{
 			url = urlTienda + userUrl + nombreUsuario + userPass + credencialUsuario;
 			con = DriverManager.getConnection(url);
-			pstmt = this.sqlConsultaSaldoMercaderiaXls(filtro, con);
+			pstmt = this.sqlConsultaGuiaxConsignacionXls(filtro, con);
 			
 			rs = pstmt.executeQuery();
 
 			if (rs !=null){
-				listaSaldoMercaderiaBean = new ArrayList<SaldoMercaderiaBean>();
+				listaGuiaConsignacionBean = new ArrayList<GuiaConsignacionBean>();
 				while(rs.next()){
-					saldoMercaderiaBean = new SaldoMercaderiaBean();
-					saldoMercaderiaBean.setFechaEmision(rs.getString("fecha_emision"));
-					saldoMercaderiaBean.setSerie(rs.getString("serie"));
-					saldoMercaderiaBean.setNumero(rs.getString("numero"));
-					saldoMercaderiaBean.setRuc(rs.getString("numero_documento"));
-					saldoMercaderiaBean.setCliente(rs.getString("nombre_cliente"));
+					guiaConsignacionBean = new GuiaConsignacionBean();
+					guiaConsignacionBean.setFechaEmision(rs.getString("fecha_emision"));
+					guiaConsignacionBean.setSerie(rs.getString("serie"));
+					guiaConsignacionBean.setNumero(rs.getString("numero"));
+					guiaConsignacionBean.setRuc(rs.getString("numero_documento_cliente"));
+					guiaConsignacionBean.setCliente(rs.getString("nombre_cliente"));
 					String[] producto = obtenerProducto(rs.getString("descripcion"));
-					saldoMercaderiaBean.setCodigoProducto(producto[0]);
-					saldoMercaderiaBean.setNombreProducto(producto[1]);
-					saldoMercaderiaBean.setSaldo(rs.getBigDecimal("saldo"));
+					guiaConsignacionBean.setCodigoProducto(producto[0]);
+					guiaConsignacionBean.setNombreProducto(producto[1]);
+					guiaConsignacionBean.setCantidad(rs.getBigDecimal("cantidad"));
 					
-					listaSaldoMercaderiaBean.add(saldoMercaderiaBean);
+					listaGuiaConsignacionBean.add(guiaConsignacionBean);
 				}
 			}
 
 		}catch(Exception e){
 			e.printStackTrace();
-			listaSaldoMercaderiaBean = null;
+			listaGuiaConsignacionBean = null;
 		}finally{
-			saldoMercaderiaBean = null;
+			guiaConsignacionBean = null;
 			rs = null;
 			pstmt = null;
 			//query = null;
@@ -87,7 +85,7 @@ public class RemisionReporteSaldoMercaderiaDao {
 				con = null;
 			}
 		}
-		return listaSaldoMercaderiaBean;
+		return listaGuiaConsignacionBean;
 	}
 	
 	private String[] obtenerProducto(String datoProducto) {
@@ -102,21 +100,24 @@ public class RemisionReporteSaldoMercaderiaDao {
 		return producto;
 	}
 
-	private PreparedStatement sqlConsultaSaldoMercaderiaXls(Filtro filtro, Connection con) throws SQLException{
+	private PreparedStatement sqlConsultaGuiaxConsignacionXls(Filtro filtro, Connection con) throws SQLException{
 		String query = null;
 		PreparedStatement pstmt = null;
 
-		query = this.sqlAllConsultaSaldoMercaderiaXls();
+		query = this.sqlAllConsultaGuiaxConsignacionXls();
 		System.out.println("query:"+query);
 		pstmt = con.prepareStatement(query);
 		pstmt.setString(1, formateaFechaYYYYMMDD(filtro.getFechaInicio()));
 		pstmt.setString(2, formateaFechaYYYYMMDD(filtro.getFechaFin()));
 		pstmt.setInt(3, filtro.getCodigoEdificacion());
 		pstmt.setString(4, validaRazonSocial(filtro.getRazonSocial()));
+		log.info("[sqlConsultaGuiaxConsignacionXls] fecha Inicio:"+formateaFechaYYYYMMDD(filtro.getFechaInicio()));
+		log.info("[sqlConsultaGuiaxConsignacionXls] fecha Fin:"+formateaFechaYYYYMMDD(filtro.getFechaFin()));
+		log.info("[sqlConsultaGuiaxConsignacionXls] Empresa:"+filtro.getCodigoEdificacion());
+		
 		log.debug(query);
 		return pstmt;
 	}
-	
 	private String validaRazonSocial(String razonSocial) {
 		String cadena = null;
 		if (razonSocial == null || razonSocial.trim().equals("")) {
@@ -133,23 +134,26 @@ public class RemisionReporteSaldoMercaderiaDao {
 		return fechaString;
 	}
 
-	private String sqlAllConsultaSaldoMercaderiaXls() throws SQLException{
+	private String sqlAllConsultaGuiaxConsignacionXls() throws SQLException{
 		String query = null;
-		query = "select com.fecha_emision, " + 
-				"	com.serie, " + 
-				"    com.numero, " + 
-				"    com.numero_documento, " + 
-				"    com.nombre_cliente, " + 
+		query = "select rem.fecha_emision, " + 
+				"	rem.serie, " + 
+				"    rem.numero, " + 
+				"    rem.numero_documento_cliente, " + 
+				"    rem.nombre_cliente, " + 
 				"    det.descripcion, " + 
-				"    det.cantidad - COALESCE(det.cantidad_guia,0) as saldo " + 
-				"from ope.tbl_comprobante com, " + 
-				"     ope.tbl_detalle_comprobante det " + 
-				"where com.codigo_comprobante = det.codigo_comprobante " + 
-				"	and com.estado = '1' " + 
-				"    and com.fecha_emision >= ?  " + 
-				"    and com.fecha_emision <= ? " + 
-				"    and com.codigo_entidad = ? " + 
-				"    and upper(com.nombre_cliente) like ? " +
+				"    det.cantidad " + 
+				"from ope.tbl_remision rem, " + 
+				"	ope.tbl_factura_asociada fac, " + 
+				"	ope.tbl_detalle_remision det " + 
+				"where rem.codigo_remision = fac.codigo_remision " + 
+				"	 and fac.codigo_factura_asociada = det.codigo_factura_asociada " + 
+				"    and rem.estado = '1' " + 
+				"    and rem.motivo_traslado = '05' "+
+				"    and to_char(to_date(rem.fecha_emision,'dd/mm/yyyy'),'yyyy-mm-dd')>= ?  " + 
+				"    and to_char(to_date(rem.fecha_emision,'dd/mm/yyyy'),'yyyy-mm-dd')<= ? " + 
+				"    and rem.codigo_entidad = ? " +
+				"    and upper(rem.nombre_cliente) like ? " +
 				"order by 1,2,3";
 				
 		return query;

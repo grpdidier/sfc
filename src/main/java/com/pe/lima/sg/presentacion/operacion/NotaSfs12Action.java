@@ -2218,7 +2218,7 @@ public class NotaSfs12Action extends BaseOperacionPresentacion<TblNota> {
 			path = "operacion/sfs12nota/sfs12not_nuevo";
 			filtro = (Filtro)request.getSession().getAttribute("filtroSession");
 			filtro.setComprobante(comprobanteDao.findOne(id));
-			filtro.setListaDetalle(detalleComprobanteDao.listarxComprobante(id));
+			filtro.setListaDetalle(detalleComprobanteDao.listarxComprobantePDF(id));
 			for(TblDetalleComprobante detalle: filtro.getListaDetalle()){
 				detalle.setPrecioUnitario(UtilSGT.getRoundDecimal(detalle.getPrecioUnitario(), 4));
 				detalle.setCantidad(UtilSGT.getRoundDecimal(detalle.getCantidad(), 2));

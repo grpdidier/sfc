@@ -1885,7 +1885,7 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 				listaDetalleSunat = sunatDetalleDao.findByCodigoCabecera(sunatCabecera.getCodigoCabecera());
 			}
 			comprobante = comprobanteDao.findOne(id);
-			listaDetalle = detalleComprobanteDao.listarxComprobante(id);
+			listaDetalle = detalleComprobanteDao.listarxComprobantePDF(id);
 			leyenda = leyendaDao.getxComprobante(id);
 			filtro.setFormaPago(formaPagoDao.obtenerFormaPago(id));
 			filtro.setLeyendaSunat(leyenda);
@@ -2181,7 +2181,7 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 			rucEntidad = ((TblUsuario)request.getSession().getAttribute("UsuarioSession") ).getTblEmpresa().getRuc();
 			OperacionUtil.asignarParametros(filtro, mapParametro,request);
 			comprobante = comprobanteDao.findOne(id);
-			listaDetalle = detalleComprobanteDao.listarxComprobante(id);
+			listaDetalle = detalleComprobanteDao.listarxComprobantePDF(id);
 			leyenda = leyendaDao.getxComprobante(id);
 			filtro.setComprobante(comprobante);
 			filtro.setListaDetalle(listaDetalle);
@@ -2336,7 +2336,7 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 			//Buscando
 			entidad = comprobanteDao.findOne(id);
 			if (!entidad.getEstadoOperacion().equals(Constantes.SUNAT_ESTADO_OPERACION_ACEPTADO)){
-				listaDetEntidad = detalleComprobanteDao.listarxComprobante(id);
+				listaDetEntidad = detalleComprobanteDao.listarxComprobantePDF(id);
 				leyenda = leyendaDao.getxComprobante(id);
 				sunat = sunatCabeceraDao.findByCodigoDocumento(id);
 				listaTributo = tributoGeneralDAO.listarxComprobante(id);

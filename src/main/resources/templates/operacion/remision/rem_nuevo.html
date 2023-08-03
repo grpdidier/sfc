@@ -199,7 +199,9 @@
 							<tr th:each="detalleComprobante, iterStat : ${entidad.listaFacturaAsociada}"  class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
 								<td th:text="${detalleComprobante.serieFactura + '-' +  detalleComprobante.numeroFactura}">factura</td>
 								<td th:text="${detalleComprobante.nombreCliente}">nombreCliente</td>
-								<td th:text="${detalleComprobante.descripcion}">descripcion</td>
+								<td>
+									<input type="text" class="form-control_v2 is-valid" th:field="*{listaFacturaAsociada[__${iterStat.index}__].descripcion}" ></input>
+								</td>
 								<td th:text="${detalleComprobante.unidadMedida}">unidadMedida</td>
 								<td th:text="${detalleComprobante.cantidad}">cantidad</td>
 								<td th:text="${detalleComprobante.peso}">peso</td>

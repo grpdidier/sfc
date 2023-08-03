@@ -10,7 +10,6 @@
 		<div id="container">
 			<div id="actionbar" class="row">
 				<div class="col-md-4 mb-3">
-					<a th:if="${not #lists.isEmpty(registros)}" th:href="${'/operacion/remision/reporte/guia/consignacionxls'}" title='Exportar Excel' ><img th:src="@{/images/iconos/exportar.png}"	alt="Regresar" /></a>
 					<a href="#"	th:href="@{/}"><img th:src="@{/images/iconos/regresar.png}"	alt="Regresar" /></a>
 				</div>
 				<div class="col-md-8 mb-3 tituloPrincipal" align="left" ><br/> REGISTRO DE GUIAS DE REMISION A CONSIGNACION </div>
@@ -27,10 +26,10 @@
 								<div class="col-md-2 mb-1" align="right" >
 									<label for="idNombre" class="textBold9pt">Fecha Inicio: </label>
 								</div>
-								<div class="col-md-3 mb-1">
+								<div class="col-md-2 mb-1">
 									<input type="text" class="form-control_v2 is-valid" placeholder="dd/MM/yyyy" th:field="${filtro.fechaInicio}" required="required"/>
 								</div>
-								<div class="col-md-4 mb-1">
+								<div class="col-md-5 mb-1">
 									
 								</div>
 							</div>
@@ -41,15 +40,28 @@
 								<div class="col-md-2 mb-1" align="right">
 									<label for="idNombre" class="textBold9pt">Fecha Fin: </label>
 								</div>
-								<div class="col-md-3 mb-1">
+								<div class="col-md-2 mb-1">
 									<input type="text" class="form-control_v2 is-valid" placeholder="dd/MM/yyyy" th:field="${filtro.fechaFin}" required="required"/>
 									<input type="hidden"   th:field="${filtro.codigoEdificacion}" />
 								</div>
-								<div class="col-md-4 mb-1">
+								<div class="col-md-5 mb-1">
 									
 								</div>
 							</div>
-															
+							<div class="row">
+								<div class="col-md-3 mb-1">
+									
+								</div>
+								<div class="col-md-2 mb-1" align="right">
+									<label for="idNombre" class="textBold9pt">Nombre Raz&oacute;n Social: </label>
+								</div>
+								<div class="col-md-4 mb-1">
+									<input type="text" class="form-control_v2 is-valid" placeholder="Nombre del Cliente" th:field="${filtro.razonSocial}" />
+								</div>
+								<div class="col-md-3 mb-1">
+									
+								</div>
+							</div>									
 					</fieldset>
 					<br></br>
 					<div class="container_v4" align="center">
@@ -78,8 +90,9 @@
 								<td th:text="${resultado.descripcion}">descripcion</td>
 								<td th:text="${resultado.totalRegistro}">totalRegistro</td>
 								<td align="center"><a
-									th:href="${'/ingresoegresosxls/excel/' }"><img
-										th:src="@{/images/iconos/excel_icon.png}" alt="Descargar PDF"  width="35px"/></a></td>
+									th:href="${'/operacion/remision/reporte/guia/consignacionxls' }"><img
+										th:src="@{/images/iconos/excel.png}" alt="Descargar Excel"  width="35px"/></a></td>
+								
 							</tr>
 						</table>
 					</div>

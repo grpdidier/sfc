@@ -413,11 +413,11 @@ public class GuiaRemisionPdf {
 	            tableFirmas.addCell(this.getDatoCeldaNoBorde(entidad.getRazonSocial(), headFont8, Element.ALIGN_CENTER,tamanioAltura));
 	            tableFirmas.addCell(this.getDatoCeldaNoBorde("Conformidad del Cliente", headFont8, Element.ALIGN_CENTER,tamanioAltura));
 	            tableFirmas.addCell(this.getDatoCeldaNoBorde(" ", headFont8, Element.ALIGN_CENTER,tamanioAltura));
-	            tableFirmas.addCell(this.getDatoCeldaNoBorde(" ", headFont8, Element.ALIGN_CENTER,tamanioAltura));
-	            tableFirmas.addCell(this.getDatoCeldaNoBorde(" ", headFont8, Element.ALIGN_CENTER,tamanioAltura));
+	            /*tableFirmas.addCell(this.getDatoCeldaNoBorde(" ", headFont8, Element.ALIGN_CENTER,tamanioAltura));
+	            /*tableFirmas.addCell(this.getDatoCeldaNoBorde(" ", headFont8, Element.ALIGN_CENTER,tamanioAltura));
 	            tableFirmas.addCell(this.getDatoCeldaNoBorde("___________________________________", headFont8, Element.ALIGN_CENTER,tamanioAltura));
 	            tableFirmas.addCell(this.getDatoCeldaNoBorde(" ", headFont8, Element.ALIGN_CENTER,tamanioAltura));
-	            tableFirmas.addCell(this.getDatoCeldaNoBorde("Sr(a) (ta)", headFont8, Element.ALIGN_CENTER,tamanioAltura));
+	            tableFirmas.addCell(this.getDatoCeldaNoBorde("Sr(a) (ta)", headFont8, Element.ALIGN_CENTER,tamanioAltura));*/
 	           
 	            datoCell = new PdfPCell();
 	            datoCell.setBorder(Rectangle.NO_BORDER);
