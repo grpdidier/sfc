@@ -695,7 +695,7 @@ public class RemisionAction {
 				TblRemision remision = remisionDao.save(entidadOriginal.getRemision());
 				log.debug("[guardarRemision] remision registrado:"+remision.getCodigoRemision());
 				log.debug("[guardarRemision] Lista ComprobanteBean tamaño:"+entidadOriginal.getListaComprobante().size());
-				grabarFacturaAsociadaDetallexComprobante(entidadOriginal, remision,listaProductoSistema,request);
+				grabarFacturaAsociadaDetallexComprobante(entidadOriginal, remision,listaProductoSistema,request, entidad);
 
 				//Actualizar serie
 				incrementarNumeroSerie(request);
@@ -720,11 +720,13 @@ public class RemisionAction {
 		return path;
 	}
 	/*Graba la factura asociada y el detalle de la remision*/
-	private void grabarFacturaAsociadaDetallexComprobante(RemisionBean entidadOriginal,TblRemision remision, List<TblProducto> listaProductoSistema, HttpServletRequest request) {
+	private void grabarFacturaAsociadaDetallexComprobante(RemisionBean entidadOriginal,TblRemision remision, List<TblProducto> listaProductoSistema, HttpServletRequest request,RemisionBean entidadFormulario) {
+		Integer indiceFacturaAsociada = 0;
 		for(ComprobanteBean comprobanteBean: entidadOriginal.getListaComprobante()) {
 			TblFacturaAsociada facturaAsociada = new TblFacturaAsociada();
 			facturaAsociada.setTblRemision(remision);
-			List<TblDetalleRemision> listaDetalleRemision = obtenerDetalleRemision(comprobanteBean.getListaDetalle(), request);
+			List<TblDetalleRemision> listaDetalleRemision = obtenerDetalleRemision(comprobanteBean.getListaDetalle(), request, indiceFacturaAsociada,entidadFormulario);
+			indiceFacturaAsociada = indiceFacturaAsociada + listaDetalleRemision.size();
 			//BigDecimal totalPesoFactura = calcularPesoProductoxFactura(listaDetalleRemision,listaProductoSistema);
 			BigDecimal totalPesoFactura = calcularPesoProductoxFactura(listaDetalleRemision);
 			//BigDecimal totalPesoFactura = entidadOriginal.getTotalPesoGuia();
@@ -1421,20 +1423,20 @@ public class RemisionAction {
 	}
 
 
-	private List<TblDetalleRemision> obtenerDetalleRemision(List<TblDetalleComprobante> listDetalleComprobante, HttpServletRequest request) {
+	private List<TblDetalleRemision> obtenerDetalleRemision(List<TblDetalleComprobante> listDetalleComprobante, HttpServletRequest request, Integer indiceFacturaAsociada, RemisionBean entidadFormulario) {
 		TblDetalleRemision detRemision = null;
-		RemisionBean entidadOriginal = (RemisionBean)request.getSession().getAttribute("guiaRemisionSession");
-		int indice = 0;
+		RemisionBean entidadOriginal = entidadFormulario;//(RemisionBean)request.getSession().getAttribute("guiaRemisionSession");
+		//int indice = 0;
 		List<FacturaAsociadaBean> listaFacturaAsociada = entidadOriginal.getListaFacturaAsociada();
 		
 		List<TblDetalleRemision> listaDetalleRemision = new ArrayList<>();
 		for(TblDetalleComprobante detComprobante:listDetalleComprobante) {
 			if (detComprobante.getCantidad().compareTo(new BigDecimal("0"))>0) {
 				detRemision = new TblDetalleRemision();
-				detRemision.setDescripcion(listaFacturaAsociada.get(indice).getDescripcion());
+				detRemision.setDescripcion(listaFacturaAsociada.get(indiceFacturaAsociada).getDescripcion());
 				//detRemision.setDescripcion(detComprobante.getDescripcion());
-				log.info("[obtenerDetalleRemision] Antes:"+detComprobante.getDescripcion()+ " Ahora:"+listaFacturaAsociada.get(indice).getDescripcion());
-				indice++;
+				log.info("[obtenerDetalleRemision] Antes:"+detComprobante.getDescripcion()+ " Ahora:"+listaFacturaAsociada.get(indiceFacturaAsociada).getDescripcion());
+				indiceFacturaAsociada++;
 				detRemision.setCantidad(detComprobante.getCantidad());
 				detRemision.setPeso(detComprobante.getValorReferencia());
 				detRemision.setUnidadMedida(detComprobante.getUnidadMedida());

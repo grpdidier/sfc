@@ -147,10 +147,12 @@ public class ClienteAction extends BaseOperacionPresentacion<TblCliente> {
 	 * @return
 	 */
 	@RequestMapping(value = "cliente/editar/{id}", method = RequestMethod.GET)
-	public String editarEdificio(@PathVariable Integer id, Model model) {
+	public String editarEdificio(@PathVariable Integer id, Model model, HttpServletRequest request) {
 		TblCliente entidad 			= null;
 		try{
 			entidad = clienteDao.findOne(id);
+			asignarMapCargaDepartamento(request, entidad);
+			asignarMapCargarDistrito(request, entidad);
 			model.addAttribute("entidad", entidad);
 		}catch(Exception e){
 			e.printStackTrace();
