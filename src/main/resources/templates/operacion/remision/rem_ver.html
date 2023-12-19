@@ -48,6 +48,12 @@
 									<label for="idNombre" class="textBold9pt">Fecha Inicio de Traslado</label>
 									<input type="text" class="form-control_v2 is-valid" placeholder="dd/MM/yyyy" th:field="${entidad.remision.fechaInicioTraslado}" disabled="disabled"  style="background-color: #ECECEC;"/>
 								</div>
+								<div class="col-md-1 mb-0" >
+									<a	th:href="${'/operacion/remision/pdf/' + entidad.remision.codigoRemision}">
+										<img th:src="@{/images/iconos/doc_pdf.png}" alt="pdf" width="35px"/>
+									</a>
+								</div>
+								
 							</div>
 							<div class="row">
 								<div class="col-md-3 mb-2">
