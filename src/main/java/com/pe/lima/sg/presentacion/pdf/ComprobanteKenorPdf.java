@@ -9,7 +9,9 @@ import java.net.MalformedURLException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
@@ -143,7 +145,8 @@ public class ComprobanteKenorPdf {
 	            tableCliente.addCell(this.getDatoCeldaNoBorde("Forma de Pago", headFonBoldt10, Element.ALIGN_LEFT,20));
 	            tableCliente.addCell(this.getDatoCeldaNoBorde(": "+ this.getFormaPago(entidad), headFont10, Element.ALIGN_LEFT, 20));
 	            
-	            
+	            //Adicionar Lista de Guias si tuviera
+	            adicionarNumeroGuiaRemision(tableCliente, entidad.getListaDetalle());
 	            datoCell = new PdfPCell();
 	            datoCell.setBorder(Rectangle.NO_BORDER);
 	            datoCell.addElement(tableCliente);
@@ -298,7 +301,37 @@ public class ComprobanteKenorPdf {
 	        return new ByteArrayInputStream(out.toByteArray());
 	    }
 	 
-	 /*Obtiene la forma de pago*/
+	 private void adicionarNumeroGuiaRemision(PdfPTable tableCliente, List<TblDetalleComprobante> listaDetalle) {
+		 String numerosGuiaRemision = "";
+		 Font headFonBoldt10 = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10);
+		 Font headFont10 = FontFactory.getFont(FontFactory.HELVETICA, 10);
+		 Map<String, String> mapGuia = new HashMap<>();
+		 for(TblDetalleComprobante detalle: listaDetalle){
+			 if (detalle.getSerieNumeroRemision()!=null && !detalle.getSerieNumeroRemision().isEmpty()) {
+				 mapGuia.put(detalle.getSerieNumeroRemision(), detalle.getSerieNumeroRemision());
+			 }
+		 }
+		 if (mapGuia.size()>0) {
+			 for (Map.Entry<String, String> entry : mapGuia.entrySet()) {
+		            String clave = entry.getKey();
+		            String valor = entry.getValue();
+		            System.out.println("Clave: " + clave + ", Valor: " + valor);
+		            if (numerosGuiaRemision.equals("")) {
+		            	numerosGuiaRemision = numerosGuiaRemision + valor;
+		            }else {
+		            	numerosGuiaRemision = numerosGuiaRemision +" , "+ valor;
+		            }
+		            
+		        }
+			 //Numero de guias de remision
+	         tableCliente.addCell(this.getDatoCeldaNoBorde("Guia(s) de Remision", headFonBoldt10, Element.ALIGN_LEFT,20));
+	         tableCliente.addCell(this.getDatoCeldaNoBorde(": "+ numerosGuiaRemision, headFont10, Element.ALIGN_LEFT, 20));
+	        
+		 }
+		
+	}
+
+	/*Obtiene la forma de pago*/
 	 public String getFormaPago(Filtro entidad){
 		 String formaPago = "Contado";
 		 if (entidad != null && entidad.getFormaPago()!=null && entidad.getFormaPago().getTipo()!=null){

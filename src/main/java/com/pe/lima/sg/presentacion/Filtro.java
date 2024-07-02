@@ -109,6 +109,8 @@ public class Filtro {
 	//Datos para el transporte
 	private String marca										= null;
 	private String placa										= null;
+	//Factura con guias de remisión
+	private String flagBusquedaGuias							= "N";
 	public Filtro() {
 		// TODO Auto-generated constructor stub
 	}

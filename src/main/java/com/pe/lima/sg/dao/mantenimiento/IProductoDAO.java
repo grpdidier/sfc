@@ -16,4 +16,7 @@ public interface IProductoDAO extends BaseOperacionDAO<TblProducto, Integer> {
 	@Query(value = "select * from mae.tbl_producto where codigo_entidad = :codigoEntidad  AND estado = '1'  ORDER BY nombre", nativeQuery = true)
 	List<TblProducto> listarAllActivos(@Param("codigoEntidad") Integer intCodigoEntidad);
 	
+	@Query(value = "select * from mae.tbl_producto where codigo_entidad = :codigoEntidad  and codigo_empresa = :codigoProducto AND estado = '1'  ORDER BY nombre", nativeQuery = true)
+	List<TblProducto> listarxCodigoProducto(@Param("codigoEntidad") Integer intCodigoEntidad, @Param("codigoProducto") String strCodigoProducto);
+	
 }

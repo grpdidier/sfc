@@ -151,6 +151,7 @@ public class RemisionReporteSaldoMercaderiaDao {
 				"    and com.codigo_entidad = ? " + 
 				"    and upper(com.nombre_cliente) like ? " +
 				"order by 1,2,3";
+		
 				
 		return query;
 	}

@@ -461,5 +461,9 @@ public class Constantes {
 	public static String CONF_11_REMISION_API_TICKET_SUNAT_URL				= "11";
 	public static String CONF_12_REMISION_API_ENVIO_SUNAT_URL				= "12";
 	
+	public static String FACTURA_CON_INGRESO_DE_PRODUCTO					= "FACTURA - CON INGRESO DE PRODUCTO";
+	public static String FACTURA_DE_GUIA_DE_REMISION						= "FACTURA - DE GUIA DE REMISIÓN";
+	
+	
 	
 }

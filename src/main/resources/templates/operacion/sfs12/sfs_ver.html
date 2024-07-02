@@ -182,7 +182,12 @@
 								<th>Val. Ref</th>
 							</tr>
 							<tr th:each="detalleComprobante : ${filtro.listaDetalle}"  class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
-								<td th:text="${detalleComprobante.descripcion}">descripcion</td>
+								<td>
+									<div th:if="${detalleComprobante.serieNumeroRemision != null}">
+									<span th:text="${detalleComprobante.serieNumeroRemision}"></span> 
+									</div>
+									<span th:text="${detalleComprobante.descripcion}"></span>
+								</td>
 								<td th:text="${#numbers.formatDecimal(detalleComprobante.precioUnitario, 1, 'DEFAULT', 2, 'DEFAULT')}">precioUnitario</td>
 								<td th:text="${#numbers.formatDecimal(detalleComprobante.cantidad, 1, 'DEFAULT', 2, 'DEFAULT')}">cantidad</td>
 								<td th:text="${#numbers.formatDecimal(detalleComprobante.precioTotal, 1, 'DEFAULT', 2, 'DEFAULT')}">precioTotal</td>

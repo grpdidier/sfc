@@ -43,6 +43,9 @@ public class TblDetalleRemision implements java.io.Serializable {
 	private String codigoProducto;
 	private Integer codigoDetalleComprobante;
 	private BigDecimal peso;
+	private BigDecimal cantidadFacturada;
+	private BigDecimal precioReporte;
+	
 	public TblDetalleRemision() {
 	}
 
@@ -255,5 +258,22 @@ public class TblDetalleRemision implements java.io.Serializable {
 
 	public void setPeso(BigDecimal peso) {
 		this.peso = peso;
+	}
+	@Column(name = "cantidad_facturada", precision = 23, scale = 10)
+	public BigDecimal getCantidadFacturada() {
+		return cantidadFacturada;
+	}
+
+	public void setCantidadFacturada(BigDecimal cantidadFacturada) {
+		this.cantidadFacturada = cantidadFacturada;
+	}
+
+	@Column(name = "precio_reporte", precision = 12, scale = 2)
+	public BigDecimal getPrecioReporte() {
+		return precioReporte;
+	}
+
+	public void setPrecioReporte(BigDecimal precioReporte) {
+		this.precioReporte = precioReporte;
 	}
 }

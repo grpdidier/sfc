@@ -188,8 +188,14 @@ public class OperacionUtil {
 				detalle.setTribBaseImponibleIgv(detalle.getValorReferencia().multiply(detalle.getCantidad()));
 			}else{
 				detalle.setValorVentaItem(detalle.getTribBaseImponibleIgv());
-				detalle.setValorUnitario(detalle.getTribBaseImponibleIgv().divide(detalle.getCantidad(), 4, RoundingMode.HALF_UP).setScale(4, RoundingMode.HALF_UP));
-				detalle.setPrecioVentaUnitario(detalle.getTribBaseImponibleIgv().add(detalle.getSumTributosItem()).divide(detalle.getCantidad(), 4, RoundingMode.HALF_UP).setScale(4, RoundingMode.HALF_UP));
+				if (detalle.getCantidad().compareTo(new BigDecimal("0"))==0) {
+					detalle.setValorUnitario(new BigDecimal("0"));
+					detalle.setPrecioVentaUnitario(new BigDecimal("0"));
+				}else {
+					detalle.setValorUnitario(detalle.getTribBaseImponibleIgv().divide(detalle.getCantidad(), 4, RoundingMode.HALF_UP).setScale(4, RoundingMode.HALF_UP));
+					detalle.setPrecioVentaUnitario(detalle.getTribBaseImponibleIgv().add(detalle.getSumTributosItem()).divide(detalle.getCantidad(), 4, RoundingMode.HALF_UP).setScale(4, RoundingMode.HALF_UP));
+					
+				}
 				detalle.setValorReferencialUnitario(new BigDecimal("0"));
 			}
 			/*Asignamos dos decimales*/

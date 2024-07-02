@@ -20,5 +20,13 @@ public class FacturaAsociadaBean {
 	private BigDecimal  peso;
 	//para validar al cliente
 	private String numeroCliente;
+	//para buscar los datos del producto
+	private String codigoProducto;
+	private BigDecimal cantidadFacturada;
+	//para la generacion de factura con guia de remision
+	private String serieRemision;
+	private String numeroRemision;
+	private Integer codigoDetalleRemision;
+	private Integer codigoRemision;
 	
 }

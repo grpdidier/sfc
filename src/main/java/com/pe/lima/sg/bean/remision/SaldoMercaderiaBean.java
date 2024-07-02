@@ -19,5 +19,9 @@ public class SaldoMercaderiaBean {
 	private String codigoProducto;
 	private String nombreProducto;
 	private BigDecimal saldo;
+	//Datos adicionales para Reporte de movimientos de guias de remision a consiganción
+	private BigDecimal cantidad;
+	private BigDecimal precio;
+	private BigDecimal total;
 
 }

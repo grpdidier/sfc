@@ -52,7 +52,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.pe.lima.sg.bean.facturador.BandejaFacturadorBean;
 import com.pe.lima.sg.bean.facturador.ParametroFacturadorBean;
-import com.pe.lima.sg.bean.remision.RemisionBean;
+import com.pe.lima.sg.bean.remision.FacturaAsociadaBean;
 import com.pe.lima.sg.dao.BaseOperacionDAO;
 import com.pe.lima.sg.dao.mantenimiento.ICatalogoDAO;
 import com.pe.lima.sg.dao.mantenimiento.IClienteDAO;
@@ -63,8 +63,11 @@ import com.pe.lima.sg.dao.operacion.IBandejaFacturadorDAO;
 import com.pe.lima.sg.dao.operacion.IComprobanteDAO;
 import com.pe.lima.sg.dao.operacion.IDetalleComprobanteDAO;
 import com.pe.lima.sg.dao.operacion.IDetalleFormaPagoDAO;
+import com.pe.lima.sg.dao.operacion.IDetalleRemisionDAO;
+import com.pe.lima.sg.dao.operacion.IFacturaAsociadaDAO;
 import com.pe.lima.sg.dao.operacion.IFormaPagoDAO;
 import com.pe.lima.sg.dao.operacion.ILeyendaDAO;
+import com.pe.lima.sg.dao.operacion.IRemisionDAO;
 import com.pe.lima.sg.dao.operacion.ISunatCabeceraDAO;
 import com.pe.lima.sg.dao.operacion.ISunatDetalleDAO;
 import com.pe.lima.sg.dao.operacion.ISunatTributoGeneralDAO;
@@ -81,8 +84,11 @@ import com.pe.lima.sg.entity.operacion.TblBandejaFacturador;
 import com.pe.lima.sg.entity.operacion.TblComprobante;
 import com.pe.lima.sg.entity.operacion.TblDetalleComprobante;
 import com.pe.lima.sg.entity.operacion.TblDetalleFormaPago;
+import com.pe.lima.sg.entity.operacion.TblDetalleRemision;
+import com.pe.lima.sg.entity.operacion.TblFacturaAsociada;
 import com.pe.lima.sg.entity.operacion.TblFormaPago;
 import com.pe.lima.sg.entity.operacion.TblLeyenda;
+import com.pe.lima.sg.entity.operacion.TblRemision;
 import com.pe.lima.sg.entity.seguridad.TblUsuario;
 import com.pe.lima.sg.entity.operacion.TblSunatCabecera;
 import com.pe.lima.sg.entity.operacion.TblSunatDetalle;
@@ -152,6 +158,14 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 	@Autowired
 	private IDetalleFormaPagoDAO detalleFormaPagoDao;
 	
+	@Autowired
+	private IRemisionDAO remisionDao;
+	
+	@Autowired
+	private IFacturaAsociadaDAO facturaAsociadaDao;
+	
+	@Autowired
+	private IDetalleRemisionDAO detalleRemisionDao;
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ComprobanteSfs12Action.class);
 
@@ -264,39 +278,77 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 
 
 	/**
+	 * Se encarga de direccionar a la pantalla de tipo de Comprobante
+	 * 
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "operacion/sfs12/nuevo", method = RequestMethod.GET)
+	public String crearComprobante(Model model, HttpServletRequest request) {
+		Filtro filtro 							= null;
+		try{
+			LOGGER.debug("[crearComprobante] Inicio");
+			filtro = new Filtro();
+			model.addAttribute("filtro", filtro);
+			
+			LOGGER.debug("[crearComprobante] Fin");
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			filtro 				= null;
+		}
+		return "operacion/sfs12/sfs_tipo";
+	}
+	/**
 	 * Se encarga de direccionar a la pantalla de creacion del Comprobante
 	 * 
 	 * @param model
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "operacion/sfs12/nuevo", method = RequestMethod.GET)
-	public String crearComprobante(Model model, HttpServletRequest request) {
-		Filtro filtro 							= null;
-		Map<String, TblParametro> mapParametro	= null;
-		//TblParametro parametro =null;
+	@RequestMapping(value = "operacion/sfs12/nuevo/tipo", method = RequestMethod.POST)
+	public String crearPorTipoComprobante(Model model, Filtro entidad, HttpServletRequest request) {
+		Filtro filtro 							= new Filtro();
+		String path 							= "";
 		
 		try{
 			LOGGER.debug("[crearComprobante] Inicio");
-			filtro = new Filtro();
-			mapParametro = (Map<String, TblParametro>)request.getSession().getAttribute("SessionMapParametroSistema");
-			OperacionUtil.asignarParametros(filtro, mapParametro,request);
-			this.obtenerSerie(filtro, request);
-			this.inicializaDatosComprobante(filtro);
-			//Inicializamos el filtro
-			inicializaFiltroFormaPago(filtro,request);
-			model.addAttribute("filtro", filtro);
-			request.getSession().setAttribute("listaDetalleSession", new ArrayList<TblDetalleComprobante>());
+			if (entidad.getTipoComprobante().equals(Constantes.FACTURA_CON_INGRESO_DE_PRODUCTO)) {
+				InicializarParametrosFactura(request,filtro);
+				model.addAttribute("filtro", filtro);
+				request.getSession().setAttribute("listaDetalleSession", new ArrayList<TblDetalleComprobante>());
+				path = "operacion/sfs12/sfs_nuevo";
+			}else if (entidad.getTipoComprobante().equals(Constantes.FACTURA_DE_GUIA_DE_REMISION)) {
+				InicializarParametrosFactura(request,filtro);
+				model.addAttribute("filtro", filtro);
+				request.getSession().setAttribute("listaDetalleSession", new ArrayList<TblDetalleComprobante>());
+				path = "operacion/sfs12/sfs_gre_nuevo";
+			}else {
+				path = "operacion/sfs12/sfs_tipo";
+				model.addAttribute("respuesta", "Seleccionar una opción valida");
+			}
+			
 			LOGGER.debug("[crearComprobante] Fin");
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			mapParametro			= null;
 			filtro 				= null;
 		}
-		return "operacion/sfs12/sfs_nuevo";
+		return path;
 	}
 	
+	@SuppressWarnings("unchecked")
+	private void InicializarParametrosFactura(HttpServletRequest request, Filtro filtro) {
+		Map<String, TblParametro> mapParametro	= null;
+		mapParametro = (Map<String, TblParametro>)request.getSession().getAttribute("SessionMapParametroSistema");
+		OperacionUtil.asignarParametros(filtro, mapParametro,request);
+		this.obtenerSerie(filtro, request);
+		this.inicializaDatosComprobante(filtro);
+		//Inicializamos el filtro
+		inicializaFiltroFormaPago(filtro,request);
+		
+	}
+
+
 	/*Obtiene las series*/
 	public void obtenerSerie(Filtro filtro , HttpServletRequest request){
 		Integer codigoEntidad 					= null;
@@ -808,6 +860,275 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 		return path;
 
 	}
+	
+	/**
+	 * Se encarga de guardar la informacion del Comprobante
+	 * 
+	 * @param comprobanteBean
+	 * @param request
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "operacion/sfs12/nuevo/guardar/Gre", method = RequestMethod.POST)
+	public String guardarEntidadGuiaRemision(Model model, Filtro entidad, HttpServletRequest request) {
+		String path = "operacion/sfs12/sfs_listado";
+		boolean exitoso 						= false;
+		TblComprobante comprobante				= null;
+		TblSunatCabecera cabecera				= null;
+		TblSunatDetalle detalleSunat			= null;
+		List<TblSunatDetalle> listaDetalle		= new ArrayList<TblSunatDetalle>();
+		List<TblDetalleComprobante> listaDetComp = null;
+		List<TblSunatTributoGeneral> listaTriSunat = new ArrayList<>();
+		TblSunatTributoGeneral tributoSunat		= null;
+		String nombreLeyendaFile				= "";
+		TblTributoGeneral tributoIgv			= new TblTributoGeneral();
+		TblTributoGeneral tributoExo			= new TblTributoGeneral();
+		TblTributoGeneral tributoIna			= new TblTributoGeneral();
+		TblTributoGeneral tributoGra			= new TblTributoGeneral();
+		ArrayList<TblDetalleFormaPago> listaDetalleFormaPago = null;
+		Map<Integer, Integer> mapFacturaAsociada = new HashMap<>();
+		try{
+			LOGGER.debug("[guardarEntidad] Inicio" );
+			listaDetComp  = (ArrayList<TblDetalleComprobante>)request.getSession().getAttribute("listaDetalleSession");
+			listaDetalleFormaPago = (ArrayList<TblDetalleFormaPago>)request.getSession().getAttribute("listaDetalleFormaPagoSession");
+			entidad.setListaDetalle(listaDetComp);
+			entidad.setListaDetalleFormaPago(listaDetalleFormaPago);
+			
+			entidad.setListaTributo(new ArrayList<>());
+			entidad.getComprobante().setFechaEmision( UtilSGT.getDateStringFormat(UtilSGT.getDatetoString(entidad.getFechaEmision())) );
+			entidad.getComprobante().setHoraEmision(entidad.getHoraEmision());
+			if (entidad.getFechaVencimiento()!=null && !entidad.getFechaVencimiento().equals("")){
+				entidad.getComprobante().setFechaVencimiento(UtilSGT.getDateStringFormat(UtilSGT.getDatetoString(entidad.getFechaVencimiento())));
+			}else{
+				entidad.getComprobante().setFechaVencimiento("");
+			}
+			
+			if (this.validarNegocioListado(model, entidad, request)){
+				LOGGER.debug("[guardarEntidad] Pre Guardar..." );
+				OperacionUtil.calculoDetalleComprobante(entidad);
+				OperacionUtil.calculoCabeceraComprobante(entidad);
+				OperacionUtil.setDatosComprobanteSFS12(entidad);
+				OperacionUtil.setDatosDetalleComprobanteSFS12(entidad);
+				OperacionUtil.setDatosTributosComprobanteSFS12(entidad, tributoIgv, tributoExo, tributoIna, tributoGra);
+				this.preGuardarListado(entidad, request);
+				this.preGuardarFormaPago(entidad, request, listaDetalleFormaPago);
+				this.preGuardarLeyenda(entidad.getLeyendaSunat(), request);
+				this.preGuardarListadoTributos(entidad, request);
+				entidad.getComprobante().setCodigoVerificacion(UUID.randomUUID().toString());
+
+				//Guardar el comprobante
+				exitoso = super.guardar(entidad.getComprobante(), model);
+				//Buscar Comprobante
+				if (exitoso){
+					this.actualizarSerie(entidad.getComprobante().getTipoComprobante(), entidad.getComprobante().getSerie(), entidad.getComprobante().getNumero(), entidad.getComprobante().getTblEmpresa().getCodigoEntidad(), request);
+					comprobante = comprobanteDao.obtenerComprobante(entidad.getComprobante().getCodigoVerificacion());
+					for(TblDetalleComprobante detalle: entidad.getListaDetalle()){
+						LOGGER.debug("[guardarEntidad] SerieNumeroRemision:" +detalle.getSerieNumeroRemision());
+						detalle.setTblComprobante(comprobante);
+						detalleComprobanteDao.save(detalle);
+						exitoso = true;
+						//actualizar la cantidad en la remision
+						TblDetalleRemision detalleRemision = actualizarCantidadRemision(detalle,request);
+						if (detalleRemision!= null) {
+							mapFacturaAsociada.put(detalleRemision.getTblFacturaAsociada().getTblRemision().getCodigoRemision(), detalleRemision.getTblFacturaAsociada().getTblRemision().getCodigoRemision());
+						}
+					}
+					//Si se completo todos los productos de la guia se activa el flag para no ser mostrado en la lista
+					actualizarFlagCantidadProductoGuiaRemision(mapFacturaAsociada,request);
+					//registro de los tributos
+					for(TblTributoGeneral detalle: entidad.getListaTributo()){
+						detalle.setTblComprobante(comprobante);
+						detalle.setCodigoComprobante(comprobante.getCodigoComprobante());
+						tributoGeneralDAO.save(detalle);
+						exitoso = true;
+					}
+					//Leyenda
+					if(exitoso){
+						nombreLeyendaFile = Constantes.SUNAT_RUC_EMISOR+"-"+comprobante.getTipoComprobante()+"-"+comprobante.getSerie()+"-"+comprobante.getNumero()+"."+Constantes.SUNAT_ARCHIVO_EXTENSION_LEYENDA;
+						if (entidad.getLeyendaSunat()!=null && !entidad.getLeyendaSunat().getCodigoSunat().equals("")){
+							entidad.getLeyendaSunat().setTblComprobante(comprobante);
+							entidad.getLeyendaSunat().setNombreArchivo(entidad.getRuc()+"-"+comprobante.getTipoComprobante()+"-"+comprobante.getSerie()+"-"+comprobante.getNumero()+"."+Constantes.SUNAT_ARCHIVO_EXTENSION_LEYENDA);
+							leyendaDao.save(entidad.getLeyendaSunat());
+						}
+						exitoso = true;
+					}
+					//Forma de Pago
+					entidad.getFormaPago().setTblComprobante(comprobante);
+					TblFormaPago tblFormaPago = formaPagoDao.save(entidad.getFormaPago());
+					if (entidad.getFormaPago().getTipo().equals(Constantes.FORMA_PAGO_CREDITO)){
+						for(TblDetalleFormaPago detalle: listaDetalleFormaPago){
+							detalle.setTblFormaPago(tblFormaPago);
+							detalleFormaPagoDao.save(detalle);
+						}
+					}
+					LOGGER.debug("[guardarEntidad] Inicio del registro de la cabecera Sunat:"+exitoso);
+					if (exitoso){
+						
+						//Grabar Datos para la sunat
+						cabecera = this.registrarCabeceraSunat(comprobante, request, entidad);
+						LOGGER.debug("[guardarEntidad] cabecera:"+cabecera);
+						if (cabecera !=null){
+							LOGGER.debug("[guardarEntidad] Inicio del registro del detalle sunat.....:");
+							//registro del detalle de la sunat
+							for(TblDetalleComprobante detalle: entidad.getListaDetalle()){
+								LOGGER.debug("[guardarEntidad] Antes del detalle:"+detalle);
+								detalleSunat = this.registrarDetalleSunat(cabecera, comprobante, detalle, request, entidad);
+								LOGGER.debug("[guardarEntidad] Despues del registro.............: "+detalle);
+								if (detalleSunat !=null){
+									exitoso = true;
+									listaDetalle.add(detalleSunat);
+								}else{
+									exitoso = false;
+									break;
+								}
+							}
+							//registro de los tributos para la sunat
+							for(TblTributoGeneral tblTributoGeneral: entidad.getListaTributo()){
+								tributoSunat = this.registroTributoSunat(cabecera, tblTributoGeneral, request, entidad);
+								if (tributoSunat !=null){
+									exitoso = true;
+									listaTriSunat.add(tributoSunat);
+								}else{
+									exitoso = false;
+									break;
+								}
+							}
+
+
+						}
+						LOGGER.debug("[guardarEntidad] Inicio de la generacion de los archivos:"+exitoso);
+						if (exitoso){
+							if (this.generarArchivoCabecera(cabecera, entidad)){
+								if (this.generarArchivoDetalle(listaDetalle, entidad)){
+									if (this.generarArchivoTributo(listaTriSunat, entidad)){
+										if (this.generarArchivoLeyenda(entidad.getLeyendaSunat(),comprobante, nombreLeyendaFile, entidad)){
+											//Generar adicional del detalle
+											/**SE DEBE ANALIZAR LA NECESIDAD DEL ARCHIVO ADICIONAL - SUNAT EN LA VERSION 1.2 MODIFICO EL ARCHIVO POR ELLO SE COMENTA*/
+											/*if (this.generarArchivoAdicionalDetalle(entidad)){
+												model.addAttribute("respuesta", "Se generó el registro exitosamente");
+											}else{
+												model.addAttribute("respuesta", "Se generó un error en la creacion del detalle adicional [gratuita] del archivo SUNAT");
+											}*/
+											//Forma de Pago
+											generarNombreFormaPago(entidad, comprobante);
+											if (this.generarArchivoFormaPago(entidad)){
+												if (entidad.getFormaPago().getTipo().equals(Constantes.FORMA_PAGO_CREDITO)){
+													int contador = 0;
+													for(TblDetalleFormaPago detalle: listaDetalleFormaPago){
+														if (!this.generarArchivoDetalleFormaPago(entidad, detalle,contador)){
+															model.addAttribute("respuesta", "Se generó un error en la creacion del detalle de forma de pago del archivo SUNAT");
+														}
+														contador++;
+													}
+												}
+											}else{
+												model.addAttribute("respuesta", "Se generó un error en la creacion de la forma de pago del archivo SUNAT");
+											}
+											
+										}else{
+											model.addAttribute("respuesta", "Se generó un error en la creacion de la leyenda del archivo SUNAT");
+										}
+									}else{
+										model.addAttribute("respuesta", "Se generó un error en la creacion del tributo en el archivo SUNAT");
+									}
+
+								}else{
+									model.addAttribute("respuesta", "Se generó un error en la creacion del detalle del archivo SUNAT");
+								}
+							}else{
+								model.addAttribute("respuesta", "Se generó un error en el regitro de la cabecera del archivo SUNAT");
+							}
+
+						}else{
+							model.addAttribute("respuesta", "Se generó un error en el regitro del detalle de datos a la SUNAT");
+							path = "operacion/sfs12/sfs_gre_nuevo";
+							model.addAttribute("filtro", entidad);
+						}
+						//Generar Archivo
+						path = "operacion/sfs12/sfs_listado";
+						this.listarComprobante(model, entidad,new PageableSG(), this.urlPaginado, request);
+					}else{
+						path = "operacion/sfs12/sfs_gre_nuevo";
+						model.addAttribute("filtro", entidad);
+					}
+				}
+
+
+			}else{
+				path = "operacion/sfs12/sfs_gre_nuevo";
+				model.addAttribute("filtro", entidad);
+			}
+
+			LOGGER.debug("[guardarEntidad] Fin" );
+		}catch(Exception e){
+			e.printStackTrace();
+			model.addAttribute("respuesta", "Se generó un error :"+e.getMessage());
+		}finally{
+			comprobante				= null;
+		}
+		return path;
+
+	}
+	private void actualizarFlagCantidadProductoGuiaRemision(Map<Integer, Integer> mapFacturaAsociada,HttpServletRequest request) {
+		TblRemision remision 							= null;
+		List<TblFacturaAsociada> listaFacturaAsociada 	= null;
+		List<TblDetalleRemision> listaDetRemision		= null;
+		boolean flagOkCantidad							= true;
+		if (mapFacturaAsociada != null && mapFacturaAsociada.size()>0) {
+			for (Map.Entry<Integer, Integer> entry : mapFacturaAsociada.entrySet()) {
+				Integer codigoGuiaRemision = entry.getKey();
+				LOGGER.debug("[actualizarFlagCantidadProductoGuiaRemision] codigoGuiaRemision: " + codigoGuiaRemision);
+	            remision = remisionDao.findOne(codigoGuiaRemision);
+	    		listaFacturaAsociada = facturaAsociadaDao.findAllxIdRemision(remision.getCodigoRemision());
+	    		flagOkCantidad	= true;
+	    		if (listaFacturaAsociada!=null) {
+
+	    			for(TblFacturaAsociada factura: listaFacturaAsociada) {
+	    				listaDetRemision = detalleRemisionDao.findAllxIdFacturaAsociada(factura.getCodigoFacturaAsociada());
+	    				for(TblDetalleRemision detRemision: listaDetRemision) {
+	    					if (detRemision.getCantidad().compareTo(detRemision.getCantidadFacturada()==null?new BigDecimal("0"):detRemision.getCantidadFacturada())!=0) {
+	    						flagOkCantidad	= false;
+	    						LOGGER.debug("[actualizarFlagCantidadProductoGuiaRemision] cantidad: " + detRemision.getCantidad() + " - cantidadFacturada: "+detRemision.getCantidadFacturada());
+	    						break;
+	    					}
+	    				}
+	    				if (!flagOkCantidad) {
+	    					break;
+	    				}
+	    			}
+	    			if (flagOkCantidad) {
+	    				remision.setFlagFacturaOk(Constantes.ESTADO_ACTIVO);
+	    				remision.setAuditoriaModificacion(request);
+	    				remisionDao.save(remision);
+	    			}
+	    		}
+	            
+	        }
+		}
+		
+	}
+
+
+	/*Actualizar las cantidades de los productos en la guia de remision*/
+	private TblDetalleRemision actualizarCantidadRemision(TblDetalleComprobante detalle,HttpServletRequest request) {
+		LOGGER.debug("[actualizarCantidadRemision] Inicio" );
+		LOGGER.debug("[actualizarCantidadRemision] Codigo y Serie:" +detalle.getCodigoDetalleRemision()+ ":"+ detalle.getSerieNumeroRemision());
+		TblDetalleRemision detalleRemision = detalleRemisionDao.findOne(detalle.getCodigoDetalleRemision());
+		if (detalleRemision!= null && detalleRemision.getCantidadFacturada()!= null) {
+			detalleRemision.setCantidadFacturada(detalleRemision.getCantidadFacturada().add(detalle.getCantidad()));
+			detalleRemision.setAuditoriaModificacion(request);
+			detalleRemisionDao.save(detalleRemision);
+		}else if (detalleRemision!= null && detalleRemision.getCantidadFacturada() == null) {
+			detalleRemision.setCantidadFacturada(detalle.getCantidad());
+			detalleRemision.setAuditoriaModificacion(request);
+			detalleRemisionDao.save(detalleRemision);
+		}else {
+			LOGGER.debug("[actualizarCantidadRemision] ERRROR HUSTON HAVE A PROBLEM........." );
+		}
+		LOGGER.debug("[actualizarCantidadRemision] Fin" );
+		return detalleRemision;
+	}
+
 
 	/*
 	 * Registro de los datos de la cabecera para la sunat
@@ -1319,6 +1640,7 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 		String FILENAME = null;//Constantes.SUNAT_FACTURADOR_RUTA_PRUEBA + detalle.getNombreArchivo();
 		/*ICBPER:06.06.2020 Inicio*/
 		ImpuestoBolsa impuestoBolsa = new ImpuestoBolsa();
+		String codigoProducto = null;
 		try{
 			for(TblSunatDetalle detalle:listaDetalle){
 				if (FILENAME == null){
@@ -1330,10 +1652,12 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 				}
 				
 				//impuestoBolsa = new ImpuestoBolsa(detalle.getTribCodTipoTributoIgv());
-				
+				//Valida si existe el código del producto y le asigna el valor que se encuentra en Descripcion
+				codigoProducto = obtenerCodigoProducto(detalle);
 				cadena = detalle.getCodigoUnidad() + Constantes.SUNAT_PIPE +
 						detalle.getCantidad() + Constantes.SUNAT_PIPE +
-						detalle.getCodigoProducto() + Constantes.SUNAT_PIPE +
+						//detalle.getCodigoProducto() + Constantes.SUNAT_PIPE +
+						codigoProducto + Constantes.SUNAT_PIPE +
 						detalle.getCodigoProductoSunat() + Constantes.SUNAT_PIPE +
 						detalle.getDescripcion() + Constantes.SUNAT_PIPE +
 						detalle.getValorUnitario()	+ Constantes.SUNAT_PIPE +
@@ -1388,6 +1712,34 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 		}
 		return resultado;
 	}
+	//Valida si el codigo es null, si es asi lo obtiene de la descripcion
+	private String obtenerCodigoProducto(TblSunatDetalle detalle) {
+		String codigoProducto = null;
+		if (detalle.getCodigoProducto() == null || detalle.getCodigoProducto().isEmpty()) {
+			codigoProducto = obtenerCodigoDeDescripcion(detalle.getDescripcion());
+		}else {
+			codigoProducto = detalle.getCodigoProducto();
+		}
+		return codigoProducto;
+	}
+
+
+	private String obtenerCodigoDeDescripcion(String descripcion) {
+		String codigoProducto = null;
+		if (descripcion != null && !descripcion.isEmpty()) {
+			Integer pos = descripcion.indexOf(":");
+			if (pos >=0) {
+				codigoProducto = descripcion.substring(0, pos);
+			}else {
+				codigoProducto = "--";
+			}
+		}else {
+			codigoProducto = "-";
+		}
+		return codigoProducto;
+	}
+
+
 	/*
 	 * Genera un archivo plano Tributo
 	 */
@@ -1473,6 +1825,136 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 		LOGGER.debug("[adicionarDetalle] Fin");
 		return path;
 	}
+	
+
+	/**
+	 * Se encarga de direccionar a la pantalla de creacion del Comprobante
+	 * 
+	 * @param model
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/operacion/sfs12/guia/seleccionar/Gre/{id}", method = RequestMethod.GET)
+	public String adicionarDetalleGuiaRemision(@PathVariable Integer id, Model model, HttpServletRequest request) {
+		String path = "operacion/sfs12/sfs_gre_nuevo";
+		List<TblDetalleComprobante> listaDetalle = null;
+		Filtro entidad = null;
+		TblDetalleComprobante tblDetalleComprobante = null;
+		try{
+			LOGGER.debug("[adicionarDetalleGuiaRemision] Inicio");
+			listaDetalle = (ArrayList<TblDetalleComprobante>)request.getSession().getAttribute("listaDetalleSession");
+			entidad = (Filtro)request.getSession().getAttribute("filtroSession");
+			persistirDetalleFormaPago(entidad, request);
+			entidad.setListaDetalle(listaDetalle);
+			if (entidad.getListaDetalle()==null){
+				entidad.setListaDetalle(new ArrayList<TblDetalleComprobante>());
+			}
+			//Obtener la lista del detalle de la guia de remision
+			List<FacturaAsociadaBean> listaFacAsoVer = obtenerDetalleGuiaRemision(id);
+			if (listaFacAsoVer!= null) {
+				for(FacturaAsociadaBean facturaAsociadaBean: listaFacAsoVer) {
+					tblDetalleComprobante = obtenerDatosProducto(facturaAsociadaBean, request);
+					if (tblDetalleComprobante.getCantidad().compareTo(new BigDecimal("0"))>0) {
+						entidad.getListaDetalle().add(tblDetalleComprobante);
+						entidad.setDetalleComprobante(tblDetalleComprobante);
+						LOGGER.debug("[adicionarDetalleGuiaRemision] Adicionando:"+facturaAsociadaBean.getDescripcion()+" : "+facturaAsociadaBean.getCantidad());
+						OperacionUtil.calculoDetalleComprobante(entidad);
+						OperacionUtil.calculoCabeceraComprobante(entidad);
+						//Asignamos el monto del importe a la forma de pago
+						asignarMontoFormaPago(entidad);
+					}
+				}
+			}
+			request.getSession().setAttribute("filtroSession", entidad);
+			request.getSession().setAttribute("listaDetalleSession", entidad.getListaDetalle());
+			model.addAttribute("filtro", entidad);
+			LOGGER.debug("[adicionarDetalleGuiaRemision] Fin");
+		}catch(Exception e){
+			LOGGER.debug("[adicionarDetalleGuiaRemision] Error: "+e.getMessage());
+			e.printStackTrace();
+			model.addAttribute("respuesta", "Se produco un Error:"+e.getMessage());
+		}finally{
+			listaDetalle = null;
+		}
+		LOGGER.debug("[adicionarDetalleGuiaRemision] Fin");
+		return path;
+	}
+
+	private TblDetalleComprobante obtenerDatosProducto(FacturaAsociadaBean facturaAsociadaBean, HttpServletRequest request) {
+		TblDetalleComprobante tblDetalleComprobante = null;
+		tblDetalleComprobante = new TblDetalleComprobante();
+		tblDetalleComprobante.setDescripcion(facturaAsociadaBean.getDescripcion());
+		tblDetalleComprobante.setUnidadMedida(facturaAsociadaBean.getUnidadMedida());
+		tblDetalleComprobante.setCantidad(obtenerCantidadAFacturar(facturaAsociadaBean));
+		TblProducto producto = obtenerDatosProducto(facturaAsociadaBean.getCodigoProducto(),request);
+		tblDetalleComprobante.setMoneda(Constantes.SUNAT_TIPO_MONEDA_SOLES);
+		tblDetalleComprobante.setPrecioUnitario(producto.getPrecio());
+		tblDetalleComprobante.setTipoAfectacion(Constantes.SUNAT_AFECTACION_IGV_GRAVADO_OPE_ONEROSO);
+		tblDetalleComprobante.setUnidadMedida(facturaAsociadaBean.getUnidadMedida());
+		tblDetalleComprobante.setSerieNumeroRemision(facturaAsociadaBean.getSerieRemision()+"-"+facturaAsociadaBean.getNumeroRemision());
+		tblDetalleComprobante.setCodigoDetalleRemision(facturaAsociadaBean.getCodigoDetalleRemision());
+		tblDetalleComprobante.setCodigoRemision(facturaAsociadaBean.getCodigoRemision());
+		return tblDetalleComprobante;
+	}
+
+
+	private TblProducto obtenerDatosProducto(String codigoProducto, HttpServletRequest request) {
+		Integer intCodigoEntidad = ((TblUsuario)request.getSession().getAttribute("UsuarioSession") ).getTblEmpresa().getCodigoEntidad() ;
+		List<TblProducto> listaProducto = productoDao.listarxCodigoProducto(intCodigoEntidad, codigoProducto);
+		if (listaProducto != null) {
+			return listaProducto.get(0);
+		}
+		return null;
+	}
+
+
+	private BigDecimal obtenerCantidadAFacturar(FacturaAsociadaBean facturaAsociadaBean) {
+		if (facturaAsociadaBean!=null) {
+			if (facturaAsociadaBean.getCantidadFacturada()!=null) {
+				return facturaAsociadaBean.getCantidad().subtract(facturaAsociadaBean.getCantidadFacturada()).setScale(2, RoundingMode.HALF_UP);
+			}else {
+				return facturaAsociadaBean.getCantidad().setScale(2, RoundingMode.HALF_UP);
+			}
+				
+		}
+		return new BigDecimal("0");
+	}
+
+
+	private List<FacturaAsociadaBean> obtenerDetalleGuiaRemision(Integer id) {
+		TblRemision remision 							= null;
+		List<TblFacturaAsociada> listaFacturaAsociada 	= null;
+		List<FacturaAsociadaBean> listaFacAsoVer		= null;
+		List<TblDetalleRemision> listaDetRemision		= null;
+		FacturaAsociadaBean facturaBean					= null;
+		remision = remisionDao.findOne(id);
+		listaFacturaAsociada = facturaAsociadaDao.findAllxIdRemision(remision.getCodigoRemision());
+		if (listaFacturaAsociada!=null) {
+			listaFacAsoVer = new ArrayList<>();
+			for(TblFacturaAsociada factura: listaFacturaAsociada) {
+				listaDetRemision = detalleRemisionDao.findAllxIdFacturaAsociada(factura.getCodigoFacturaAsociada());
+				for(TblDetalleRemision detRemision: listaDetRemision) {
+					facturaBean = new FacturaAsociadaBean();
+					facturaBean.setSerieRemision(remision.getSerie());
+					facturaBean.setNumeroRemision(remision.getNumero());
+					facturaBean.setCodigoComprobante(factura.getCodigoComprobante());
+					facturaBean.setNombreCliente(remision.getNombreCliente());
+					facturaBean.setDescripcion(detRemision.getDescripcion());
+					facturaBean.setUnidadMedida(Constantes.SUNAT_UNIDAD_MEDIDA);
+					facturaBean.setCantidad(detRemision.getCantidad());
+					facturaBean.setPeso(detRemision.getPeso()==null?new BigDecimal("0"):detRemision.getPeso());
+					facturaBean.setCodigoProducto(detRemision.getCodigoProducto());
+					facturaBean.setCantidadFacturada(detRemision.getCantidadFacturada());
+					facturaBean.setCodigoDetalleRemision(detRemision.getCodigoDetalleRemision());
+					facturaBean.setCodigoRemision(remision.getCodigoRemision());
+					listaFacAsoVer.add(facturaBean);
+				}
+				
+			}
+		}
+		return listaFacAsoVer;
+	}
+	
 
 	/*Asignación de montos en forma de pago*/
 	private void asignarMontoFormaPago(Filtro entidad){
@@ -1485,7 +1967,6 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 	public String editarDetalle(@PathVariable Integer id, Model model, HttpServletRequest request) {
 		Filtro entidad								= null;
 		String path 								= "operacion/sfs12/sfs_edicion_producto";
-		List<TblDetalleComprobante> listaDetalle 	= null;
 		TblDetalleComprobante detalle				= null;
 		try{
 			LOGGER.debug("[editarDetalle] Inicio");
@@ -1505,9 +1986,36 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 			e.printStackTrace();
 			model.addAttribute("respuesta", "Se produco un Error:"+e.getMessage());
 		}finally{
-			listaDetalle = null;
 		}
 		LOGGER.debug("[editarDetalle] Fin");
+		return path;
+	}
+	/*Carga la pantalla de editar  */
+	@RequestMapping(value = "/operacion/sfs12/editar/Gre/{id}", method = RequestMethod.GET)
+	public String editarDetalleGuiaRemision(@PathVariable Integer id, Model model, HttpServletRequest request) {
+		Filtro entidad								= null;
+		String path 								= "operacion/sfs12/sfs_gre_edicion_producto";
+		TblDetalleComprobante detalle				= null;
+		try{
+			LOGGER.debug("[editarDetalleGuiaRemision] Inicio");
+			entidad = (Filtro)request.getSession().getAttribute("filtroSession");
+			//Asignamos el monto del importe a la forma de pago
+			asignarMontoFormaPago(entidad);
+			request.getSession().setAttribute("filtroSession", entidad);
+			request.getSession().setAttribute("listaDetalleSession", entidad.getListaDetalle());
+			detalle = entidad.getListaDetalle().get(id);
+			entidad.setDetalleComprobante(detalle);
+			request.getSession().setAttribute("flagProducto","MODIFICAR");
+			request.getSession().setAttribute("idEdicion", id);
+			model.addAttribute("filtro", entidad);
+			LOGGER.debug("[editarDetalleGuiaRemision] Fin");
+		}catch(Exception e){
+			LOGGER.debug("[editarDetalleGuiaRemision] Error: "+e.getMessage());
+			e.printStackTrace();
+			model.addAttribute("respuesta", "Se produco un Error:"+e.getMessage());
+		}finally{
+		}
+		LOGGER.debug("[editarDetalleGuiaRemision] Fin");
 		return path;
 	}
 	
@@ -1598,6 +2106,50 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 		LOGGER.debug("[traerRegistrosFiltrados] Fin");
 		return path;
 	}
+	/*
+	 * Listado de Clientes para la pantalla de Factura x guia de remision
+	 */
+	@RequestMapping(value = "/operacion/sfs12/clientes/Gre", method = RequestMethod.POST)
+	public String mostrarClientesParaGuiaRemision(Model model, Filtro filtro, String path, HttpServletRequest request) {
+		path = "operacion/sfs12/sfs_gre_cli_listado";
+		try{
+			LOGGER.debug("[mostrarClientesParaGuiaRemision] Inicio");
+			request.getSession().setAttribute("filtroSession", filtro);
+			model.addAttribute("filtro", filtro);
+			LOGGER.debug("[mostrarClientesParaGuiaRemision] Fin");
+		}catch(Exception e){
+			LOGGER.debug("[mostrarClientesParaGuiaRemision] Error: "+e.getMessage());
+			e.printStackTrace();
+			model.addAttribute("respuesta", "Se produco un Error:"+e.getMessage());
+		}finally{
+
+		}
+		LOGGER.debug("[mostrarClientesParaGuiaRemision] Fin");
+		return path;
+	}
+	/*
+	 * Listado de Guias de Remision para la pantalla de Factura x guia de remision
+	 */
+	@RequestMapping(value = "/operacion/sfs12/guias/Gre", method = RequestMethod.POST)
+	public String mostrarGuiaRemision(Model model, Filtro filtro, String path, HttpServletRequest request) {
+		path = "operacion/sfs12/sfs_gre_rem_listado";
+		Filtro filtroRemision = new Filtro();
+		try{
+			LOGGER.debug("[mostrarGuiaRemision] Inicio");
+			request.getSession().setAttribute("filtroSession", filtro);
+			filtroRemision.setRuc(filtro.getComprobante().getNumeroDocumento());			
+			model.addAttribute("filtro", filtroRemision);
+			LOGGER.debug("[mostrarGuiaRemision] Fin");
+		}catch(Exception e){
+			LOGGER.debug("[mostrarGuiaRemision] Error: "+e.getMessage());
+			e.printStackTrace();
+			model.addAttribute("respuesta", "Se produco un Error:"+e.getMessage());
+		}finally{
+
+		}
+		LOGGER.debug("[mostrarGuiaRemision] Fin");
+		return path;
+	}
 	/*** Listado de Cliente ***/
 	private void listarCliente(Model model, Filtro filtro, HttpServletRequest request){
 		List<TblCliente> entidades = new ArrayList<TblCliente>();
@@ -1637,6 +2189,29 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 
 		}
 		LOGGER.debug("[listarClientes] Fin");
+		return path;
+	}
+	/*Busqueda de clientes para la pantalla de factura con guia de remision*/
+	@RequestMapping(value = "/operacion/sfs12/clientes/q/Gre", method = RequestMethod.POST)
+	public String listarClientesConGuiaRemision(Model model, Filtro filtro, String path, HttpServletRequest request) {
+		path = "operacion/sfs12/sfs_gre_cli_listado";
+		try{
+			LOGGER.debug("[listarClientesConGuiaRemision] Inicio");
+			if (validarNegocioCliente(model, filtro)){
+				this.listarCliente(model, filtro, request);
+			}else{
+				model.addAttribute("registros", new ArrayList<TblCliente>());
+			}
+			model.addAttribute("filtro", filtro);
+			LOGGER.debug("[listarClientesConGuiaRemision] Fin");
+		}catch(Exception e){
+			LOGGER.debug("[listarClientesConGuiaRemision] Error: "+e.getMessage());
+			e.printStackTrace();
+			model.addAttribute("respuesta", "Se produco un Error:"+e.getMessage());
+		}finally{
+
+		}
+		LOGGER.debug("[listarClientesConGuiaRemision] Fin");
 		return path;
 	}
 	private boolean validarNegocioCliente(Model model, Filtro filtro) {
@@ -1697,6 +2272,50 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 		return path;
 	}
 	/*
+	 * Asignar Cliente para la Factura con Guia de Remision
+	 */
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/operacion/sfs12/clientes/seleccionar/Gre/{id}", method = RequestMethod.GET)
+	public String asignarClienteGuiaRemisionGet(@PathVariable Integer id, Model model, HttpServletRequest request) {
+		TblCliente cliente 					= null;
+		Filtro filtro						= null;
+		String path							= null;
+		List<TblDetalleComprobante> listaDetalle = null;
+		try{
+			listaDetalle = (ArrayList<TblDetalleComprobante>)request.getSession().getAttribute("listaDetalleSession");
+			LOGGER.debug("[asignarClienteGuiaRemisionGet] Inicio:"+id);
+			cliente = clienteDao.findOne(id);
+			//Se mantiene en Session el contrato hasta retornar
+			filtro = (Filtro) request.getSession().getAttribute("filtroSession");
+			LOGGER.debug("[asignarClienteGuiaRemisionGet] cliente:"+cliente);
+			if (cliente!=null ){
+				filtro.getComprobante().setNombreCliente(cliente.getNombre());
+				filtro.getComprobante().setNumeroDocumento(cliente.getNumeroDocumento());
+				filtro.getComprobante().setTipoDocumento(cliente.getTblCatalogo().getCodigoSunat());
+				filtro.getComprobante().setDireccionCliente(cliente.getDireccion());
+				filtro.setFlagBusquedaGuias(Constantes.ESTADO_ACTIVO);
+			}else{
+				filtro.getComprobante().setNombreCliente("");
+				filtro.getComprobante().setNumeroDocumento("");
+				filtro.getComprobante().setTipoDocumento("");
+				filtro.getComprobante().setDireccionCliente("");
+				filtro.setFlagBusquedaGuias(Constantes.ESTADO_INACTIVO);
+			}
+			filtro.setListaDetalle(listaDetalle);	
+			persistirDetalleFormaPago(filtro, request);
+			model.addAttribute("filtro", filtro);
+			path = "operacion/sfs12/sfs_gre_nuevo";
+			LOGGER.debug("[asignarClienteGuiaRemisionGet] Fin");
+
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			cliente = null;
+			filtro 	= null;
+		}
+		return path;
+	}
+	/*
 	 * Regresa a la pantalla de comprobante
 	 */
 	@SuppressWarnings("unchecked")
@@ -1709,7 +2328,7 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 			filtro = (Filtro) request.getSession().getAttribute("filtroSession");
 			filtro.setListaDetalle(listaDetalle);	
 			persistirDetalleFormaPago(filtro, request);
-			LOGGER.debug("[regresarContrato] oPERACION:"+filtro.getStrOperacion());
+			LOGGER.debug("[regresarContrato] Operacion:"+filtro.getStrOperacion());
 			path = "operacion/sfs12/sfs_nuevo";
 
 			model.addAttribute("filtro", filtro);
@@ -1717,6 +2336,34 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 			LOGGER.debug("[regresarComprobante] Fin");
 		}catch(Exception e){
 			LOGGER.debug("[regresarComprobante] Error:"+e.getMessage());
+			e.printStackTrace();
+		}finally{
+			filtro = null;
+		}
+
+		return path;
+	}
+	/*
+	 * Regresa a la pantalla de comprobante x guia de remision
+	 */
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/operacion/sfs12/regresar/Gre", method = RequestMethod.POST)
+	public String regresarComprobanteConGuiaRemision(Model model, Filtro filtro, String path, HttpServletRequest request) {
+		List<TblDetalleComprobante> listaDetalle = null;
+		try{
+			LOGGER.debug("[regresarComprobanteConGuiaRemision] Inicio");
+			listaDetalle = (ArrayList<TblDetalleComprobante>)request.getSession().getAttribute("listaDetalleSession");
+			filtro = (Filtro) request.getSession().getAttribute("filtroSession");
+			filtro.setListaDetalle(listaDetalle);	
+			persistirDetalleFormaPago(filtro, request);
+			LOGGER.debug("[regresarComprobanteConGuiaRemision] Operacion:"+filtro.getStrOperacion());
+			path = "operacion/sfs12/sfs_gre_nuevo";
+
+			model.addAttribute("filtro", filtro);
+			request.getSession().setAttribute("flagProducto","");
+			LOGGER.debug("[regresarComprobanteConGuiaRemision] Fin");
+		}catch(Exception e){
+			LOGGER.debug("[regresarComprobanteConGuiaRemision] Error:"+e.getMessage());
 			e.printStackTrace();
 		}finally{
 			filtro = null;
@@ -1852,7 +2499,38 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 			model.addAttribute("filtro", filtro);
 			OperacionUtil.calculoDetalleComprobante(filtro);
 			OperacionUtil.calculoCabeceraComprobante(filtro);
+			asignarMontoFormaPago(filtro);
 			path = "operacion/sfs12/sfs_nuevo";
+
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			listaDetalle = null;
+		}
+		return path;
+	}
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/operacion/sfs12/eliminar/Gre/{id}", method = RequestMethod.GET)
+	public String eliminarDetalleGetGuiaRemision(@PathVariable Integer id, Model model, HttpServletRequest request) {
+		Filtro filtro						= null;
+		String path							= null;
+		List<TblDetalleComprobante> listaDetalle = null;
+		try{
+			listaDetalle = (ArrayList<TblDetalleComprobante>)request.getSession().getAttribute("listaDetalleSession");
+			filtro = (Filtro) request.getSession().getAttribute("filtroSession");
+
+			if (listaDetalle!=null && listaDetalle.size()>id){
+				listaDetalle.remove(id.intValue());
+
+			}
+			request.getSession().setAttribute("listaDetalleSession", listaDetalle);
+			filtro.setListaDetalle(listaDetalle);
+			persistirDetalleFormaPago(filtro, request);
+			model.addAttribute("filtro", filtro);
+			OperacionUtil.calculoDetalleComprobante(filtro);
+			OperacionUtil.calculoCabeceraComprobante(filtro);
+			asignarMontoFormaPago(filtro);
+			path = "operacion/sfs12/sfs_gre_nuevo";
 
 		}catch(Exception e){
 			e.printStackTrace();
@@ -2285,7 +2963,7 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 		path = "operacion/sfs12/sfs_nuevo";
 		List<TblDetalleComprobante> listaDetalle = null;
 		try{
-			LOGGER.debug("[adicionarDetalle] Inicio");
+			LOGGER.debug("[asignarLeyenda] Inicio");
 			listaDetalle = (ArrayList<TblDetalleComprobante>)request.getSession().getAttribute("listaDetalleSession");
 			entidad.setListaDetalle(listaDetalle);
 			entidad.getLeyendaSunat().setDescripcionSunat(OperacionUtil.getDescripcionLeyenda(entidad.getLeyendaSunat().getCodigoSunat(), request));
@@ -2293,18 +2971,42 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 			request.getSession().setAttribute("listaDetalleSession", entidad.getListaDetalle());
 			persistirDetalleFormaPago(entidad, request);
 			model.addAttribute("filtro", entidad);
-			LOGGER.debug("[adicionarDetalle] Fin");
+			LOGGER.debug("[asignarLeyenda] Fin");
 		}catch(Exception e){
-			LOGGER.debug("[adicionarDetalle] Error: "+e.getMessage());
+			LOGGER.debug("[asignarLeyenda] Error: "+e.getMessage());
 			e.printStackTrace();
 			model.addAttribute("respuesta", "Se produco un Error:"+e.getMessage());
 		}finally{
 
 		}
-		LOGGER.debug("[adicionarDetalle] Fin");
+		LOGGER.debug("[asignarLeyenda] Fin");
 		return path;
 	}
-	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/operacion/sfs12/leyenda/Gre", method = RequestMethod.POST)
+	public String asignarLeyendaConGuiaRemision(Model model, Filtro entidad, String path, HttpServletRequest request) {
+		path = "operacion/sfs12/sfs_gre_nuevo";
+		List<TblDetalleComprobante> listaDetalle = null;
+		try{
+			LOGGER.debug("[asignarLeyendaConGuiaRemision] Inicio");
+			listaDetalle = (ArrayList<TblDetalleComprobante>)request.getSession().getAttribute("listaDetalleSession");
+			entidad.setListaDetalle(listaDetalle);
+			entidad.getLeyendaSunat().setDescripcionSunat(OperacionUtil.getDescripcionLeyenda(entidad.getLeyendaSunat().getCodigoSunat(), request));
+			request.getSession().setAttribute("filtroSession", entidad);
+			request.getSession().setAttribute("listaDetalleSession", entidad.getListaDetalle());
+			persistirDetalleFormaPago(entidad, request);
+			model.addAttribute("filtro", entidad);
+			LOGGER.debug("[asignarLeyendaConGuiaRemision] Fin");
+		}catch(Exception e){
+			LOGGER.debug("[asignarLeyendaConGuiaRemision] Error: "+e.getMessage());
+			e.printStackTrace();
+			model.addAttribute("respuesta", "Se produco un Error:"+e.getMessage());
+		}finally{
+
+		}
+		LOGGER.debug("[asignarLeyendaConGuiaRemision] Fin");
+		return path;
+	}
 
 	/**
 	 * Se encarga de la eliminacion fisica del comprobante
@@ -2393,6 +3095,8 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 
 				}
 				if (listaDetEntidad !=null){
+					//Revertimos los descuentos de las cantidades en las remisiones y fuera el caso
+					revertirCantidadEnGuiaRemision(listaDetEntidad,request);
 					for(TblDetalleComprobante detalle: listaDetEntidad){
 						try{
 							detalleComprobanteDao.delete(detalle);
@@ -2425,7 +3129,7 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 					e1.printStackTrace();
 				}
 
-				model.addAttribute("respuesta", "Debe eliminó satisfactoriamente");
+				model.addAttribute("respuesta", "Se eliminó satisfactoriamente");
 			}else{
 				model.addAttribute("respuesta", "La Factura fue generado y aceptado por la SUNAT, no se puede eliminar");
 			}
@@ -2449,6 +3153,33 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 			filtro		= null;
 		}
 		return path;
+	}
+
+
+	private void revertirCantidadEnGuiaRemision(List<TblDetalleComprobante> listaDetEntidad, HttpServletRequest request) {
+		LOGGER.info("[revertirCantidadEnGuiaRemision] Inicio");
+		if (listaDetEntidad!= null) {
+			for(TblDetalleComprobante detalleComprobante : listaDetEntidad) {
+				if (detalleComprobante.getCodigoDetalleRemision() !=null && detalleComprobante.getCodigoDetalleRemision() > 0) {
+					TblDetalleRemision detalleRemision = detalleRemisionDao.findOne(detalleComprobante.getCodigoDetalleRemision());
+					if (detalleRemision != null) {
+						detalleRemision.setAuditoriaModificacion(request);
+						LOGGER.info("[revertirCantidadEnGuiaRemision] CodigoDetalle:"+detalleComprobante.getCodigoDetalleRemision()+ " Cantidad Facturada:"+detalleRemision.getCantidadFacturada()+ " Cantidad a Descontar:"+detalleComprobante.getCantidad());
+						detalleRemision.setCantidadFacturada(detalleRemision.getCantidadFacturada().subtract(detalleComprobante.getCantidad()));
+						detalleRemisionDao.save(detalleRemision);
+						if (detalleComprobante.getCodigoRemision() != null && detalleComprobante.getCodigoRemision()>0) {
+							TblRemision remision = remisionDao.findOne(detalleComprobante.getCodigoRemision());
+							if (remision != null) {
+								remision.setAuditoriaModificacion(request);
+								remision.setFlagFacturaOk(Constantes.ESTADO_INACTIVO);
+								remisionDao.save(remision);
+							}
+						}
+					}
+				}
+			}
+		}
+		LOGGER.info("[revertirCantidadEnGuiaRemision] Fin");
 	}
 
 
@@ -2546,7 +3277,35 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 		LOGGER.debug("[numeroComprobanteSerie] Fin");
 		return path;
 	}
-	
+	@RequestMapping(value = "/operacion/comprobantes/numeroComprobanteSerie/Gre", method = RequestMethod.POST)
+	public String asignarNumeroxSeriexComprobanteParaFactura(Model model, Filtro filtro, String path, HttpServletRequest request) {
+		path = "operacion/sfs12/sfs_gre_nuevo";
+		Integer codigoEntidad 					= null;
+		List<TblSerie> listaSerie 				= null;
+		TblSerie serie							= null;
+		try{
+			LOGGER.debug("[asignarNumeroxSeriexComprobanteParaFactura] Inicio");
+			codigoEntidad = ((TblUsuario)request.getSession().getAttribute("UsuarioSession") ).getTblEmpresa().getCodigoEntidad() ;
+			listaSerie = serieDao.buscarOneByNombre(filtro.getComprobante().getTipoComprobante(), filtro.getComprobante().getSerie(), codigoEntidad);
+			if (listaSerie !=null){
+				serie = listaSerie.get(0);
+				filtro.getComprobante().setNumero(serie.getNumeroComprobante());
+			}
+			persistirDetalleFormaPago(filtro, request);
+			request.getSession().setAttribute("filtroSession", filtro);
+			request.getSession().setAttribute("listaDetalleSession", filtro.getListaDetalle());
+			model.addAttribute("filtro", filtro);
+			LOGGER.debug("[asignarNumeroxSeriexComprobanteParaFactura] Fin");
+		}catch(Exception e){
+			LOGGER.debug("[asignarNumeroxSeriexComprobanteParaFactura] Error: "+e.getMessage());
+			e.printStackTrace();
+			model.addAttribute("respuesta", "Se produco un Error:"+e.getMessage());
+		}finally{
+
+		}
+		LOGGER.debug("[asignarNumeroxSeriexComprobanteParaFactura] Fin");
+		return path;
+	}
 	/*public void sendEmailWithoutTemplating() throws CannotSendEmailException, URISyntaxException, IOException{
 		   final Email email = DefaultEmail.builder()
 		        .from(new InternetAddress("daisy.minchola.m@gmail.com", "Daisy Minchola"))
@@ -2630,6 +3389,43 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 		LOGGER.debug("[adicionarDetalleFormaPago] Fin");
 		return path;
 	}
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/operacion/sfs12/adicionarDetalleFormaPago/Gre", method = RequestMethod.POST)
+	public String adicionarDetalleFormaPagoGuiaRemision(Model model, Filtro entidad, String path, HttpServletRequest request) {
+		path = "operacion/sfs12/sfs_gre_nuevo";
+		TblDetalleFormaPago detalleFormaPago 		= null;
+		String mensajeValidacion 					= null;
+		ArrayList<TblDetalleFormaPago> listaDetalle = null;
+		try{
+			LOGGER.debug("[adicionarDetalleFormaPagoGuiaRemision] Inicio");
+			LOGGER.debug("[adicionarDetalleFormaPagoGuiaRemision] Flag:"+entidad.getFlagMostrarDetalleFormaPago());
+			mensajeValidacion = validarDetalleFormaPago(entidad.getDetalleFormaPago());
+			if (mensajeValidacion.equals("")){
+				listaDetalle = (ArrayList<TblDetalleFormaPago>)request.getSession().getAttribute("listaDetalleFormaPagoSession");
+				detalleFormaPago = new TblDetalleFormaPago();
+				detalleFormaPago.setMoneda(entidad.getDetalleFormaPago().getMoneda());
+				detalleFormaPago.setMonto(entidad.getDetalleFormaPago().getMonto());
+				detalleFormaPago.setFecha(entidad.getDetalleFormaPago().getFecha());
+				listaDetalle.add(detalleFormaPago);
+				request.getSession().setAttribute("listaDetalleFormaPagoSession", listaDetalle);
+				entidad.setListaDetalleFormaPago(listaDetalle);
+			}else{
+				model.addAttribute("respuesta", mensajeValidacion);
+			}
+			persistirDetalle(entidad, request);
+			request.getSession().setAttribute("filtroSession", entidad);
+			request.getSession().setAttribute("listaDetalleSession", entidad.getListaDetalle());
+			model.addAttribute("filtro", entidad);
+			LOGGER.debug("[adicionarDetalleFormaPagoGuiaRemision] Flag:"+entidad.getFlagMostrarDetalleFormaPago());
+			LOGGER.debug("[adicionarDetalleFormaPagoGuiaRemision] Fin");
+		}catch(Exception e){
+			LOGGER.debug("[adicionarDetalleFormaPagoGuiaRemision] Error: "+e.getMessage());
+			e.printStackTrace();
+			model.addAttribute("respuesta", "Se produco un Error:"+e.getMessage());
+		}
+		LOGGER.debug("[adicionarDetalleFormaPagoGuiaRemision] Fin");
+		return path;
+	}
 	/*Valida el detalle de forma de pago*/
 	private String validarDetalleFormaPago(TblDetalleFormaPago detalleFormaPago){
 		String resultado = "";
@@ -2682,7 +3478,40 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 		LOGGER.debug("[mostrarDetalleFormaPago] Fin");
 		return path;
 	}
-	
+	/**
+	 * Muestra el detalle de la forma de pago al Credito para la Factura con Guia de Remision
+	 * 
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/operacion/sfs12/mostrarDetalleFormaPago/Gre", method = RequestMethod.POST)
+	public String mostrarDetalleFormaPagoConGuiaRemision(Model model, Filtro entidad, String path, HttpServletRequest request) {
+		path = "operacion/sfs12/sfs_gre_nuevo";
+		try{
+			LOGGER.debug("[mostrarDetalleFormaPagoConGuiaRemision] Inicio");
+			LOGGER.debug("[mostrarDetalleFormaPagoConGuiaRemision] Flag:"+entidad.getFlagMostrarDetalleFormaPago());
+			if (entidad.getFormaPago().getTipo().equals(Constantes.FORMA_PAGO_CREDITO)){
+				entidad.setFlagMostrarDetalleFormaPago(Constantes.TIPO_SI);
+				entidad.setDetalleFormaPago(new TblDetalleFormaPago());
+				entidad.getDetalleFormaPago().setMoneda(Constantes.SUNAT_TIPO_MONEDA_SOLES);
+			}else{
+				entidad.setFlagMostrarDetalleFormaPago(Constantes.TIPO_NO);
+			}
+			persistirDetalleFormaPago(entidad, request);
+			persistirDetalle(entidad, request);
+			request.getSession().setAttribute("filtroSession", entidad);
+			request.getSession().setAttribute("listaDetalleSession", entidad.getListaDetalle());
+			model.addAttribute("filtro", entidad);
+			LOGGER.debug("[mostrarDetalleFormaPagoConGuiaRemision] Flag:"+entidad.getFlagMostrarDetalleFormaPago());
+			LOGGER.debug("[mostrarDetalleFormaPagoConGuiaRemision] Fin");
+		}catch(Exception e){
+			LOGGER.debug("[mostrarDetalleFormaPagoConGuiaRemision] Error: "+e.getMessage());
+			e.printStackTrace();
+			model.addAttribute("respuesta", "Se produco un Error:"+e.getMessage());
+		}
+		LOGGER.debug("[mostrarDetalleFormaPagoConGuiaRemision] Fin");
+		return path;
+	}
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/operacion/sfs12/eliminarDetalleFormaPago/{id}", method = RequestMethod.GET)
 	public String eliminarDetalleFormaPagoGet(@PathVariable Integer id, Model model, HttpServletRequest request) {
@@ -2764,6 +3593,46 @@ public class ComprobanteSfs12Action extends BaseOperacionPresentacion<TblComprob
 			listaDetalle = null;
 		}
 		LOGGER.debug("[modificarDetalle] Fin");
+		return path;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/operacion/sfs12/modificar/Gre", method = RequestMethod.POST)
+	public String modificarDetalleGuiaRemision(Model model, Filtro entidad, String path, HttpServletRequest request) {
+		path = "operacion/sfs12/sfs_gre_nuevo";
+		List<TblDetalleComprobante> listaDetalle = null;
+		Integer id = null;
+		try{
+			id = (Integer)request.getSession().getAttribute("idEdicion");
+			LOGGER.debug("[modificarDetalleGuiaRemision] Inicio");
+			listaDetalle = (ArrayList<TblDetalleComprobante>)request.getSession().getAttribute("listaDetalleSession");
+			persistirDetalleFormaPago(entidad, request);
+			
+			entidad.setListaDetalle(listaDetalle);
+			//if (this.validarDetalle(model, entidad, request)){
+				LOGGER.debug("[modificarDetalleGuiaRemision] id:"+id);
+				entidad.setListaDetalle(actualizarListaDetalle(entidad, id, listaDetalle));
+				request.getSession().setAttribute("flagProducto","");
+			//}else {
+			//	path = "operacion/sfs12/sfs_edicion_producto";
+			//}
+			OperacionUtil.calculoDetalleComprobante(entidad);
+			OperacionUtil.calculoCabeceraComprobante(entidad);
+			//Asignamos el monto del importe a la forma de pago
+			asignarMontoFormaPago(entidad);
+			request.getSession().setAttribute("filtroSession", entidad);
+			request.getSession().setAttribute("listaDetalleSession", entidad.getListaDetalle());
+
+			model.addAttribute("filtro", entidad);
+			LOGGER.debug("[modificarDetalleGuiaRemision] Fin");
+		}catch(Exception e){
+			LOGGER.debug("[modificarDetalleGuiaRemision] Error: "+e.getMessage());
+			e.printStackTrace();
+			model.addAttribute("respuesta", "Se produco un Error:"+e.getMessage());
+		}finally{
+			listaDetalle = null;
+		}
+		LOGGER.debug("[modificarDetalleGuiaRemision] Fin");
 		return path;
 	}
 	

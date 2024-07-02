@@ -78,6 +78,14 @@ public class GuiaRemisionPdf {
 	            	 
 	            	 tableEmpresa.addCell(cellLogo);
 
+	            }else {
+	            	image = UtilPdfGuiaRemision.generarImagenQR("https://www.sunat.gob.pe/");
+	            	 //image.scaleToFit(90, 90);
+	            	 PdfPCell cellLogo = new PdfPCell(image,false);
+	            	 cellLogo.setBorder(Rectangle.NO_BORDER);
+	            	 cellLogo.setPadding(0);
+	            	 
+	            	 tableEmpresa.addCell(cellLogo);
 	            }
 	            
 	            //Dato de la Empresa

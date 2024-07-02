@@ -364,4 +364,14 @@ public class ListaUtilAction {
 		resultados.put("UNIDAD", "UNIDAD");
 		return resultados;
 	}
+	/**
+	 * Listado de tipos de origen de la factura
+	 * 
+	 */
+	public Map<String, Object> obtenerTipoOrigenFactura() {
+		Map<String, Object> resultados = new LinkedHashMap<String, Object>();
+		resultados.put(Constantes.FACTURA_CON_INGRESO_DE_PRODUCTO, Constantes.FACTURA_CON_INGRESO_DE_PRODUCTO);
+		resultados.put(Constantes.FACTURA_DE_GUIA_DE_REMISION, Constantes.FACTURA_DE_GUIA_DE_REMISION);
+		return resultados;
+	}
 }

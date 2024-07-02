@@ -36,7 +36,28 @@ public final class RemisionSpecifications {
 		};
 	}
 	
+	public static Specification<TblRemision> conNoEstadoOperacionRemision(String strEstado) {
+		return (root, query, cb) -> {
+			return cb.notEqual(root.<String> get("estadoOperacion"), strEstado);
+		};
+	}
 	
+	public static Specification<TblRemision> conNumeroDocumentoCliente(String strNroDocumento) {
+		return (root, query, cb) -> {
+			
+			return cb.equal(root.<String> get("numeroDocumentoCliente"), strNroDocumento);
+		};
+	}
+	public static Specification<TblRemision> conFlagFacturaOkNull() {
+		return (root, query, cb) -> {
+			return cb.isNull(root.<String> get("flagFacturaOk"));
+		};
+	}
+	public static Specification<TblRemision> conFlagFacturaOkSinCompletar() {
+		return (root, query, cb) -> {
+			return cb.equal(root.<String> get("flagFacturaOk"), "N");
+		};
+	}
 	
 	public static Specification<TblRemision> conCodigoEmpresaRemision(Integer intCodigoEmpresa) {
 		return (root, query, cb) -> {

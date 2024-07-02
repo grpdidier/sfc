@@ -74,7 +74,11 @@ public class TblDetalleComprobante implements java.io.Serializable {
 	private BigDecimal valorVentaItem;
 	private BigDecimal valorReferencialUnitario;
 	private BigDecimal valorUnitario;
+	//Adicion para la factura
 	private BigDecimal cantidadGuia;	
+	private Integer codigoDetalleRemision;
+	private String serieNumeroRemision;
+	private Integer codigoRemision;
 
 	public TblDetalleComprobante() {
 	}
@@ -617,5 +621,31 @@ public class TblDetalleComprobante implements java.io.Serializable {
 
 	public void setCantidadGuia(BigDecimal cantidadGuia) {
 		this.cantidadGuia = cantidadGuia;
+	}
+
+	@Column(name = "serie_numero_remision", length = 32)
+	public String getSerieNumeroRemision() {
+		return serieNumeroRemision;
+	}
+
+	public void setSerieNumeroRemision(String serieNumeroRemision) {
+		this.serieNumeroRemision = serieNumeroRemision;
+	}
+	@Column(name = "codigo_detalle_remision")
+	public Integer getCodigoDetalleRemision() {
+		return codigoDetalleRemision;
+	}
+
+	public void setCodigoDetalleRemision(Integer codigoDetalleRemision) {
+		this.codigoDetalleRemision = codigoDetalleRemision;
+	}
+
+	@Column(name = "codigo_remision")
+	public Integer getCodigoRemision() {
+		return codigoRemision;
+	}
+
+	public void setCodigoRemision(Integer codigoRemision) {
+		this.codigoRemision = codigoRemision;
 	}
 }

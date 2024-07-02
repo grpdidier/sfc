@@ -75,6 +75,8 @@ public class TblRemision implements java.io.Serializable {
 	private String ubigeoLlegada;
 	private String numeroRegistroMtc;
 	private String remolque;
+	//Adicionado para la Factura
+	private String flagFacturaOk;
 	
 	private Set<TblFacturaAsociada> tblFacturaAsociadas = new HashSet<>(0);
 
@@ -585,6 +587,14 @@ public class TblRemision implements java.io.Serializable {
 
 	public void setRemolque(String remolque) {
 		this.remolque = remolque;
+	}
+	@Column(name = "flag_factura_ok", length = 1)
+	public String getFlagFacturaOk() {
+		return flagFacturaOk;
+	}
+
+	public void setFlagFacturaOk(String flagFacturaOk) {
+		this.flagFacturaOk = flagFacturaOk;
 	}
 }
 

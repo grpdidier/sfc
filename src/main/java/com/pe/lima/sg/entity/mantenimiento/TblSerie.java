@@ -40,6 +40,7 @@ public class TblSerie implements java.io.Serializable {
 	private String ipModificacion;
 	private String descripcion;
 	private TblEmpresa tblEmpresa;
+	private String tipoOperacion;
 	
 	public TblSerie() {
 	}
@@ -242,5 +243,14 @@ public class TblSerie implements java.io.Serializable {
 
 	public void setTblEmpresa(TblEmpresa tblEmpresa) {
 		this.tblEmpresa = tblEmpresa;
+	}
+
+	@Column(name = "tipo_operacion", length = 16)
+	public String getTipoOperacion() {
+		return tipoOperacion;
+	}
+
+	public void setTipoOperacion(String tipoOperacion) {
+		this.tipoOperacion = tipoOperacion;
 	}
 }

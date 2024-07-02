@@ -462,3 +462,66 @@ function  jsValidarNumerosYPunto(obj){
 	// Establecer el valor numérico en el campo de texto
 	obj.value = valorNumerico;
 }
+/* *********************************************************************************************************************************
+ * MODULO DE FACTURA CON GUIA DE REMISION
+ ********************************************************************************************************************************* */
+
+//Busqueda de Cliente
+function jsListarClienteDocumentoVentaGre(){
+	document.forms[0].action = '/operacion/sfs12/clientes/Gre' ;
+	document.forms[0].method = 'POST';
+	document.forms[0].submit();
+}
+//Regresa a la pantalla de Factura x guia de remision
+function jsRegresarDocumentoVentaGre(){
+	document.forms[0].action = '/operacion/sfs12/regresar/Gre' ;
+	document.forms[0].method = 'POST';
+	document.forms[0].submit();	
+}
+//Busqueda de Guias de remision
+function jsListarGuiasRemisionxCliente(){
+	document.forms[0].action = '/operacion/sfs12/guias/Gre' ;
+	document.forms[0].method = 'POST';
+	document.forms[0].submit();
+}
+function jsBuscarClienteComprobantexNombreGre(e){
+	
+	if (e.keyCode == 13) {
+		document.forms[0].action = '/operacion/sfs12/clientes/q/Gre' ;
+		document.forms[0].method = 'POST';
+		document.forms[0].submit();
+	}
+}
+function jsCargarSerieComprobanteGre(){
+	document.forms[0].action = '/operacion/comprobantes/numeroComprobanteSerie/Gre' ;
+	document.forms[0].method = 'POST';
+	document.forms[0].submit();
+}
+function jsCargarNumeroComprobanteGre(){
+	document.forms[0].action = '/operacion/comprobantes/numeroComprobanteSerie/Gre' ;
+	document.forms[0].method = 'POST';
+	document.forms[0].submit();
+}
+function jsMostrarDetalleFormaPagoGre(obj){
+	document.forms[0].action = '/operacion/sfs12/mostrarDetalleFormaPago/Gre' ;
+	document.forms[0].method = 'POST';
+	document.forms[0].submit();
+}
+function jsCargarLeyendaDescripcionSFS12Gre(){
+	document.forms[0].action = '/operacion/sfs12/leyenda/Gre' ;
+	document.forms[0].method = 'POST';
+	document.forms[0].submit();	
+}
+//Modificación del detalle
+function jsModificarDetalleDocumentoVentaGre(){
+	document.forms[0].action = '/operacion/sfs12/modificar/Gre' ;
+	document.forms[0].method = 'POST';
+	document.forms[0].submit();
+}
+//Adicion del detalle de Forma de Pago
+function jsAdicionarDetalleFormaPagoGre(){
+	document.forms[0].action = '/operacion/sfs12/adicionarDetalleFormaPago/Gre' ;
+	document.forms[0].method = 'POST';
+	document.forms[0].submit();
+}
+

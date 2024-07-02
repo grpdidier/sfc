@@ -2267,17 +2267,18 @@ public class NotaSfs12Action extends BaseOperacionPresentacion<TblNota> {
 	public boolean mValidarDetalleNota(Model model,Filtro filtro){
 		boolean resultado = true;
 		//Precio unitario
-		if (filtro.getDetalleComprobante().getPrecioUnitario() == null || filtro.getDetalleComprobante().getPrecioUnitario().doubleValue()<=0){
+		/*if (filtro.getDetalleComprobante().getPrecioUnitario() == null || filtro.getDetalleComprobante().getPrecioUnitario().doubleValue()<=0){
 			resultado = false;
 			model.addAttribute("respuesta", "Debe ingresar el precio unitario");
 			return resultado;
-		}
+		}*/
 		//cantidad
-		if (filtro.getDetalleComprobante().getCantidad() == null || filtro.getDetalleComprobante().getCantidad().doubleValue()<=0){
+		/*TODO: SE COMENTA TEMPORALMENTE HASTA IMPLEMENTAR EL TIPO DE NOTA: CORRECCIÓN EN DESCRIPCION*/
+		/*if (filtro.getDetalleComprobante().getCantidad() == null || filtro.getDetalleComprobante().getCantidad().doubleValue()<=0){
 			resultado = false;
 			model.addAttribute("respuesta", "Debe ingresar la cantidad");
 			return resultado;
-		}
+		}*/
 		//Descuento
 		if (filtro.getDetalleComprobante().getDescuento() == null || filtro.getDetalleComprobante().getDescuento().doubleValue()<0){
 			resultado = false;

@@ -71,6 +71,7 @@
 								<th>Prefijo</th>
 								<th>Secuencial</th>
 								<th>Numero Comprobante</th>
+								<th>Tipo Operacion</th>
 								<th>Editar</th>
 								<th>Eliminar</th>
 							</tr>
@@ -81,6 +82,7 @@
 								<td th:text="${serie.prefijoSerie}">prefijoSerie</td>
 								<td th:text="${serie.secuencialSerie}">secuencialSerie</td>
 								<td th:text="${serie.numeroComprobante}">numeroComprobante</td>
+								<td th:text="${serie.tipoOperacion}">tipoOperacion</td>
 								<td align="center"><a
 									th:href="${'/serie/editar/' + serie.codigoSerie }"><img
 										th:src="@{/images/iconos/editar.png}" alt="Editar" /></a></td>
@@ -98,11 +100,12 @@
 								<th>Prefijo</th>
 								<th>Secuencial</th>
 								<th>Numero Comprobante</th>
+								<th>Tipo Operacion</th>
 								<th>Editar</th>
 								<th>Eliminar</th>
 							</tr>
 							<tr class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
-								<td colspan="6" align="center">No se encontr&oacute; elementos</td>
+								<td colspan="7" align="center">No se encontr&oacute; elementos</td>
 							</tr>
 						</table>
 					</div>

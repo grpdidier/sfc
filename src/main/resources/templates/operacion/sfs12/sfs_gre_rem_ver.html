@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+<!--/*/ <th:block th:include="fragments/headerinc :: head"></th:block> /*/-->
+</head>
+<body>
+	<!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+	<main>
+		<div id="container">	
+			<div id="actionbar" class="row">
+				<div class="col-md-4 mb-3">
+					<a href="#" th:href="@{/operacion/regresar/Gre}"><img th:src="@{/images/iconos/regresar.png}" alt="Regresar" /></a>
+				</div>
+				<div class="col-md-8 mb-3 tituloPrincipal" align="left" ><br/> M&oacute;dulo de Remisi&oacute;n - Ver - RUC: <label th:text="${entidad.ruc}" style="color: RED"></label></div>
+				
+			</div>
+			
+			<form id="form" th:object="${entidad}" th:action="@{/operacion/remision/nuevo/guardar}" method="post">
+				
+				<div id="informacion" class="container_v3">
+					<p style="color: red" th:text="${respuesta}" /> 
+						<fieldset class="scheduler-border">
+						<legend class="scheduler-border title10pt">Datos de la Gu&iacute;a de Remisi&oacute;n</legend>
+							
+							<div class="row">
+								<div class="col-md-4 mb-0">
+									<label for="idNombre" class="textBold9pt">Motivo de Traslado</label>
+										<select th:field="${entidad.remision.motivoTraslado}" class="form-control_v2 is-valid"  disabled="disabled">
+											<option value="-1">--Seleccionar--</option>
+											<option th:each="entry : ${session.SessionMapMotivoTraslado}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+										</select>
+								</div>
+								<div class="col-md-1 mb-0" >
+									<label for="idNombre" class="textBold9pt">Serie</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="serie" th:field="${entidad.remision.serie}"  disabled="disabled" maxlength="4"  style="background-color: #ECECEC;"/>
+								</div>
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">N&uacute;mero Comprobante</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="numero" th:field="${entidad.remision.numero}"  disabled="disabled" maxlength="8"  style="background-color: #ECECEC;"/>
+								</div>
+								
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">Fecha de Emisi&oacute;n</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="dd/MM/yyyy" th:field="${entidad.remision.fechaEmision}"  disabled="disabled"  style="background-color: #ECECEC;"/>
+								</div>
+								
+								<div class="col-md-2 mb-0">
+									<label for="idNombre" class="textBold9pt">Fecha Inicio de Traslado</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="dd/MM/yyyy" th:field="${entidad.remision.fechaInicioTraslado}" disabled="disabled"  style="background-color: #ECECEC;"/>
+								</div>
+								<div class="col-md-1 mb-0" >
+									
+								</div>
+								
+							</div>
+							<div class="row">
+								<div class="col-md-3 mb-2">
+									<label for="idNombre" class="textBold9pt">Tipo de Comprobante</label>
+									<select th:field="${entidad.remision.tipoComprobante}" class="form-control_v2 is-valid"  disabled="disabled">
+										<option value="-1">--Seleccionar--</option>
+										<option th:each="entry : ${session.SessionMapTipoComprobante}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+									</select>
+								</div>
+								<div class="col-md-9 mb-2">
+									<label for="idNombre" class="textBold9pt">C&oacute;digo Domicilio Partida</label>
+									<select th:field="${entidad.remision.codigoDomicilioPartida}" class="form-control_v2 is-valid"  disabled="disabled">
+										<option value="-1">--Seleccionar--</option>
+										<option th:each="entry : ${session.SessionMapDomicilioPartida}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+									</select>
+									
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-10 mb-2">
+									<label for="idNombre" class="textBold9pt">Domicilio de Llegada</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="domicilio de llegada" th:field="${entidad.remision.domicilioLlegada}"  disabled="disabled" maxlength="256"  style="background-color: #ECECEC;"/>
+									
+								</div>
+								<div class="col-md-2 mb-2">
+									<label for="idNombre" class="textBold9pt">Ubigeo de Llegada</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Codigo Ubigeo" th:field="${entidad.remision.ubigeoLlegada}" disabled="disabled" maxlength="8" style="background-color: #ECECEC;"/>
+									
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-2 mb-2">
+									<label for="idNombre" class="textBold9pt">Ruc Transportista</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="ruc del transportista" th:field="${entidad.remision.numeroDocumentoTransportista}"  disabled="disabled" maxlength="16"  style="background-color: #ECECEC;"/>
+									
+								</div>
+								<div class="col-md-7 mb-2">
+									<label for="idNombre" class="textBold9pt">Nombre Transportista</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="nombre del transportista" th:field="${entidad.remision.nombreTransportista}"  disabled="disabled" maxlength="256"  style="background-color: #ECECEC;"/>
+								</div>
+								<div class="col-md-2 mb-2">
+									<label for="idNombre" class="textBold9pt">Nro Registro MTC</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="numero certificado" th:field="${entidad.remision.numeroRegistroMtc}"  disabled="disabled" maxlength="20"  style="background-color: #ECECEC;"/>
+								</div>
+								<div class="col-md-1 mb-2"></div>
+							</div>
+							
+							<div class="row">
+								<div class="col-md-3 mb-2">
+									<label for="idNombre" class="textBold9pt">Tipo de Transporte</label>
+									<select th:field="${entidad.remision.tipoTransporte}" class="form-control_v2 is-valid" onchange="jsActualizarTipoTransporte()" disabled="disabled">
+										<option value="-1">--Seleccionar--</option>
+										<option th:each="entry : ${session.SessionTipoTransporteGuia}" th:value="${entry.value}" th:text="${entry.key}">opcion</option>
+									</select>
+								</div>
+								<div class="col-md-9 mb-2">
+									<div class="row">
+										<div class="col-md-2 mb-2">
+											<label for="idNombre" class="textBold9pt">Veh&iacute;culo Marca</label>
+											<input type="text" class="form-control_v2 is-valid" placeholder="marca" th:field="${entidad.remision.marca}"  disabled="disabled" maxlength="128"  style="background-color: #ECECEC;"/>
+										</div>
+										<div class="col-md-2 mb-2">
+											<label for="idNombre" class="textBold9pt">Placa</label>
+											<input type="text" class="form-control_v2 is-valid" placeholder="placa" th:field="${entidad.remision.placa}"  disabled="disabled" maxlength="64"  style="background-color: #ECECEC;"/>
+										</div>
+										<div class="col-md-2 mb-2">
+											<label for="idNombre" class="textBold9pt">Placa 2</label>
+											<input type="text" class="form-control_v2 is-valid" placeholder="placa" th:field="${entidad.remision.remolque}"  style="background-color: #ECECEC;" disabled="disabled" />
+										</div>
+										<div class="col-md-3 mb-2">
+											<label for="idNombre" class="textBold9pt">Nro Certificado Inscripci&oacute;n</label>
+											<input type="text" class="form-control_v2 is-valid" placeholder="numero certificado" th:field="${entidad.remision.numeroCertInscripcion}"  disabled="disabled" maxlength="64"  style="background-color: #ECECEC;"/>
+										</div>
+										<div class="col-md-3 mb-2">
+											<label for="idNombre" class="textBold9pt">Nro Licencia de Conducir</label>
+											<input type="text" class="form-control_v2 is-valid" placeholder="numero licencia" th:field="${entidad.remision.numeroLicencia}"  disabled="disabled" maxlength="64"  style="background-color: #ECECEC;"/>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row" th:if="${entidad.remision.tipoTransporte == '02'}">
+								<div class="col-md-2 mb-2">
+									<label for="idNombre" class="textBold9pt">DNI Conductor</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="DNI" th:field="${entidad.remision.numeroDNIConductor}"  maxlength="12" style="background-color: #ECECEC;" disabled="disabled"/>
+								</div>
+								<div class="col-md-5 mb-2">
+									<label for="idNombre" class="textBold9pt">Nombre del Conductor</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Nombre del Conductor" th:field="${entidad.remision.nombreConductor}"  maxlength="64" style="background-color: #ECECEC;" disabled="disabled"/>
+								</div>
+								<div class="col-md-5 mb-2">
+									<label for="idNombre" class="textBold9pt">Apellido del Conductor</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Apellido del Conductor" th:field="${entidad.remision.apellidoConductor}"  maxlength="64" style="background-color: #ECECEC;" disabled="disabled"/>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-10 mb-2">
+									<label for="idNombre" class="textBold9pt">Observaci&oacute;n (Obligatorio cuando el motivo de traslado es OTROS)</label>
+									<input type="text" class="form-control_v2 is-valid" placeholder="Descripcion del motivo de traslado Otros" th:field="${entidad.remision.observacion}"  maxlength="256" style="background-color: #ECECEC;" disabled="disabled"/>
+									
+								</div>
+								<div class="col-md-2 mb-2">
+									
+								</div>
+							</div>
+					</fieldset>
+					
+					<br></br>
+					
+					<div id="c_tablas" th:if="${not #lists.isEmpty(entidad.listaFacturaAsociada)}">	
+						<input type="hidden" th:field="${entidad.indiceElemento}" id="idIndice"/>
+						<table id="t01" class="table   table-bordered table-active tabla_cabecera_general">
+							<tr>
+								<th width="20%">Factura Asociada</th>
+								<th width="25%">Cliente</th>
+								<th width="25%">Descripci&oacute;n Producto</th>
+								<th width="10%">Unidad</th>
+								<th width="10%">Cantidad</th>
+								<th width="10%">Peso (KG)</th>
+							</tr>
+							<tr th:each="detalleComprobante, iterStat : ${entidad.listaFacturaAsociada}"  class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
+								<td th:text="${detalleComprobante.serieFactura + '-' +  detalleComprobante.numeroFactura}">factura</td>
+								<td th:text="${detalleComprobante.nombreCliente}">nombreCliente</td>
+								<td th:text="${detalleComprobante.descripcion}">descripcion</td>
+								<td th:text="${detalleComprobante.unidadMedida}">unidadMedida</td>
+								<td th:text="${#numbers.formatDecimal(detalleComprobante.cantidad, 1, 'DEFAULT', 2, 'DEFAULT')}">cantidad</td>
+								<td th:text="${#numbers.formatDecimal(detalleComprobante.peso, 1, 'DEFAULT', 2, 'DEFAULT')}">cantidad</td>
+								
+							</tr>
+						</table>
+						<table class="table">
+							<tr>
+								<th width="20%"> </th>
+								<th width="25%"> </th>
+								<th width="25%">  </th>
+								<th width="10%"> </th>
+								<th width="10%">Total:</th>
+								<th width="10%" class="campos2">
+									<input type="text" class="form-control_v2 is-valid" placeholder="Total" th:field="${entidad.totalPesoGuia}"  maxlength="12" style="background-color: #ECECEC;" disabled="disabled" />
+								</th>
+								
+							</tr>
+						</table>
+					</div>
+					<div id="c_tablas" th:if="${#lists.isEmpty(entidad.listaFacturaAsociada)}">				
+						<table id="t01" class="table   table-bordered table-active tabla_cabecera_general">
+							<tr>
+								<th width="20%">Factura Asociada</th>
+								<th width="25%">Cliente</th>
+								<th width="30%">Descripci&oacute;n Producto</th>
+								<th width="10%">Unidad</th>
+								<th width="10%">Cantidad</th>
+								<th width="10%">Peso (KG)</th>
+							</tr>
+							<tr class="campos2" onMouseOver="this.className='camposF'" onMouseOut="this.className='camposFi'">
+								<td colspan="6" align="center">No se encontr&oacute; elementos</td>
+							</tr>
+						</table>
+					</div>
+					<br></br>
+					
+						
+							
+					
+			  	</div>
+			</form>
+
+		</div>
+	</main>
+	<nav id="nav" >
+		<!--/*/ <th:block th:include="fragments/util :: menu"></th:block> /*/-->
+	</nav>	
+</body>
+</html>

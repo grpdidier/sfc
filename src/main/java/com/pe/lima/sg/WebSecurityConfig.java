@@ -35,6 +35,7 @@ import com.pe.lima.sg.dao.mantenimiento.ICatalogoDAO;
 import com.pe.lima.sg.dao.mantenimiento.IEmpresaDAO;
 import com.pe.lima.sg.dao.mantenimiento.IParametroDAO;
 import com.pe.lima.sg.dao.mantenimiento.IProductoDAO;
+import com.pe.lima.sg.dao.mantenimiento.ISerieDAO;
 import com.pe.lima.sg.dao.mantenimiento.ITransporteDAO;
 import com.pe.lima.sg.dao.mantenimiento.IUbigeoDAO;
 import com.pe.lima.sg.dao.operacion.IConfiguracionDAO;
@@ -46,6 +47,7 @@ import com.pe.lima.sg.entity.mantenimiento.TblCatalogo;
 import com.pe.lima.sg.entity.mantenimiento.TblEmpresa;
 import com.pe.lima.sg.entity.mantenimiento.TblParametro;
 import com.pe.lima.sg.entity.mantenimiento.TblProducto;
+import com.pe.lima.sg.entity.mantenimiento.TblSerie;
 import com.pe.lima.sg.entity.mantenimiento.TblTransporte;
 import com.pe.lima.sg.entity.mantenimiento.TblUbigeo;
 import com.pe.lima.sg.entity.operacion.TblComprobante;
@@ -79,6 +81,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Autowired
 	private IUbigeoDAO ubigeoDao;
+	
+	@Autowired
+	private ISerieDAO serieDao;
 	
 	 private static final Logger LOGGER = LoggerFactory.getLogger(WebSecurityConfig.class);
 		
@@ -314,7 +319,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				List<TblEmpresa> listaEmpresa					= null;
 				Map<String, Object> mapEmpresa					= null;
 				Integer codigoEntidad 							= null;
-				
+				List<TblSerie> listaSerie 						= null;
 				try{
 					LOGGER.debug("[obtenerValoresCatalogo] inicio");
 					//Para la EDS
@@ -475,6 +480,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						
 						//Lista completa de la tabla de catalogo
 						request.getSession().setAttribute("SessionListCatalogo", listaCatalogo);
+						//Numeros de serie
+						//codigoEntidad = ((TblUsuario)request.getSession().getAttribute("UsuarioSession") ).getTblEmpresa().getCodigoEntidad() ;
+						listaSerie = serieDao.buscarAllxTipo(Constantes.TIPO_COMPROBANTE_GUIA_REMISION, codigoEntidad);
+						request.getSession().setAttribute("SessionListSeriexEmpresa", listaSerie);
 					}
 					
 					
@@ -567,6 +576,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						}
 					}
 					request.getSession().setAttribute("SessionMapTransporte",mapTransporte);
+					
+					/*Cargamos los tipos de origen de la factura*/
+					request.getSession().setAttribute("SessionTipoOrigenFactura", listaUtil.obtenerTipoOrigenFactura());
+					
+					
 					LOGGER.debug("[obtenerValoresCatalogo] Fin");
 				}catch(Exception e){
 					e.printStackTrace();

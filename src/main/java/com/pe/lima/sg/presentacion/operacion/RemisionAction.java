@@ -11,6 +11,10 @@ import static com.pe.lima.sg.dao.operacion.ComprobanteSpecifications.conNumero;
 import static com.pe.lima.sg.dao.operacion.RemisionSpecifications.conCodigoEmpresaRemision;
 import static com.pe.lima.sg.dao.operacion.RemisionSpecifications.conEstadoRemision;
 import static com.pe.lima.sg.dao.operacion.RemisionSpecifications.conNumeroRemision;
+import static com.pe.lima.sg.dao.operacion.RemisionSpecifications.conNumeroDocumentoCliente;
+import static com.pe.lima.sg.dao.operacion.RemisionSpecifications.conFlagFacturaOkNull;
+import static com.pe.lima.sg.dao.operacion.RemisionSpecifications.conFlagFacturaOkSinCompletar;
+import static com.pe.lima.sg.dao.operacion.RemisionSpecifications.conNoEstadoOperacionRemision;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -129,6 +133,8 @@ public class RemisionAction {
 	private String urlPaginado = "/operacion/remision/paginado/"; 
 
 	private String urlPaginadoRemision = "/operacion/remision/principal/paginado/"; 
+	
+	private String urlPaginadoGreRemision = "/operacion/remision/principal/Gre/paginado/"; 
 
 	@RequestMapping(value = "/operacion/remision", method = RequestMethod.GET)
 	public String traerRegistros(Model model, String path,  PageableSG pageable, HttpServletRequest request) {
@@ -168,6 +174,53 @@ public class RemisionAction {
 		log.debug("[traerRegistrosFiltradosRemision] Fin");
 		return path;
 	}
+	@RequestMapping(value = "/operacion/remision/q/Gre", method = RequestMethod.POST)
+	public String traerRegistrosFiltradosRemisionParaFactura(Model model, Filtro filtro,  PageableSG pageable, String path, HttpServletRequest request) {
+		path = "operacion/sfs12/sfs_gre_rem_listado";
+		try{
+			log.debug("[traerRegistrosFiltradosRemisionParaFactura] Inicio");
+			this.listarRemisionxCliente(model, filtro, pageable, urlPaginadoGreRemision, request);
+			request.getSession().setAttribute("sessionFiltroRemisionCriterio", filtro);
+			model.addAttribute("filtro", filtro);
+			log.debug("[traerRegistrosFiltradosRemisionParaFactura] Fin");
+		}catch(Exception e){
+			log.debug("[traerRegistrosFiltradosRemisionParaFactura] Error: "+e.getMessage());
+			e.printStackTrace();
+			model.addAttribute("respuesta", "Se produco un Error:"+e.getMessage());
+		}
+		log.debug("[traerRegistrosFiltradosRemisionParaFactura] Fin");
+		return path;
+	}
+	/*** Listado de Remisiones ***/
+	private void listarRemisionxCliente(Model model, Filtro filtro,  PageableSG pageable, String url, HttpServletRequest request){
+		List<TblRemision> entidades = new ArrayList<TblRemision>();
+		Sort sort = new Sort(new Sort.Order(Direction.DESC, "numero"));
+		Integer codigoEntidad	= null;
+		try{
+			codigoEntidad = ((TblUsuario)request.getSession().getAttribute("UsuarioSession") ).getTblEmpresa().getCodigoEntidad() ;
+			log.debug("[listarRemisionxCliente] Inicio:"+filtro.getRuc());
+			Specification<TblRemision> criterio = Specifications.where(conNumeroRemision(filtro.getNumero()))
+					.and(conCodigoEmpresaRemision(codigoEntidad))
+					.and(conNumeroDocumentoCliente(filtro.getRuc()))
+					.and(conFlagFacturaOkNull()).or(conFlagFacturaOkSinCompletar())
+					.and(conNoEstadoOperacionRemision(Constantes.ESTADO_XML_ANULADO)) //Guia anulada
+					.and(conEstadoRemision(Constantes.ESTADO_REGISTRO_ACTIVO));
+			pageable.setSort(sort);
+
+			Page<TblRemision> entidadPage = remisionDao.findAll(criterio, pageable);
+			PageWrapper<TblRemision> page = new PageWrapper<TblRemision>(entidadPage, url, pageable);
+			model.addAttribute("registros", page.getContent());
+			request.getSession().setAttribute("ListadoConsultaRemision",page.getContent());
+			model.addAttribute("page", page);
+			request.getSession().setAttribute("PageRemisionPrincipal",page);
+			log.debug("[listarRemisionxCliente] entidades:"+entidades);
+			request.getSession().setAttribute("SessionPrincipalPageabeSG", pageable);
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			entidades = null;
+		}
+	}
 	/*** Listado de Remisiones ***/
 	private void listarRemision(Model model, Filtro filtro,  PageableSG pageable, String url, HttpServletRequest request){
 		List<TblRemision> entidades = new ArrayList<TblRemision>();
@@ -204,7 +257,8 @@ public class RemisionAction {
 			entidad = new RemisionBean();
 			entidad.setRemision(new TblRemision());
 			entidad.getRemision().setTipoTransporte(Constantes.TIPO_TRANSPORTE_PUBLICO);
-			this.obtenerSerieRemision(entidad, request);
+			//this.obtenerSerieRemision(entidad, request); //Se comenta porque ahora se setea una nueva serie para el tipo de traslado OTROS
+			this.obtenerSerieRemisionxTipoOperacion(entidad,request,"GENERAL");
 			this.inicializaDatosRemision(entidad);
 			entidad.setRuc(Constantes.SUNAT_RUC_EMISOR);
 			model.addAttribute("entidad", entidad);
@@ -217,6 +271,41 @@ public class RemisionAction {
 		}
 		return "operacion/remision/rem_nuevo";
 	}
+	//Se setea la seri según el tipo de traslado (operacion)
+	private void obtenerSerieRemisionxTipoOperacion(RemisionBean entidad, HttpServletRequest request, String TipoOperacion) {
+		List<TblSerie> listaSerie 				= null;
+		try{
+			//listaSerie = (List<TblSerie>)request.getSession().getAttribute("SessionListSeriexEmpresa") ;
+			Integer codigoEntidad = ((TblUsuario)request.getSession().getAttribute("UsuarioSession") ).getTblEmpresa().getCodigoEntidad() ;
+			listaSerie = serieDao.buscarAllxTipo(Constantes.TIPO_COMPROBANTE_GUIA_REMISION, codigoEntidad);
+			if (listaSerie!=null){
+				for(TblSerie serie:listaSerie){
+					if ("OTROS".equals(TipoOperacion) ) {
+						if (serie.getTipoOperacion() !=null && serie.getTipoOperacion().equals("OTROS")){
+							entidad.getRemision().setSerie(serie.getPrefijoSerie());
+							entidad.getRemision().setNumero(String.format("%08d", serie.getSecuencialSerie()));
+							break;	
+						}
+					}else  if ("GENERAL".equals(TipoOperacion) ) {
+						if ( serie.getTipoOperacion() == null || serie.getTipoOperacion().equals("") || serie.getTipoOperacion().equals("GENERAL")) {
+							entidad.getRemision().setSerie(serie.getPrefijoSerie());
+							entidad.getRemision().setNumero(String.format("%08d", serie.getSecuencialSerie()));
+							break;
+						}
+					}
+				}
+			}else {
+				entidad.getRemision().setSerie("");
+				entidad.getRemision().setNumero("");
+				
+			}
+
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+	}
+
 	/*********************************************************************************************************************************/
 	/*Sección de Asociacion de Facturas
 	/*********************************************************************************************************************************/
@@ -688,7 +777,8 @@ public class RemisionAction {
 			List<TblProducto> listaProductoSistema = (List<TblProducto>)request.getSession().getAttribute("SessionListaProductoxEntidad");
 			actualizarFaltantes(entidadOriginal,entidad,request);
 			//obtener serie
-			obtenerSerieRemision(entidadOriginal, request);
+			//obtenerSerieRemision(entidadOriginal, request);//Comentado porque ahora se asigna la serie según el motivo de traslado
+			this.validaMotivoTransladoAsignaSerie(entidadOriginal, request);
 			if (okDatosRemision(entidadOriginal, model)) {
 				entidadOriginal.getRemision().setAuditoriaCreacion(request);
 				
@@ -698,7 +788,7 @@ public class RemisionAction {
 				grabarFacturaAsociadaDetallexComprobante(entidadOriginal, remision,listaProductoSistema,request, entidad);
 
 				//Actualizar serie
-				incrementarNumeroSerie(request);
+				incrementarNumeroSerie(request,entidadOriginal.getRemision().getMotivoTraslado());
 				Filtro filtro = new Filtro();
 				filtro.setNumero(remision.getNumero());
 				request.getSession().setAttribute("sessionFiltroRemisionCriterio", filtro);
@@ -852,6 +942,64 @@ public class RemisionAction {
 			model.addAttribute("entidad", entidad);
 			
 			log.debug("[verRemision] Fin");
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return path;
+	}
+	@RequestMapping(value = "/operacion/remision/ver/Gre/{id}", method = RequestMethod.GET)
+	public String verRemisionParaFactura(@PathVariable Integer id, Model model, HttpServletRequest request) {
+		RemisionBean entidad 							= null;
+		String path										= null;
+		TblRemision remision 							= null;
+		List<TblFacturaAsociada> listaFacturaAsociada 	= null;
+		//List<ComprobanteBean> listaComprobante			= null;
+		//ComprobanteBean comprobanteBean					= null;
+		List<FacturaAsociadaBean> listaFacAsoVer		= null;
+		FacturaAsociadaBean facturaBean					= null;
+		List<TblDetalleRemision> listaDetRemision		= null;
+		//List<TblDetalleComprobante> listaDetComprobante	= null;
+		//Map<Integer,TblDetalleComprobante> mapDetComprobante = new HashMap<>();
+		BigDecimal total 								= new BigDecimal("0");
+		try{
+			log.debug("[verRemisionParaFactura] Inicio");
+			//Leer los comprobantes - detalle y armar la presentación
+			entidad = new RemisionBean();
+			path = "operacion/sfs12/sfs_gre_rem_ver";
+			remision = remisionDao.findOne(id);
+			listaFacturaAsociada = facturaAsociadaDao.findAllxIdRemision(remision.getCodigoRemision());
+			if (listaFacturaAsociada!=null) {
+				listaFacAsoVer = new ArrayList<>();
+				for(TblFacturaAsociada factura: listaFacturaAsociada) {
+					listaDetRemision = detalleRemisionDao.findAllxIdFacturaAsociada(factura.getCodigoFacturaAsociada());
+					for(TblDetalleRemision detRemision: listaDetRemision) {
+						facturaBean = new FacturaAsociadaBean();
+						String[] serieNumero = obtenerDatosSerieNumero(factura.getObservacion(),factura.getCodigoComprobante());
+						facturaBean.setSerieFactura(serieNumero[0]);
+						facturaBean.setNumeroFactura(serieNumero[1]);
+						facturaBean.setCodigoComprobante(factura.getCodigoComprobante());
+						facturaBean.setNombreCliente(remision.getNombreCliente());
+						facturaBean.setDescripcion(detRemision.getDescripcion());
+						facturaBean.setUnidadMedida(detRemision.getUnidadMedida());
+						facturaBean.setCantidad(detRemision.getCantidad());
+						facturaBean.setPeso(detRemision.getPeso()==null?new BigDecimal("0"):detRemision.getPeso());
+						listaFacAsoVer.add(facturaBean);
+						
+					}
+					total = total.add(factura.getPesoTotal());
+				}
+			}
+			entidad.setRemision(remision);
+			entidad.setListaFacturaAsociada(listaFacAsoVer);
+			if (remision.getPesoTotal()!=null) {
+				entidad.setTotalPesoGuia(remision.getPesoTotal());
+			}else {
+				entidad.setTotalPesoGuia(total);
+			}
+			
+			model.addAttribute("entidad", entidad);
+			
+			log.debug("[verRemisionParaFactura] Fin");
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -1444,6 +1592,7 @@ public class RemisionAction {
 				detRemision.setCodigoProducto(detComprobante.getCodigoProducto());
 				detRemision.setAuditoriaCreacion(request);
 				detRemision.setCodigoDetalleComprobante(detComprobante.getCodigoDetalle());
+				detRemision.setPrecioReporte(detComprobante.getPrecioUnitario());
 				listaDetalleRemision.add(detRemision);
 			}
 		}
@@ -1453,7 +1602,8 @@ public class RemisionAction {
 
 
 
-	private void obtenerSerieRemision(RemisionBean entidad , HttpServletRequest request){
+	/* Se comenta porque la serie se asigna por el motivo de traslado
+	 * private void obtenerSerieRemision(RemisionBean entidad , HttpServletRequest request){
 		Integer codigoEntidad 					= null;
 		List<TblSerie> listaSerie 				= null;
 		try{
@@ -1470,26 +1620,54 @@ public class RemisionAction {
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-	}
+	}*/
 
-	private void incrementarNumeroSerie(HttpServletRequest request) {
+	private void incrementarNumeroSerie(HttpServletRequest request, String codigoMotivoTraslado) {
 		Integer codigoEntidad 					= null;
 		List<TblSerie> listaSerie 				= null;
 		try{
+			log.info("[incrementarNumeroSerie] Inicio");
 			codigoEntidad = ((TblUsuario)request.getSession().getAttribute("UsuarioSession") ).getTblEmpresa().getCodigoEntidad() ;
 			listaSerie = serieDao.buscarAllxTipo(Constantes.TIPO_COMPROBANTE_GUIA_REMISION, codigoEntidad);
+			String motivoTraslado = "";
+			log.info("[incrementarNumeroSerie] codigoMotivoTraslado:"+codigoMotivoTraslado);
+			if (codigoMotivoTraslado.equals("13")) {
+				motivoTraslado = "OTROS";
+			}else {
+				motivoTraslado = "GENERAL";
+			}
+			log.info("[incrementarNumeroSerie] motivoTraslado:"+motivoTraslado);
 			if (listaSerie!=null){
 				for(TblSerie serie:listaSerie){
-					Integer numero = serie.getSecuencialSerie();
-					numero++;
-					String numeroFormateado = String.format("%08d", numero);
-					serie.setNumeroComprobante(numeroFormateado);
-					serie.setSecuencialSerie(numero);
-					serieDao.save(serie);
-					break;
+					log.info("[incrementarNumeroSerie] serie.getTipoOperacion():"+serie.getTipoOperacion());
+					if ("OTROS".equals(motivoTraslado)) {
+						if (serie.getTipoOperacion() != null && serie.getTipoOperacion().equals("OTROS")) {
+							Integer numero = serie.getSecuencialSerie();
+							numero++;
+							String numeroFormateado = String.format("%08d", numero);
+							serie.setNumeroComprobante(numeroFormateado);
+							serie.setSecuencialSerie(numero);
+							serieDao.save(serie);
+							log.info("[incrementarNumeroSerie] OTROS numero:"+numero);
+							break;
+						}
+					}
+					if ("GENERAL".equals(motivoTraslado)) {
+						if (serie.getTipoOperacion() == null || serie.getTipoOperacion().equals("")) {
+							Integer numero = serie.getSecuencialSerie();
+							numero++;
+							String numeroFormateado = String.format("%08d", numero);
+							serie.setNumeroComprobante(numeroFormateado);
+							serie.setSecuencialSerie(numero);
+							serieDao.save(serie);
+							log.info("[incrementarNumeroSerie] GENERAL numero:"+numero);
+							break;
+						}
+					}
+					
 				}
 			}
-
+			log.info("[incrementarNumeroSerie] Fin");
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -1689,6 +1867,45 @@ public class RemisionAction {
 		return path;
 	}
 	/*********************************************************************************************************************************/
+	/*Sección de Paginado - Factura
+	/*********************************************************************************************************************************/
+	
+	@RequestMapping(value = "/operacion/remision/principal/Gre/paginado/{page}/{size}/{operacion}", method = RequestMethod.GET)
+	public String paginarPrincipalGreEntidad(@PathVariable Integer page, @PathVariable Integer size, @PathVariable String operacion, Model model,  PageableSG pageable, HttpServletRequest request) {
+		Filtro filtro = null;
+		String path = null;
+		try{
+			log.debug("[paginarPrincipalGreEntidad] Inicio");
+			path = "operacion/sfs12/sfs_gre_rem_listado";
+			if (pageable!=null){
+				if (pageable.getLimit() == 0){
+					pageable.setLimit(size);
+				}
+				if (pageable.getOffset()== 0){
+					pageable.setOffset(page*size);
+				}
+				if (pageable.getOperacion() ==null || pageable.getOperacion().equals("")){
+					pageable.setOperacion(operacion);
+				}
+
+			}
+			filtro = (Filtro)request.getSession().getAttribute("sessionFiltroRemisionCriterio");
+			model.addAttribute("filtro", filtro);
+			this.listarRemisionxCliente(model, filtro, pageable,this.urlPaginadoGreRemision, request);
+			request.getSession().setAttribute("SessionPrincipalIntegerPage", page);
+			request.getSession().setAttribute("SessionPrincipalIntegerSize", size);
+			request.getSession().setAttribute("SessionPrincipalStringOperacion", operacion);
+
+			log.debug("[paginarPrincipalGreEntidad] Fin");
+		}catch(Exception e){
+			log.debug("[paginarPrincipalGreEntidad] Error:"+e.getMessage());
+			e.printStackTrace();
+		}finally{
+			filtro = null;
+		}
+		return path;
+	}
+	/*********************************************************************************************************************************/
 	/*Sección de Retorno
 	/*********************************************************************************************************************************/
 	/*** Retorna a la consulta de facturas ***/
@@ -1711,6 +1928,7 @@ public class RemisionAction {
 
 		return path;
 	}
+	
 	/*Retorna a la pantalla de nueva remision*/
 	@RequestMapping(value = "/operacion/remision/regresar", method = RequestMethod.GET)
 	public String regresarNuevoRemision(Model model, Filtro filtro, String path, HttpServletRequest request) {
@@ -1748,6 +1966,26 @@ public class RemisionAction {
 
 		return path;
 	}
+	/*Retorna a la pantalla de guias de remision*/
+	@RequestMapping(value = "/operacion/regresar/Gre", method = RequestMethod.GET)
+	public String regresarRemisionConFactura(Model model, Filtro filtro, String path, HttpServletRequest request) {
+		try{
+			log.debug("[regresarRemisionConFactura] Inicio");
+			path = "operacion/sfs12/sfs_gre_rem_listado";
+			model.addAttribute("filtro", request.getSession().getAttribute("sessionFiltroRemisionCriterio"));
+			model.addAttribute("page", request.getSession().getAttribute("PageRemisionPrincipal"));
+			model.addAttribute("registros", request.getSession().getAttribute("ListadoConsultaRemision"));
+
+			log.debug("[regresarRemisionConFactura] Fin");
+		}catch(Exception e){
+			log.debug("[regresarRemisionConFactura] Error:"+e.getMessage());
+			e.printStackTrace();
+		}finally{
+			filtro = null;
+		}
+
+		return path;
+	}
 	/*********************************************************************************************************************************/
 	/*Motivo de Traslado
 	/*********************************************************************************************************************************/
@@ -1759,16 +1997,18 @@ public class RemisionAction {
 			
 			path = "operacion/remision/rem_nuevo";
 			String motivoTraslado = entidad.getRemision().getMotivoTraslado();
-			String serie = entidad.getRemision().getSerie();
-			String numero = entidad.getRemision().getNumero();
+			//String serie = entidad.getRemision().getSerie();
+			//String numero = entidad.getRemision().getNumero();
 			entidad = new RemisionBean();
 			entidad.setRemision(new TblRemision());
 			entidad.getRemision().setTipoTransporte(Constantes.TIPO_TRANSPORTE_PUBLICO);
 			//this.obtenerSerieRemision(entidad, request);
 			this.inicializaDatosRemision(entidad);
 			entidad.getRemision().setMotivoTraslado(motivoTraslado);
-			entidad.getRemision().setSerie(serie);
-			entidad.getRemision().setNumero(numero);
+			//entidad.getRemision().setSerie(serie);
+			//entidad.getRemision().setNumero(numero);
+			this.validaMotivoTransladoAsignaSerie(entidad,request);
+			
 			entidad.setRuc(Constantes.SUNAT_RUC_EMISOR);
 			model.addAttribute("entidad", entidad);
 			request.getSession().setAttribute("guiaRemisionSession", entidad);
@@ -1779,7 +2019,17 @@ public class RemisionAction {
 		}
 		return path;
 	}
-	
+	//Asigna segun el motivo de traslado la serie
+	private void validaMotivoTransladoAsignaSerie(RemisionBean entidad, HttpServletRequest request) {
+		String motivoTraslado = entidad.getRemision().getMotivoTraslado();
+		if (motivoTraslado.equals("13")) {
+			this.obtenerSerieRemisionxTipoOperacion(entidad,request,"OTROS");
+		}else {
+			this.obtenerSerieRemisionxTipoOperacion(entidad,request,"GENERAL");
+		}
+		
+	}
+
 	/*********************************************************************************************************************************/
 	/*Muestra la pantalla para asignar transporte
 	/*********************************************************************************************************************************/

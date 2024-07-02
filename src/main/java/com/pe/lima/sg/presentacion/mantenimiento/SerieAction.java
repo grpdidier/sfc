@@ -310,6 +310,7 @@ public class SerieAction extends BaseOperacionPresentacion<TblSerie> {
 			entidadEnBd.setTipoComprobante(entidad.getTipoComprobante());
 			entidadEnBd.setNumeroComprobante(entidad.getNumeroComprobante());
 			entidadEnBd.setDescripcion(entidad.getDescripcion());
+			entidadEnBd.setTipoOperacion(entidad.getTipoOperacion());
 			this.preEditar(entidadEnBd, request);
 			boolean exitoso = super.guardar(entidadEnBd, model);
 			LOGGER.debug("[guardarEntidad] Guardado..." );
